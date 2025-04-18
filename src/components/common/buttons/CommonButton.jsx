@@ -10,7 +10,7 @@ const CommonButton = ({
     <button
       type={type}
       style={style}
-      className={`${"common-btn"} ${className}`}
+      className={`${"common-btn "} ${className}`}
       onClick={onClick}
       {...args}
     >
