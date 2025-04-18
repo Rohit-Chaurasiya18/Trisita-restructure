@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
   }
   return {
     plugins: [react()],
+    base: '/',
     // Server Configuration
     server: {
       watch: {
