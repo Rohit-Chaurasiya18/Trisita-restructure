@@ -28,6 +28,8 @@ const routesConstants = {
   CALENDAR: "/calendar",
   FAQ: "/faq",
   LOGIN: "/login",
+  PROFILE: "/profile",
+  CHANGE_PASSWORD: "/change_password",
   UNAUTHORIZED: "/unauthorized",
   _404: "*",
 };

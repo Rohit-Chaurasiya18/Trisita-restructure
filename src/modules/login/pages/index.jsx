@@ -75,21 +75,6 @@ const Login = () => {
           <h1>Welcome to Trisita</h1>
         </div>
         <form onSubmit={handleSubmit}>
-          {/* <div className="formGroup">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Enter your email address"
-              value={values.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            {touched.email && errors.email ? (
-              <div className="error">{errors.email}</div>
-            ) : null}
-          </div> */}
           <div className="formGroup">
             <CommonInputTextField
               labelName="Email Address"
@@ -103,21 +88,6 @@ const Login = () => {
               errorText={errors.email}
             />
           </div>
-          {/* <div className="formGroup">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              value={values.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            {touched.password && errors.password ? (
-              <div className="error">{errors.password}</div>
-            ) : null}
-          </div> */}
           <div className="formGroup">
             <CommonInputTextField
               labelName="Password"

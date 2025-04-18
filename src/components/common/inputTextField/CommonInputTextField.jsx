@@ -16,9 +16,10 @@ const CommonInputTextField = (
     className = "",
     placeHolder = "",
     isDisabled = false,
-    errorClass="",
+    errorClass = "",
     name = "",
     mainDiv = "",
+    labelClass = "",
     ...inputProps
   },
   ref
@@ -31,7 +32,7 @@ const CommonInputTextField = (
   return (
     <div className={mainDiv}>
       {labelName && (
-        <label className="form-label">
+        <label className={`form-label ${labelClass}`}>
           {labelName}
           {required && <span className="text-danger"> *</span>}
         </label>
@@ -65,7 +66,7 @@ const CommonInputTextField = (
           />
         </span>
       )}
-       {isInvalid && errorText && (
+      {isInvalid && errorText && (
         <div className={`invalid-feedback ${errorClass}`}>{errorText}</div>
       )}
     </div>

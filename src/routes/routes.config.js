@@ -7,6 +7,8 @@ import {
   Insight_metrics_v2,
   Alert_subscription,
   Get_usage,
+  Profile,
+  ChangePassword,
 } from "./routeImports";
 
 const routesConfig = {
@@ -127,6 +129,14 @@ const routesConfig = {
     {
       path: routesConstants.FAQ,
       component: Dashboard,
+    },
+    {
+      path: routesConstants.PROFILE + `/:id`,
+      component: Profile,
+    },
+    {
+      path: routesConstants?.CHANGE_PASSWORD,
+      component: ChangePassword,
     },
   ],
   public: [{ path: routesConstants?.LOGIN, component: Login }],

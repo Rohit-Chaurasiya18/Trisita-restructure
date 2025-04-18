@@ -31,7 +31,7 @@ const Layout = () => {
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} isMobileView={isMobileView} setIsMobileView ={setIsMobileView}/>
       <div className="main-content">
         <Header setIsOpen={setIsOpen} isOpen={isOpen} isMobileView={isMobileView} setIsMobileView ={setIsMobileView}/>
-        <div className="content">
+        <div className="content p-4">
           <Outlet />
         </div>
         {/* <Footer /> */}

@@ -61,7 +61,7 @@
       transition: all 0.3s ease;
 
       &:hover {
-        background: var(--primary-color);
+        background: var(--custom-hover-primary);
         color: white;
       }
     }
@@ -133,4 +133,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+.notification-icon {
+  cursor: pointer;
 }

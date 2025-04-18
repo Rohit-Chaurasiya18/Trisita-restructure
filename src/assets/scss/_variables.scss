@@ -23,16 +23,15 @@ $color-red: red;
   --primary-color: #854d0e;
   --primary-hover: #337383;
   --primary-bg-color: #cfedec;
+  --custom-hover-primary: #fffff;
   --border-color: #e2e8f0;
   --input-background: #ffffff;
   --primary-rgb: 66, 153, 225;
-  --tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --tw-ring-shadow: 0 0 #0000;
   --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-bg-opacity:0.5
-
-  // Dark theme
-  &[data-theme="dark"] {
+  --tw-bg-opacity: 0.5 // Dark theme
+    &[data-theme= "dark"] {
     --background-color: #1a202c;
     --card-background: #2d3748;
     --text-primary: #e2e8f0;
