@@ -6,11 +6,11 @@ export default defineConfig(({ mode }) => {
   let outDir = "build"; // Default output directory
   // Customize output directory based on the mode
   if (mode === "development") {
-    outDir = "dist-dev";
+    outDir = "dist";
   } else if (mode === "uat") {
-    outDir = "dist-uat";
+    outDir = "dist";
   } else if (mode === "production") {
-    outDir = "dist-prod";
+    outDir = "dist";
   }
   return {
     plugins: [react()],
