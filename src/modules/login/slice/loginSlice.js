@@ -5,12 +5,11 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import { LOGIN } from "@/services/url";
 
-const token = Cookies.get(cookieKeys?.TOKEN) || localStorage.getItem("token");
+const token = Cookies.get(cookieKeys?.TOKEN);
 const user = Cookies.get(cookieKeys?.USER);
 
 const loginState = {
   isAuth: !!token,
-  // isAuth:false,
   token: token ? token : "",
   pageLoader: false,
   userDetail: user,
@@ -28,7 +27,6 @@ export const getLogin = createAsyncThunk(
       return true;
     } catch (err) {
       Cookies.set(cookieKeys?.TOKEN, "thisisfaketoken");
-      localStorage.setItem("token" , "thisisfaketoken")
       // toast.error(err?.response?.data?.message || somethingWentWrong);
       return true
       // return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
@@ -65,7 +63,7 @@ const loginSlice = createSlice({
     //login
     builder.addCase(getLogin.pending, (state) => {
       state.loading = true;
-      state.isAuth = true;
+      // state.isAuth = true;
     });
     builder.addCase(getLogin.fulfilled, (state) => {
       state.loading = false;

@@ -8,9 +8,7 @@ export default defineConfig(({ mode }) => {
   // Customize output directory based on the mode
   if (mode === 'development') {
     outDir = 'dist';
-  } else if (mode === 'uat') {
-    outDir = 'dist';
-  } else if (mode === 'production') {
+  }else if (mode === 'production') {
     outDir = 'dist';
   }
 

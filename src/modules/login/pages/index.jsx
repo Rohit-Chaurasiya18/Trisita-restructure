@@ -50,16 +50,18 @@ const Login = () => {
         email: values.email?.trim(),
         password: values.password?.trim(),
       })
-    ).then(() => {
-      //Handle page loader
-      navigate(routesConstants?.DASHBOARD);
-      dispatch(setPageLoader(false));
-      setIsLoading(false);
-    }).catch(() =>  
-    {navigate(routesConstants?.DASHBOARD)
-    dispatch(setPageLoader(false))
-    setIsLoading(false)}
-    );
+    )
+      .then(() => {
+        //Handle page loader
+        navigate(routesConstants?.DASHBOARD);
+        dispatch(setPageLoader(false));
+        setIsLoading(false);
+      })
+      .catch(() => {
+        navigate(routesConstants?.DASHBOARD);
+        dispatch(setPageLoader(false));
+        setIsLoading(false);
+      });
   };
 
   const { values, touched, errors, handleSubmit, handleChange, handleBlur } =
