@@ -55,7 +55,11 @@ const Login = () => {
       navigate(routesConstants?.DASHBOARD);
       dispatch(setPageLoader(false));
       setIsLoading(false);
-    });
+    }).catch(() =>  
+    {navigate(routesConstants?.DASHBOARD)
+    dispatch(setPageLoader(false))
+    setIsLoading(false)}
+    );
   };
 
   const { values, touched, errors, handleSubmit, handleChange, handleBlur } =

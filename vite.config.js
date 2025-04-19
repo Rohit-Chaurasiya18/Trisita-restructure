@@ -3,18 +3,20 @@ import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  let outDir = "build"; // Default output directory
+  let outDir = 'build'; // Default output directory
+
   // Customize output directory based on the mode
-  if (mode === "development") {
-    outDir = "dist";
-  } else if (mode === "uat") {
-    outDir = "dist";
-  } else if (mode === "production") {
-    outDir = "dist";
+  if (mode === 'development') {
+    outDir = 'dist';
+  } else if (mode === 'uat') {
+    outDir = 'dist';
+  } else if (mode === 'production') {
+    outDir = 'dist';
   }
+
   return {
     plugins: [react()],
-    base: '/',
+    
     // Server Configuration
     server: {
       watch: {
@@ -22,13 +24,16 @@ export default defineConfig(({ mode }) => {
       },
       port: 3000,
       host: true, // Allows external access for testing on multiple devices
+      
     },
+    
     // Module Resolution
     resolve: {
       alias: {
         "@": "/src", // Cleaner alias definition
       },
     },
+    
     // CSS Preprocessor Configuration
     css: {
       preprocessorOptions: {
@@ -37,11 +42,13 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    
     // Build Configuration
     build: {
       outDir: outDir, // Output directory based on mode
       chunkSizeWarningLimit: 1600, // Custom chunk size limit warning
-      sourcemap: mode !== "production", // Enable sourcemaps only for non-prod builds
+      sourcemap: mode !== 'production', // Enable sourcemaps only for non-prod builds
     },
+   
   };
 });

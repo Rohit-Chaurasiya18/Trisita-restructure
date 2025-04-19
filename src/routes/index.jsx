@@ -74,7 +74,6 @@ const createNestedRoutes = (routes, RouteType) => {
 const Routes = () => {
   const { isAuth } = useSelector((state) => state.login);
   const { common, private: privateRoutes, public: publicRoutes } = routesConfig;
-  
   return (
     <ReactRouterDomRoutes>
       {isAuth ? (
