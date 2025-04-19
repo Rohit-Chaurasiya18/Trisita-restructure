@@ -17,7 +17,7 @@ export const getUserProfile = createAsyncThunk(
       console.log(response);
     } catch (err) {
       console.log(err);
-      toast.error(err?.response?.data?.message || somethingWentWrong);
+      // toast.error(err?.response?.data?.message || somethingWentWrong);
       return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
     }
   }
