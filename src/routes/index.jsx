@@ -86,7 +86,10 @@ const Routes = () => {
           <Route path="/" element={<Layout />}>
             {createNestedRoutes(privateRoutes, Private)}
           </Route>
-          <Route path="*" element={<Navigate to={routesConstants?.DASHBOARD} />} />
+          <Route
+            path="*"
+            element={<Navigate to={routesConstants?.DASHBOARD} />}
+          />
         </>
       ) : (
         <>

@@ -102,6 +102,27 @@
   background-color: #555;
 }
 
-.form-control.is-invalid{
+.form-control.is-invalid {
   background-image: none;
+}
+.suspense-loader-div {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    height: 150px;
+    width: 250px;
+  }
+}
+.common-breadcrum-msg {
+  margin: 0 px;
+  font-family: Source Sans Pro, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.334;
+  color: #3da58a;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
