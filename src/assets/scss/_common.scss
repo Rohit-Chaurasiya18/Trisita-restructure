@@ -126,3 +126,26 @@
 .cursor-pointer {
   cursor: pointer;
 }
+.commom-header-title {
+  margin: 0;
+  font-family: Source Sans Pro, sans-serif;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.2;
+  color: #141414;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.common-green-btn {
+  color: rgb(0 0 0 /1);
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  background-color: rgb(141 190 134 / 1);
+  width: 75px;
+  height: 45px;
+  &:hover {
+    background-color: rgb(141 190 134 / 1);
+  }
+}

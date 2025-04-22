@@ -8,6 +8,7 @@
   color: white;
   transition: transform 0.3s ease-in-out;
   overflow-y: auto;
+  z-index: 1;
 }
 .sidebar-open {
   display: block;

@@ -113,7 +113,9 @@
     width: 30%;
     margin-top: 25px;
     background-color: #f2f0f0;
-    height: fit-content;
+    max-height: 100vh;
+    overflow: auto;
+    cursor: pointer;
   }
 }
 .geography-span {
@@ -253,9 +255,9 @@
     display: grid;
   }
   .dashboard-filter {
-    display: grid;
+    display: flex;
     .MuiInputBase-root {
-      width: 480px !important;
+      width: 100px !important;
     }
     button {
       width: 480px !important;
@@ -266,7 +268,7 @@
 @media (max-width: 412px) {
   .dashboard-filter {
     .MuiInputBase-root {
-      width: 315px !important;
+      width: 80px !important;
     }
     button {
       width: 315px !important;
@@ -281,5 +283,16 @@
     button {
       width: 260px !important;
     }
+  }
+}
+@media (max-width: 344px) {
+  .header_content {
+    display: grid !important;
+  }
+  .header_right {
+    display: grid !important;
+  }
+  .dashboard-filter {
+    display: grid !important;
   }
 }

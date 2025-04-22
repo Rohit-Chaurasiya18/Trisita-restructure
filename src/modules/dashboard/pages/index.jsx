@@ -6,7 +6,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import { BarChart, GeographyChart, LineChart } from "../components";
 import { Tooltip } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   GetDashboardChart,
   GetDashboardData,
@@ -14,7 +14,6 @@ import {
 } from "../slice";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import CommonSelect from "@/components/common/dropdown/CommonSelect";
 
 const data = [
   {
@@ -26,54 +25,26 @@ const data = [
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const [filter, setFilter] = useState({
-    year: "",
-    csn: "",
-  });
+  const { filter } = useSelector((state) => ({
+    filter: state?.layout?.filter,
+  }));
 
   useEffect(() => {
-    dispatch(GetDashboardData({ id: "1" }));
-    dispatch(GetDashboardChart({ id: "2" }));
-    dispatch(GetSeatDateChart({ id: "3" }));
-  }, []);
-
-  const handleFilterChange = (key) => (event) => {
-    setFilter((prev) => ({
-      ...prev,
-      [key]: event.target.value,
-    }));
-  };
+    dispatch(GetDashboardData({ id: filter?.csn }));
+    dispatch(GetDashboardChart({ id: filter?.csn }));
+    dispatch(GetSeatDateChart({ id: filter?.csn }));
+  }, [filter?.csn]);
 
   return (
     <div className="">
       <div className="dashboard-header">
         <div>
-          <h3 className="mb-0">Dashboard</h3>
+          <h3 className="mb-0 commom-header-title">Dashboard</h3>
           <span className="common-breadcrum-msg">
             Welcome to your dashboard
           </span>
         </div>
         <div className="dashboard-filter">
-          <CommonSelect
-            value={filter.year}
-            onChange={handleFilterChange("year")}
-            placeholder="All Year"
-            options={[
-              { value: "ADSK FY 2025", label: "ADSK FY 2025" },
-              { value: "ADSK FY 2024", label: "ADSK FY 2024" },
-              { value: "ADSK FY 2023", label: "ADSK FY 2023" },
-            ]}
-          />
-          <CommonSelect
-            value={filter.csn}
-            onChange={handleFilterChange("csn")}
-            placeholder="All CSN"
-            options={[
-              { value: "5102086717", label: "5102086717" },
-              { value: "5117963549", label: "5117963549" },
-              { value: "1234567890", label: "1234567890" },
-            ]}
-          />
           <CommonButton className="download-report-btn">
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
             Download Reports
@@ -105,6 +76,35 @@ const Dashboard = () => {
           icon={PersonOffIcon}
           value={5}
           title="Inactive Accounts"
+          percentage={5.43}
+          isLink
+        />
+      </div>
+      <div className="dashboard-startCard">
+        <StatCard
+          icon={EmailIcon}
+          value={`₹3580311.55`}
+          title="Payment Overdue"
+          percentage={14}
+          isLink
+        />
+        <StatCard
+          icon={PointOfSaleIcon}
+          value={`₹3580311.55`}
+          title="Payment Outstanding"
+          percentage={21}
+        />
+        <StatCard
+          icon={PersonAddIcon}
+          value={`₹0`}
+          title="Payment Received"
+          percentage={94.57}
+          isLink
+        />
+        <StatCard
+          icon={PersonOffIcon}
+          value={25}
+          title="Invoice Pending"
           percentage={5.43}
           isLink
         />

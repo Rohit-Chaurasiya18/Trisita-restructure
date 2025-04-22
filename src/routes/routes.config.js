@@ -36,99 +36,99 @@ const routesConfig = {
     },
     {
       path: routesConstants.ACCOUNT,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.ADD_ACCOUNT,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.THIRD_PARTY_ACCOUNT,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.OPPORTUNITY,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.QUOTATION,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.SUBSCRIPTION,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.NEW_SUBSCRIPTION,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.DELETED_SUBSCRIPTION,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.CHANGED_LOG_SUBSCRIPTION,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.SUBSCRIPTION_DATA_COMPARISON,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.ORDER_LOADING_PO,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.ORDER_LOADING_DISTRIBUTOR,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.RA_ORDER,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.EXPORTED_FILE,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.PRODUCT_MASTER,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.PRODUCT,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.RUN_CAMPAIGN,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.CAMPAIGN_HISTORY,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.CAMPAIGN_HISTORY,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.CONTACT_INFORMATION,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.RENEW_HISTORY,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.PROFILE_FORM,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.CALENDAR,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.FAQ,
-      component: Dashboard,
+      component: Get_usage,
     },
     {
       path: routesConstants.PROFILE + `/:id`,
