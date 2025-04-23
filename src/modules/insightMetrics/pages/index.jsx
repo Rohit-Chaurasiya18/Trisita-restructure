@@ -9,8 +9,12 @@ import {
   withoutProparated,
   withProparated,
   risk,
+  processedData,
+  columns,
 } from "../constants";
 import ReactApexChart from "react-apexcharts";
+import CommonTable from "@/components/common/dataTable/CommonTable";
+import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 
 const CommonChart = ({ title, options, series }) => {
   return (
@@ -32,7 +36,7 @@ const InsightMetrics = () => {
   const handleStatusChange = () => {
     console.log("Status changed!");
   };
-
+  const getRowId = (row) => row.id;
   return (
     <>
       <div className="insight-metrics-header">
@@ -82,6 +86,23 @@ const InsightMetrics = () => {
           title="Retention Risk shows summary of the renewal risk for the subscription's contract"
           options={risk.options}
           series={risk.series}
+        />
+      </div>
+      <div className="table-container">
+        <ExportToExcel
+          data={processedData}
+          columns={columns}
+          fileName={`insight_trisita`}
+          className="insight-export-btn"
+        />
+        <h3 className="common-insight-title">Table Data</h3>
+        <CommonTable
+          rows={processedData}
+          columns={columns}
+          getRowId={getRowId}
+          checkboxSelection
+          toolbar
+          exportFileName={`insight_trisita`}
         />
       </div>
     </>

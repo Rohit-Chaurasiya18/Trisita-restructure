@@ -1,0 +1,20 @@
+.MuiDataGrid-footerContainer {
+  border-top: none !important;
+  background-color: #a4a9fc !important;
+}
+.MuiDataGrid-columnHeaders {
+  background-color: #a4a9fc !important;
+  border-top: none !important;
+}
+.MuiDataGrid-root {
+  --DataGrid-t-header-background-base: #a4a9fc !important;
+  border-radius: 0px !important;
+}
+@media (max-width: 599px) {
+  .MuiTablePagination-selectLabel {
+    display: block !important;
+  }
+  .MuiTablePagination-input {
+    display: flex !important;
+  }
+}
