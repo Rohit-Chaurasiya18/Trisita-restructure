@@ -59,8 +59,8 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
             <CommonSelect
               value={filter?.year}
               onChange={handleFilterChange("year")}
-              placeholder="All Year"
               options={[
+                { value: "All Year", label: "All Year" },
                 { value: "ADSK FY 2025", label: "ADSK FY 2025" },
                 { value: "ADSK FY 2024", label: "ADSK FY 2024" },
                 { value: "ADSK FY 2023", label: "ADSK FY 2023" },
@@ -69,8 +69,8 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
             <CommonSelect
               value={filter?.csn}
               onChange={handleFilterChange("csn")}
-              placeholder="All CSN"
               options={[
+                { value: "All CSN", label: "All CSN" },
                 { value: "5102086717", label: "5102086717" },
                 { value: "5117963549", label: "5117963549" },
                 { value: "1234567890", label: "1234567890" },

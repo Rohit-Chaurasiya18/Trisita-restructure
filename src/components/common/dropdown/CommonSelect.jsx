@@ -6,17 +6,21 @@ const CommonSelect = ({
   onChange,
   options = [],
   placeholder = "Select",
-  style = { height: "45px" },
+  sx = {},
+  defaultValue,
 }) => {
   return (
     <Select
       value={value}
       onChange={onChange}
+      placeholder={placeholder}
+      defaultValue={defaultValue}
       displayEmpty
       inputProps={{ "aria-label": "common select" }}
-      style={style}
+      // style={style}
+      sx={{ height: "45px", ...sx }}
     >
-      <MenuItem value="">{placeholder}</MenuItem>
+      {/* <MenuItem value="">{placeholder}</MenuItem> */}
       {options.map((opt) => (
         <MenuItem key={opt.value} value={opt.value}>
           {opt.label}

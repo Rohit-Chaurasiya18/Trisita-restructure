@@ -7,8 +7,8 @@ import { LOGIN } from "@/services/url";
 
 const layoutState = {
   filter: {
-    csn: "",
-    year: "",
+    csn: "All CSN",
+    year: "All Year",
   },
 };
 

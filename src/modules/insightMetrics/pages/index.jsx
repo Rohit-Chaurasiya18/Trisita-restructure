@@ -56,8 +56,10 @@ const InsightMetrics = () => {
 
           <CommonSelect
             onChange={handleStatusChange}
-            placeholder="All Status"
+            // placeholder="All Status"
+            value="All Status"
             options={statusOption}
+
           />
 
           <CommonAutocomplete

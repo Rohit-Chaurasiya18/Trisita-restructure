@@ -31,7 +31,6 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
     if (window.innerWidth < 769) {
       setIsMobileView(true);
     }
-    console.log(navigate);
   };
   return (
     <>

@@ -6,8 +6,10 @@ import {
   options,
   statusOption,
 } from "@/modules/insightMetrics/constants";
-import { product_aggrement, risk } from "../constants";
+import { processedData, product_aggrement, risk, columns } from "../constants";
 import ReactApexChart from "react-apexcharts";
+import ExportToExcel from "@/components/common/buttons/ExportToExcel";
+import CommonTable from "@/components/common/dataTable/CommonTable";
 
 const CommonChart = ({ title, options, series }) => {
   return (
@@ -29,6 +31,7 @@ const InsightMetricsV2 = () => {
   const handleStatusChange = () => {
     console.log("Status changed!");
   };
+  const getRowId = (row) => row.id;
   return (
     <>
       <div className="insight-metrics-header">
@@ -46,7 +49,7 @@ const InsightMetricsV2 = () => {
 
           <CommonSelect
             onChange={handleStatusChange}
-            placeholder="All Status"
+            value="All Status"
             options={statusOption}
           />
 
@@ -69,6 +72,23 @@ const InsightMetricsV2 = () => {
           title="Retention Risk shows summary of the renewal risk for the subscription's contract"
           options={risk.options}
           series={risk.series}
+        />
+      </div>
+      <div className="table-container">
+        <ExportToExcel
+          data={processedData}
+          columns={columns}
+          fileName={`insight_trisita_V2`}
+          className="insight-export-btn"
+        />
+        <h3 className="common-insight-title">Table Data</h3>
+        <CommonTable
+          rows={processedData}
+          columns={columns}
+          getRowId={getRowId}
+          checkboxSelection
+          toolbar
+          exportFileName={`insight_trisita_V2`}
         />
       </div>
     </>

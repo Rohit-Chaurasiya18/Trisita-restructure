@@ -149,3 +149,9 @@
     background-color: rgb(141 190 134 / 1);
   }
 }
+.common-date-picker {
+  .MuiPickersInputBase-sectionsContainer {
+    height: 45px;
+    margin-bottom: 5px;
+  }
+}
