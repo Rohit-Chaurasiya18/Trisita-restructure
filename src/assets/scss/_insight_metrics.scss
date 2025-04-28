@@ -77,3 +77,22 @@
     align-items: center !important;
   }
 }
+
+@media (max-width: 1024px) {
+  .alert-subscription {
+    display: grid;
+  }
+}
+@media (max-width: 768px) {
+  .alert-subscription {
+    .filter {
+      display: grid;
+      & .MuiStack-root {
+        width: 250px;
+      }
+      & .MuiInputBase-root {
+        width: 250px;
+      }
+    }
+  }
+}

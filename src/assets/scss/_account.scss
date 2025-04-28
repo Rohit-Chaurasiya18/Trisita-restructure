@@ -1,0 +1,88 @@
+.account-filter {
+  display: flex;
+  justify-content: end;
+  gap: 20px;
+  & .MuiInputBase-root {
+    height: 45px;
+  }
+  & .MuiFormLabel-root {
+    top: -6px;
+  }
+}
+.account-industry-chart {
+  .chart-data-header {
+    display: flex;
+    background-color: #f2f0f0;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chart-data-subcategory {
+    display: flex;
+    gap: 30px;
+    margin-right: 10px;
+    color: rgb(59 130 246 / 1);
+    font-size: 14px;
+    p {
+      cursor: pointer;
+    }
+  }
+}
+.account-industry-chart-2 {
+  display: flex;
+  gap: 10px;
+  .chart-data-1 {
+    width: 30%;
+    .chart-data {
+      height: 100%;
+    }
+  }
+  .chart-data-2 {
+    width: 70%;
+  }
+}
+@media (max-width: 768px) {
+  .account-industry-chart-2 {
+    display: grid;
+    gap: 10px;
+    .chart-data-1 {
+      width: 100%;
+      .chart-data {
+        height: 100%;
+      }
+    }
+    .chart-data-2 {
+      width: 100%;
+    }
+  }
+}
+@media (max-width: 425px) {
+  .account-filter {
+    display: grid;
+    justify-content: start;
+  }
+  .chart-data-header {
+    display: grid !important;
+    .chart-data-subcategory {
+      justify-content: center;
+    }
+  }
+  .apexcharts-canvas {
+    height: 350px !important;
+    width: 350px !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+  }
+}
+@media (max-width: 390px) {
+  .apexcharts-canvas {
+    height: 350px !important;
+    width: 330px !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+  }
+  .account-filter {
+    & .MuiInputBase-root {
+      width: 260px !important;
+    }
+  }
+}

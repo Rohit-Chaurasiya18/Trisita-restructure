@@ -9,6 +9,7 @@ import {
   Get_usage,
   Profile,
   ChangePassword,
+  Account,
 } from "./routeImports";
 
 const routesConfig = {
@@ -36,7 +37,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.ACCOUNT,
-      component: Get_usage,
+      component: Account,
     },
     {
       path: routesConstants.ADD_ACCOUNT,

@@ -19,19 +19,11 @@ const AlertSubscription = () => {
         <div className="filter">
           <CommonDatePicker
             label="Start Date"
-            // value={new Date().toLocaleDateString("en-CA")}
-            onChange={(value) =>
-              // setFormData({ ...formData, from_date: value })
-              console.log(value)
-            }
+            onChange={(value) => console.log(value)}
           />
           <CommonDatePicker
             label="End Date"
-            // value={new Date().toLocaleDateString("en-CA")}
-            onChange={(value) =>
-              // setFormData({ ...formData, from_date: value })
-              console.log(value)
-            }
+            onChange={(value) => console.log(value)}
           />
           <CommonSelect
             onChange={handleStatusChange}
@@ -56,7 +48,7 @@ const AlertSubscription = () => {
           />
         </div>
       </div>
-      <div className="alert-subscription-table mt-4">
+      <div className="alert-subscription-table">
         <ExportToExcel
           data={processedData}
           columns={columns}
