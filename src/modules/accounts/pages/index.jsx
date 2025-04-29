@@ -21,8 +21,8 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
         <div className="chart-data-header">
           <h3>{title}</h3>
           <div className="chart-data-subcategory">
-            {subCategory?.map((item) => (
-              <p>{item}</p>
+            {subCategory?.map((item,index) => (
+              <p key={index}>{item}</p>
             ))}
           </div>
         </div>

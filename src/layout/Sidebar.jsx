@@ -47,15 +47,15 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
         </div>
         <nav className="menuItems_list">
           <ul>
-            {navLinks?.map((link) =>
+            {navLinks?.map((link, index) =>
               link?.isLabel ? (
                 <>
-                  <h4 key={link?.name} className="mb-3 mt-4">
+                  <h4 key={index} className="mb-3 mt-4">
                     {link?.name}
                   </h4>
-                  {link?.item?.map((item) => (
+                  {link?.item?.map((item, ind) => (
                     <li
-                      key={item?.itemName}
+                      key={ind}
                       onClick={() => handleItemClick(item?.href)}
                       className="mb-3"
                     >
@@ -65,11 +65,17 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                         TransitionComponent={Zoom}
                         placement="right"
                         disableHoverListener={isOpen}
-                        key={item?.itemName}
+                        key={ind}
                       >
-                        <Link to={item?.href} key={item?.itemName} className={`${location.pathname === item?.href && "active-link"}`}>
+                        <Link
+                          to={item?.href}
+                          key={ind}
+                          className={`${
+                            location.pathname === item?.href && "active-link"
+                          }`}
+                        >
                           {item?.iconUrl && item?.iconUrl}
-                          <span className="menu-item-text" key={item?.itemName}>
+                          <span className="menu-item-text" key={ind}>
                             {item?.itemName}
                           </span>
                         </Link>
@@ -79,7 +85,7 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                 </>
               ) : (
                 <li
-                  key={link?.name}
+                  key={index}
                   onClick={() => handleItemClick(link?.href)}
                   className="mb-3"
                 >
@@ -89,11 +95,17 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                     TransitionComponent={Zoom}
                     placement="right"
                     disableHoverListener={isOpen}
-                    key={link?.name}
+                    key={index}
                   >
-                    <Link to={link?.href} key={link?.name} className={`${location.pathname === link?.href && "active-link"}`}>
+                    <Link
+                      to={link?.href}
+                      key={index}
+                      className={`${
+                        location.pathname === link?.href && "active-link"
+                      }`}
+                    >
                       {link?.iconUrl && link?.iconUrl}
-                      <span className="menu-item-text" key={link?.name}>
+                      <span className="menu-item-text" key={index}>
                         {link?.name}
                       </span>
                     </Link>
