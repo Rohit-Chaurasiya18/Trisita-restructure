@@ -10,6 +10,7 @@ import {
   Profile,
   ChangePassword,
   Account,
+  AddAccount
 } from "./routeImports";
 
 const routesConfig = {
@@ -41,7 +42,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.ADD_ACCOUNT,
-      component: Get_usage,
+      component: AddAccount,
     },
     {
       path: routesConstants.THIRD_PARTY_ACCOUNT,

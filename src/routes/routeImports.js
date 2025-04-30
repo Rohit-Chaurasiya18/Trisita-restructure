@@ -11,7 +11,9 @@ export const Alert_subscription = lazy(() =>
 );
 export const Get_usage = lazy(() => import("@/modules/getUsage/pages/index"));
 export const Account = lazy(() => import("@/modules/accounts/pages/index"));
-
+export const AddAccount = lazy(() =>
+  import("@/modules/accounts/pages/addAccount/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));

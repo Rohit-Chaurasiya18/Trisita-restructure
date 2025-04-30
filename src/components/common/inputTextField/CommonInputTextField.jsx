@@ -20,6 +20,7 @@ const CommonInputTextField = (
     name = "",
     mainDiv = "",
     labelClass = "",
+    requiredText = false,
     ...inputProps
   },
   ref
@@ -32,7 +33,11 @@ const CommonInputTextField = (
   return (
     <div className={mainDiv}>
       {labelName && (
-        <label className={`form-label ${labelClass}`}>
+        <label
+          className={`form-label ${labelClass} ${
+            requiredText && "requiredText"
+          }`}
+        >
           {labelName}
           {required && <span className="text-danger"> *</span>}
         </label>
