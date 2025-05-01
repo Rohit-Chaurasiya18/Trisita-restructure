@@ -9,10 +9,23 @@ const CommonSelect = ({
   options,
   placeholder = "Select an option",
   isMulti = false,
-  error = "",
+  error = false,
+  errorText = '',
   name,
   isDisabled = false,
 }) => {
+  // Custom style for red border on error
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      borderColor: error ? "#e84c4d" : provided.borderColor,
+      boxShadow: error ? "0 0 0 1px #e84c4d" : state.isFocused ? "0 0 0 1px #2684FF" : provided.boxShadow,
+      "&:hover": {
+        borderColor: error ? "#e84c4d" : state.isFocused ? "#2684FF" : provided.borderColor,
+      },
+    }),
+  };
+
   return (
     <div className="form-group" style={{ marginBottom: "1rem" }}>
       {label && (
@@ -22,7 +35,7 @@ const CommonSelect = ({
           style={{
             display: "block",
             fontWeight: 500,
-            color: "rgba(220, 53, 69, 1)",
+            color: required ? "rgba(220, 53, 69, 1)" : "rgb(55 65 81 / 1)",
           }}
         >
           {label}
@@ -39,6 +52,7 @@ const CommonSelect = ({
         isDisabled={isDisabled}
         placeholder={placeholder}
         classNamePrefix="react-select"
+        styles={customStyles}
       />
       {error && (
         <span
@@ -49,7 +63,7 @@ const CommonSelect = ({
             display: "block",
           }}
         >
-          {error}
+          {errorText}
         </span>
       )}
     </div>
