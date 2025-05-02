@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
@@ -13,6 +13,7 @@ import {
   LineChartData,
 } from "../constants";
 import ReactApexChart from "react-apexcharts";
+import { useLocation } from "react-router-dom";
 
 const CommonChart = ({ title, options, series, subCategory, className }) => {
   return (
@@ -21,7 +22,7 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
         <div className="chart-data-header">
           <h3>{title}</h3>
           <div className="chart-data-subcategory">
-            {subCategory?.map((item,index) => (
+            {subCategory?.map((item, index) => (
               <p key={index}>{item}</p>
             ))}
           </div>
@@ -39,6 +40,12 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
 
 const Account = () => {
   const [searchValue, setSearchValue] = useState("");
+  const location = useLocation();
+
+  const isThirdPartyAccount = useMemo(
+    () => location.pathname.startsWith("/third_party_account"),
+    [location?.pathname]
+  );
 
   const categories = [
     { title: "All", active: 1632, inactive: 2533, total: 4165 },
@@ -50,6 +57,12 @@ const Account = () => {
     { title: "Unknown", active: 193, inactive: 288, total: 481 },
     { title: "Null", active: 1, inactive: 1, total: 2 },
   ];
+
+  const thirdPartyCategories = [
+    { title: "All", active: 17, inactive: 0, total: 17 },
+    { title: "Null", active: 0, inactive: 0, total: 0 },
+  ];
+
   const getRowId = (row) => row.id;
   return (
     <div className="account">
@@ -102,7 +115,9 @@ const Account = () => {
         />
       </div>
       <div className="mt-4">
-        <CommonCategoryGrid data={categories} />
+        <CommonCategoryGrid
+          data={isThirdPartyAccount ? thirdPartyCategories : categories}
+        />
       </div>
       <div className="account-table mt-4">
         <CommonTable

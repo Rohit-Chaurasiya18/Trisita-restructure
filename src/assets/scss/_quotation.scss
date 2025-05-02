@@ -1,0 +1,17 @@
+.quotation-header {
+  display: flex;
+  justify-content: space-between;
+  .quotation-filter {
+    display: flex;
+    gap: 10px;
+    & .MuiInputBase-root {
+      height: 45px;
+    }
+    & .MuiFormLabel-root {
+      top: -6px;
+    }
+  }
+}
+.quotation-table {
+  margin-top: 2rem;
+}

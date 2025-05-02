@@ -1,7 +1,7 @@
 import React from "react";
 import Select from "react-select";
 
-const CommonSelect = ({
+const CustomSelect = ({
   label,
   required = false,
   value,
@@ -10,7 +10,7 @@ const CommonSelect = ({
   placeholder = "Select an option",
   isMulti = false,
   error = false,
-  errorText = '',
+  errorText = "",
   name,
   isDisabled = false,
 }) => {
@@ -19,9 +19,17 @@ const CommonSelect = ({
     control: (provided, state) => ({
       ...provided,
       borderColor: error ? "#e84c4d" : provided.borderColor,
-      boxShadow: error ? "0 0 0 1px #e84c4d" : state.isFocused ? "0 0 0 1px #2684FF" : provided.boxShadow,
+      boxShadow: error
+        ? "0 0 0 1px #e84c4d"
+        : state.isFocused
+        ? "0 0 0 1px #2684FF"
+        : provided.boxShadow,
       "&:hover": {
-        borderColor: error ? "#e84c4d" : state.isFocused ? "#2684FF" : provided.borderColor,
+        borderColor: error
+          ? "#e84c4d"
+          : state.isFocused
+          ? "#2684FF"
+          : provided.borderColor,
       },
     }),
   };
@@ -70,4 +78,4 @@ const CommonSelect = ({
   );
 };
 
-export default CommonSelect;
+export default CustomSelect;

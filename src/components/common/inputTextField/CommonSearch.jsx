@@ -39,7 +39,10 @@ const CommonSearchInput = ({
         disabled={disabled}
         InputProps={{
           endAdornment: loading && (
-            <CircularProgress size={20} sx={{ position: "absolute", right: 10 }} />
+            <CircularProgress
+              size={20}
+              sx={{ position: "absolute", right: 10 }}
+            />
           ),
         }}
       />

@@ -10,8 +10,11 @@ import {
   Profile,
   ChangePassword,
   Account,
-  AddAccount
+  AddAccount,
+  Quotations,
+  AddQuotation,
 } from "./routeImports";
+import { Outlet } from "react-router-dom";
 
 const routesConfig = {
   common: [{ path: routesConstants._404, component: _404 }],
@@ -46,15 +49,23 @@ const routesConfig = {
     },
     {
       path: routesConstants.THIRD_PARTY_ACCOUNT,
-      component: Get_usage,
+      component: Account,
     },
     {
       path: routesConstants.OPPORTUNITY,
       component: Get_usage,
     },
+    // {
+    //   path: routesConstants.QUOTATION,
+    //   component: Quotations,
+    // },
     {
       path: routesConstants.QUOTATION,
-      component: Get_usage,
+      component: Outlet,
+      children: [
+        { index: true, component: Quotations },
+        { path: "add_quotation", component: AddQuotation },
+      ],
     },
     {
       path: routesConstants.SUBSCRIPTION,

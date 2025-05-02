@@ -1,6 +1,6 @@
 import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import CommonTable from "@/components/common/dataTable/CommonTable";
-import CommonDatePicker from "@/components/common/date/CommonDatePicker";
+import DatePickerFilter from "@/components/common/date/DatePickerFilter";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import { columns, processedData } from "../constants";
 
@@ -17,11 +17,11 @@ const AlertSubscription = () => {
           ROR Change Alert / Lost to Competition
         </div>
         <div className="filter">
-          <CommonDatePicker
+          <DatePickerFilter
             label="Start Date"
             onChange={(value) => console.log(value)}
           />
-          <CommonDatePicker
+          <DatePickerFilter
             label="End Date"
             onChange={(value) => console.log(value)}
           />

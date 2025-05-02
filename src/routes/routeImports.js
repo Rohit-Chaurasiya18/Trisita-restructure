@@ -14,8 +14,15 @@ export const Account = lazy(() => import("@/modules/accounts/pages/index"));
 export const AddAccount = lazy(() =>
   import("@/modules/accounts/pages/addAccount/pages/index")
 );
+export const Quotations = lazy(() =>
+  import("@/modules/quotations/pages/index")
+);
+export const AddQuotation = lazy(() =>
+  import("@/modules/quotations/pages/AddQuotation")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));
-export const ChangePassword = lazy(() => import("@/modules/profile/components/ChangePassword"));
-
+export const ChangePassword = lazy(() =>
+  import("@/modules/profile/components/ChangePassword")
+);
