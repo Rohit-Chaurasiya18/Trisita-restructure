@@ -15,3 +15,26 @@
 .quotation-table {
   margin-top: 2rem;
 }
+@media (max-width: 849px) {
+  .quotation-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .quotation-filter {
+    display: grid;
+    gap: 10px;
+  }
+}
+@media (max-width: 516px) {
+  .quotation-filter {
+    display: grid !important;
+    gap: 10px !important;
+  }
+}
+@media (max-width: 350px) {
+  .quotation-filter {
+    & .MuiInputBase-root {
+      width: 150px !important;
+    }
+  }
+}
