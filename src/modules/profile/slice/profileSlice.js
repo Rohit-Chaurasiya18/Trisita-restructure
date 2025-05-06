@@ -60,7 +60,6 @@ const profileSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    //login
     builder.addCase(getUserProfile.pending, (state) => {
       state.userDetail = null;
     });

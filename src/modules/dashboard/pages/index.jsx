@@ -14,25 +14,33 @@ import {
 } from "../slice";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-
-const data = [
-  {
-    account_name: "Penta India Technical Consultants Pvt. Ltd",
-    bd_person_name: "person",
-    order_loading_date: "1938359",
-  },
-];
+import SkeletonLoader from "@/components/common/loaders/Skeleton";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const { filter } = useSelector((state) => ({
+  const {
+    filter,
+    dashboardDataLoading,
+    dashboardData,
+    dashboardChart,
+    seatDateChart,
+  } = useSelector((state) => ({
     filter: state?.layout?.filter,
+    dashboardDataLoading: state?.dashboard?.dashboardDataLoading,
+    dashboardData: state?.dashboard?.dashboardData,
+    dashboardChart: state?.dashboard?.dashboardChart,
+    seatDateChart: state?.dashboard?.seatDateChart,
   }));
-
   useEffect(() => {
-    dispatch(GetDashboardData({ id: filter?.csn }));
-    dispatch(GetDashboardChart({ id: filter?.csn }));
-    dispatch(GetSeatDateChart({ id: filter?.csn }));
+    dispatch(
+      GetDashboardData({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
+    dispatch(
+      GetDashboardChart({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
+    dispatch(
+      GetSeatDateChart({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
   }, [filter?.csn]);
 
   return (
@@ -51,64 +59,86 @@ const Dashboard = () => {
           </CommonButton>
         </div>
       </div>
-      <div className="dashboard-startCard">
-        <StatCard
-          icon={EmailIcon}
-          value={0}
-          title="Renewal Email Sent"
-          percentage={14}
-          isLink
-        />
-        <StatCard
-          icon={PointOfSaleIcon}
-          value={1232805}
-          title="Sales Invoice Inc GST"
-          percentage={21}
-        />
-        <StatCard
-          icon={PersonAddIcon}
-          value={87}
-          title="Active Accounts"
-          percentage={94.57}
-          isLink
-        />
-        <StatCard
-          icon={PersonOffIcon}
-          value={5}
-          title="Inactive Accounts"
-          percentage={5.43}
-          isLink
-        />
-      </div>
-      <div className="dashboard-startCard">
-        <StatCard
-          icon={EmailIcon}
-          value={`₹3580311.55`}
-          title="Payment Overdue"
-          percentage={14}
-          isLink
-        />
-        <StatCard
-          icon={PointOfSaleIcon}
-          value={`₹3580311.55`}
-          title="Payment Outstanding"
-          percentage={21}
-        />
-        <StatCard
-          icon={PersonAddIcon}
-          value={`₹0`}
-          title="Payment Received"
-          percentage={94.57}
-          isLink
-        />
-        <StatCard
-          icon={PersonOffIcon}
-          value={25}
-          title="Invoice Pending"
-          percentage={5.43}
-          isLink
-        />
-      </div>
+      {dashboardDataLoading ? (
+        <SkeletonLoader isDashboard />
+      ) : (
+        <>
+          <div className="dashboard-startCard">
+            <StatCard
+              icon={EmailIcon}
+              value={dashboardData?.renewal_count || 0}
+              title="Renewal Email Sent"
+              percentage={14}
+              isLink
+            />
+            <StatCard
+              icon={PointOfSaleIcon}
+              value={dashboardData?.total_sales_invoice_amount_exc_gst || 0}
+              title="Sales Invoice Inc GST"
+              percentage={21}
+            />
+            <StatCard
+              icon={PersonAddIcon}
+              value={dashboardData?.active_account || 0}
+              title="Active Accounts"
+              percentage={`${(
+                (dashboardData?.active_account /
+                  dashboardData?.total_accounts) *
+                100
+              ).toFixed(2)}`}
+              isLink
+            />
+            <StatCard
+              icon={PersonOffIcon}
+              value={dashboardData?.inactive_account || 0}
+              title="Inactive Accounts"
+              percentage={`${(
+                (dashboardData?.inactive_account /
+                  dashboardData?.total_accounts) *
+                100
+              ).toFixed(2)}`}
+              isLink
+            />
+          </div>
+          <div className="dashboard-startCard">
+            <StatCard
+              icon={EmailIcon}
+              value={`₹${dashboardData?.payment_overdue || 0}`}
+              title="Payment Overdue"
+              percentage={14}
+              isLink
+            />
+            <StatCard
+              icon={PointOfSaleIcon}
+              value={`₹${dashboardData?.payment_outstanding || 0}`}
+              title="Payment Outstanding"
+              percentage={21}
+            />
+            <StatCard
+              icon={PersonAddIcon}
+              value={`₹${dashboardData?.payment_received || 0}`}
+              title="Payment Received"
+              percentage={`${(
+                (dashboardData?.active_account /
+                  dashboardData?.total_accounts) *
+                100
+              ).toFixed(2)}`}
+              isLink
+            />
+            <StatCard
+              icon={PersonOffIcon}
+              value={dashboardData?.invoice_pending || 0}
+              title="Invoice Pending"
+              percentage={`${(
+                (dashboardData?.invoice_pending /
+                  dashboardData?.order_loading_count) *
+                100
+              ).toFixed(2)}`}
+              isLink
+            />
+          </div>
+        </>
+      )}
       <div className="dashboard-chart-section">
         <div className="dashboard-chart">
           <div className="chart" key="line">
@@ -122,23 +152,25 @@ const Dashboard = () => {
             <GeographyChart isDashboard={true} />
           </div>
         </div>
-        <div className="dashboard-recent-transaction">
-          <p className="dashboard-recent-span">Resent Transaction</p>
-          {data?.map((item) => (
-            <div className="recent-transaction-section">
-              <div>
-                <Tooltip title={item?.account_name || ""} placement="left">
-                  <p className="mb-0 title">
-                    {item?.account_name.slice(0, 14) + "..."}
-                  </p>
-                  <span>Ankit</span>
-                </Tooltip>
+        {dashboardData?.order_loading_ho?.length > 0 && (
+          <div className="dashboard-recent-transaction">
+            <p className="dashboard-recent-span">Resent Transaction</p>
+            {dashboardData?.order_loading_ho?.map((item) => (
+              <div className="recent-transaction-section">
+                <div>
+                  <Tooltip title={item?.account_name || ""} placement="left">
+                    <p className="mb-0 title">
+                      {item?.account_name.slice(0, 14) + "..."}
+                    </p>
+                    <span>Ankit</span>
+                  </Tooltip>
+                </div>
+                <p>{item?.bd_person_name}</p>
+                <p className="amount">₹{item?.order_loading_date}</p>
               </div>
-              <p>{item?.bd_person_name}</p>
-              <p className="amount">₹{item?.order_loading_date}</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
