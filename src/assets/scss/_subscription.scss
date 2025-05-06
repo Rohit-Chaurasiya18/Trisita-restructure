@@ -1,0 +1,116 @@
+.subscription-filter {
+  padding-top: 30px;
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+  align-items: start;
+  & .MuiInputBase-root {
+    height: 45px;
+  }
+  & .MuiFormLabel-root {
+    top: -6px;
+  }
+  & .MuiInputLabel-shrink {
+    top: 6px !important;
+  }
+  & .MuiStack-root {
+    padding-top: 0px !important;
+  }
+  & .MuiPickersInputBase-root {
+    height: 45px !important;
+  }
+}
+.subscription-chart {
+  margin-top: 30px;
+  .chart-data-header {
+    background-color: #f2f0f0;
+  }
+  .insight-metrics-chart .chart-data h3 {
+    background-color: #f2f0f0;
+    border-bottom: none;
+    // border-color: #e0e0e0;
+    padding: 16px;
+    margin: 0;
+    font-family: Source Sans Pro, sans-serif;
+    font-size: 20px;
+    line-height: 1.235;
+    font-weight: 600;
+  }
+  .chart-data-subcategory {
+    display: flex;
+    gap: 30px;
+    margin-right: 10px;
+    color: rgb(59, 130, 246);
+    font-size: 14px;
+    padding-left: 16px;
+    cursor: pointer;
+  }
+  .chart-data {
+    height: 100%;
+  }
+  .chart-section {
+    display: flex;
+    gap: 10px;
+    width: 70%;
+  }
+}
+
+@media (max-width: 320px) {
+  .subscription-filter {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 375px) {
+  .subscription-header {
+    .insight-metrics-chart {
+      width: 330px;
+    }
+    .subscription-table {
+      width: 330px;
+    }
+  }
+}
+
+@media (max-width: 670px) {
+  .subscription-filter {
+    grid-template-columns: repeat(1, 1fr) !important;
+  }
+}
+
+@media (max-width: 985px) {
+  .subscription-header {
+    .chart-data-1 {
+      width: 100%;
+    }
+    .chart-data-2 {
+      width: 100%;
+    }
+    .account-industry-chart-2 {
+      display: grid;
+    }
+    .chart-section {
+      display: grid;
+      width: 100%;
+    }
+    .subscription-filter {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      & .MuiInputBase-root {
+        width: 300px;
+      }
+    }
+    .common-date-picker {
+      width: 300px;
+    }
+  }
+}
+
+@media (max-width: 1526px) {
+  .subscription-header {
+    .subscription-filter {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}

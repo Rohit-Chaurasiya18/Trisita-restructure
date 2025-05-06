@@ -13,6 +13,7 @@ import {
   AddAccount,
   Quotations,
   AddQuotation,
+  Subscription
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -69,7 +70,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.SUBSCRIPTION,
-      component: Get_usage,
+      component: Subscription,
     },
     {
       path: routesConstants.NEW_SUBSCRIPTION,
