@@ -4,6 +4,7 @@ const CommonButton = ({
   type = "button",
   onClick,
   style,
+  isDisabled,
   ...args
 }) => {
   return (
@@ -12,6 +13,7 @@ const CommonButton = ({
       style={style}
       className={`${"common-btn "} ${className}`}
       onClick={onClick}
+      disabled={isDisabled}
       {...args}
     >
       {children}

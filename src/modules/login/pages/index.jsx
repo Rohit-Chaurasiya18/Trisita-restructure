@@ -14,6 +14,7 @@ import {
 import { Construction } from "@/constants/images";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -50,18 +51,23 @@ const Login = () => {
         email: values.email?.trim(),
         password: values.password?.trim(),
       })
-    )
-      .then(() => {
-        //Handle page loader
+    ).then((res) => {
+      if (res?.payload?.access) {
         navigate(routesConstants?.DASHBOARD);
-        dispatch(setPageLoader(false));
-        setIsLoading(false);
-      })
-      .catch(() => {
-        navigate(routesConstants?.DASHBOARD);
-        dispatch(setPageLoader(false));
-        setIsLoading(false);
-      });
+        toast.success("Login Successfully");
+      }
+      dispatch(setPageLoader(false));
+      setIsLoading(false);
+      //Handle page loader
+      // navigate(routesConstants?.DASHBOARD);
+      // dispatch(setPageLoader(false));
+      // setIsLoading(false);
+    });
+    // .catch(() => {
+    //   navigate(routesConstants?.DASHBOARD);
+    //   dispatch(setPageLoader(false));
+    //   setIsLoading(false);
+    // });
   };
 
   const { values, touched, errors, handleSubmit, handleChange, handleBlur } =

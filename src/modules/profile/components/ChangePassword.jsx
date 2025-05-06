@@ -2,36 +2,61 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
 import { useFormik } from "formik";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import * as Yup from "yup";
+import { changedPassword } from "../slice/profileSlice";
+import { toast } from "react-toastify";
 
 const ChangePassword = () => {
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const validationSchema = Yup.object({
-    oldPassword: Yup.string().required("Old password is required"),
 
-    newPassword: Yup.string()
+  const validationSchema = Yup.object({
+    old_password: Yup.string().trim().required("Old password is required"),
+
+    new_password: Yup.string()
+      .trim()
       .min(6, "New password must be at least 6 characters")
       .required("New password is required"),
 
     confirmNewPassword: Yup.string()
-      .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+      .trim()
+      .oneOf([Yup.ref("new_password"), null], "Passwords must match")
       .required("Confirm password is required"),
   });
 
   const onSubmit = (values) => {
-    console.log("Submit", values);
+    setIsLoading(true);
+    dispatch(changedPassword(values)).then((res) => {
+      if (res?.payload?.status === 200) {
+        toast.success(
+          res?.payload?.data?.message || "Password changed successfully"
+        );
+        resetForm();
+      }
+      setIsLoading(false);
+    });
   };
+
   const initialValues = {
-    oldPassword: "",
-    newPassword: "",
+    old_password: "",
+    new_password: "",
     confirmNewPassword: "",
   };
-  const { values, touched, errors, handleSubmit, handleChange, handleBlur } =
-    useFormik({
-      initialValues,
-      validationSchema,
-      onSubmit,
-    });
+
+  const {
+    values,
+    touched,
+    errors,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    resetForm,
+  } = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit,
+  });
   return (
     <>
       <h3>Change Password</h3>
@@ -40,28 +65,28 @@ const ChangePassword = () => {
         <form onSubmit={handleSubmit} className="change-password">
           <CommonInputTextField
             labelName="Old Password"
-            id="oldPassword"
+            id="old_password"
             type="password"
             required
-            value={values.oldPassword}
+            value={values.old_password}
             onChange={handleChange}
             onBlur={handleBlur}
             placeHolder="Enter old password"
-            isInvalid={errors.oldPassword && touched.oldPassword}
-            errorText={errors.oldPassword}
+            isInvalid={errors.old_password && touched.old_password}
+            errorText={errors.old_password}
             errorClass="Password-error"
           />
           <CommonInputTextField
             labelName="New Password"
-            id="newPassword"
+            id="new_password"
             type="password"
             required
-            value={values.newPassword}
+            value={values.new_password}
             onChange={handleChange}
             onBlur={handleBlur}
             placeHolder="Enter new password"
-            isInvalid={errors.newPassword && touched.newPassword}
-            errorText={errors.newPassword}
+            isInvalid={errors.new_password && touched.new_password}
+            errorText={errors.new_password}
             errorClass="Password-error"
           />
           <CommonInputTextField

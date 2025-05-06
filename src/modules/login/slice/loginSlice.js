@@ -24,12 +24,10 @@ export const getLogin = createAsyncThunk(
         Cookies.set(cookieKeys?.USER, response?.data?.user_serializer);
         return response.data;
       }
-      return true;
+      return response;
     } catch (err) {
-      Cookies.set(cookieKeys?.TOKEN, "thisisfaketoken");
-      // toast.error(err?.response?.data?.message || somethingWentWrong);
-      return true
-      // return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+      toast.error(err?.response?.data?.message || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
     }
   }
 );
@@ -37,11 +35,6 @@ export const getLogout = createAsyncThunk(
   `authentication/Logout`,
   async (payload, thunkAPI) => {
     try {
-      // const response = await axiosReact.post(LOGIN, payload);
-      // if (response?.status === 200) {
-      //   Cookies.set(cookieKeys?.USER, response?.data?.user_serializer);
-      //   return response.data;
-      // }
       Cookies.remove(cookieKeys.TOKEN);
       return true;
     } catch (err) {
@@ -63,7 +56,7 @@ const loginSlice = createSlice({
     //login
     builder.addCase(getLogin.pending, (state) => {
       state.loading = true;
-      // state.isAuth = true;
+      state.isAuth = false;
     });
     builder.addCase(getLogin.fulfilled, (state) => {
       state.loading = false;
@@ -71,7 +64,7 @@ const loginSlice = createSlice({
     });
     builder.addCase(getLogin.rejected, (state) => {
       state.loading = false;
-      state.isAuth = true;
+      state.isAuth = false;
     });
 
     // getLogout

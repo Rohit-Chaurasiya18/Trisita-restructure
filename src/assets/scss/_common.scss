@@ -169,3 +169,30 @@
 .react-select__placeholder {
   color: #999;
 }
+
+.skeleton-loader .skeleton {
+  background-color: #e2e2e2;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.skeleton.line {
+  height: 50px;
+  width: 100%;
+}
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
