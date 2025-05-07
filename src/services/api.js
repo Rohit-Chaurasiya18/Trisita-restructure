@@ -31,15 +31,17 @@ class Axios {
       Cookies.set(cookieKeys?.TOKEN, response.data?.access);
     }
     if (response?.data?.refresh) {
-      Cookies.set(
-        cookieKeys?.REFRESH_TOKEN,
-        response?.data?.refresh
-      );
+      Cookies.set(cookieKeys?.REFRESH_TOKEN, response?.data?.refresh);
     }
     return response;
   };
 
   _responseErr = (error) => {
+    if (error?.response?.status === 401) {
+      Cookies.remove(cookieKeys.TOKEN);
+      Cookies.clear()
+      window.location.reload();
+    }
     return Promise.reject(error);
   };
 }

@@ -65,6 +65,7 @@ const dashboardState = {
   dashboardData: null,
   dashboardChartLoading: false,
   dashboardChart: null,
+  seatDateChartLoading: false,
   seatDateChart: null,
 };
 
@@ -108,12 +109,15 @@ const dashboardSlice = createSlice({
     // Get Seat Date Chart
     builder.addCase(GetSeatDateChart.pending, (state) => {
       state.seatDateChart = null;
+      state.seatDateChartLoading = true;
     });
     builder.addCase(GetSeatDateChart.fulfilled, (state, action) => {
       state.seatDateChart = action?.payload?.data;
+      state.seatDateChartLoading = false;
     });
     builder.addCase(GetSeatDateChart.rejected, (state) => {
       state.seatDateChart = null;
+      state.seatDateChartLoading = false;
     });
   },
 });

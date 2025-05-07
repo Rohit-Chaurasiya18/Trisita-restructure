@@ -15,6 +15,13 @@ import {
 import ReactApexChart from "react-apexcharts";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import ExportToExcel from "@/components/common/buttons/ExportToExcel";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllAccount,
+  getAllBranch,
+  getInsightMetrics,
+} from "../slice/insightMetrics";
 
 const CommonChart = ({ title, options, series }) => {
   return (
@@ -33,10 +40,37 @@ const CommonChart = ({ title, options, series }) => {
 };
 
 const InsightMetrics = () => {
+  const dispatch = useDispatch();
+  const {
+    account_list,
+    branch_list,
+    filter,
+    lastUpdated,
+    insightMetricsCustomer,
+  } = useSelector((state) => ({
+    filter: state?.layout?.filter,
+    account_list: state?.insightMetrics?.accountList,
+    branch_list: state?.insightMetrics?.branchList,
+    lastUpdated: state?.insightMetrics?.lastUpdated,
+    insightMetricsCustomer: state?.insightMetrics?.insightMetricsCustomer,
+  }));
+
+  useEffect(() => {
+    dispatch(getAllBranch());
+    dispatch(getAllAccount());
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      getInsightMetrics({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
+  }, [filter?.csn]);
+
   const handleStatusChange = () => {
     console.log("Status changed!");
   };
   const getRowId = (row) => row.id;
+
   return (
     <>
       <div className="insight-metrics-header">
@@ -50,7 +84,7 @@ const InsightMetrics = () => {
             onChange={(event, newValue) => {
               console.log("Branch selected:", newValue);
             }}
-            options={options}
+            options={branch_list}
             label="Select a Branch"
           />
 
@@ -59,14 +93,13 @@ const InsightMetrics = () => {
             // placeholder="All Status"
             value="All Status"
             options={statusOption}
-
           />
 
           <CommonAutocomplete
             onChange={(event, newValue) => {
               console.log("Account selected:", newValue);
             }}
-            options={accountOption}
+            options={account_list}
             label="Select an Account"
           />
         </div>

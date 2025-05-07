@@ -15,6 +15,7 @@ import {
 import CommonButton from "@/components/common/buttons/CommonButton";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import { setPageLoader } from "@/modules/login/slice/loginSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -22,13 +23,17 @@ const Dashboard = () => {
     filter,
     dashboardDataLoading,
     dashboardData,
+    dashboardChartLoading,
     dashboardChart,
+    seatDateChartLoading,
     seatDateChart,
   } = useSelector((state) => ({
     filter: state?.layout?.filter,
     dashboardDataLoading: state?.dashboard?.dashboardDataLoading,
     dashboardData: state?.dashboard?.dashboardData,
+    dashboardChartLoading: state?.dashboard?.dashboardChartLoading,
     dashboardChart: state?.dashboard?.dashboardChart,
+    seatDateChartLoading: state?.dashboard?.seatDateChartLoading,
     seatDateChart: state?.dashboard?.seatDateChart,
   }));
   useEffect(() => {
@@ -42,6 +47,18 @@ const Dashboard = () => {
       GetSeatDateChart({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
     );
   }, [filter?.csn]);
+
+  useEffect(() => {
+    if (
+      !dashboardChartLoading &&
+      !dashboardDataLoading &&
+      !seatDateChartLoading
+    ) {
+      dispatch(setPageLoader(false));
+    } else {
+      dispatch(setPageLoader(true));
+    }
+  }, [dashboardChartLoading, dashboardDataLoading, seatDateChartLoading]);
 
   return (
     <div className="">
@@ -141,12 +158,21 @@ const Dashboard = () => {
       )}
       <div className="dashboard-chart-section">
         <div className="dashboard-chart">
-          <div className="chart" key="line">
-            <LineChart />
-          </div>
-          <div className="chart" key="bar">
-            <BarChart />
-          </div>
+          {seatDateChartLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            <div className="chart" key="line">
+              <LineChart data={seatDateChart} />
+            </div>
+          )}
+
+          {dashboardChartLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            <div className="chart" key="bar">
+              <BarChart data={dashboardChart?.Response} />
+            </div>
+          )}
           <div className="chart" key="geography">
             <span className="geography-span">Geography Based Traffic</span>
             <GeographyChart isDashboard={true} />

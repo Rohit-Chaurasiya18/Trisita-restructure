@@ -1,8 +1,15 @@
-const SkeletonLoader = ({ isDashboard = false }) => {
+const SkeletonLoader = ({
+  isDashboard = false,
+  height = "250px",
+  width = "100%",
+}) => {
   return (
     <>
       {isDashboard ? (
-        <div className="skeleton-rectangle" />
+        <div
+          className="skeleton-rectangle"
+          style={{ height: height, width: width }}
+        />
       ) : (
         <div className="skeleton-loader">
           <div className="skeleton avatar" />
