@@ -1,7 +1,6 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
-
 import {
   options,
   statusOption,
@@ -42,14 +41,18 @@ const CommonChart = ({ title, options, series }) => {
 const InsightMetrics = () => {
   const dispatch = useDispatch();
   const {
+    accountListLoading,
     account_list,
+    branchListLoading,
     branch_list,
     filter,
     lastUpdated,
     insightMetricsCustomer,
   } = useSelector((state) => ({
     filter: state?.layout?.filter,
+    accountListLoading: state?.insightMetrics?.accountListLoading,
     account_list: state?.insightMetrics?.accountList,
+    branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
     lastUpdated: state?.insightMetrics?.lastUpdated,
     insightMetricsCustomer: state?.insightMetrics?.insightMetricsCustomer,
@@ -86,11 +89,10 @@ const InsightMetrics = () => {
             }}
             options={branch_list}
             label="Select a Branch"
+            loading={branchListLoading}
           />
-
           <CommonSelect
             onChange={handleStatusChange}
-            // placeholder="All Status"
             value="All Status"
             options={statusOption}
           />
@@ -101,6 +103,8 @@ const InsightMetrics = () => {
             }}
             options={account_list}
             label="Select an Account"
+            getOptionLabel={(option) => `${option?.label} (${option?.csn})`}
+            loading={accountListLoading}
           />
         </div>
       </div>

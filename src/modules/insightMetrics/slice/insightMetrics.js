@@ -50,7 +50,9 @@ export const getInsightMetrics = createAsyncThunk(
 );
 
 const insightMetricsState = {
+  accountListLoading: false,
   accountList: null,
+  branchListLoading: false,
   branchList: null,
   insightMetricsCustomer: null,
   lastUpdated: null,
@@ -64,20 +66,24 @@ const insightMetricsSlice = createSlice({
     // Get All Branch List
     builder.addCase(getAllBranch.pending, (state) => {
       state.branchList = [];
+      state.branchListLoading = true;
     });
     builder.addCase(getAllBranch.fulfilled, (state, action) => {
       state.branchList = action?.payload?.data?.Branch?.map((item) => ({
         label: item?.branch_name,
         value: item?.id,
       }));
+      state.branchListLoading = false;
     });
     builder.addCase(getAllBranch.rejected, (state) => {
       state.branchList = [];
+      state.branchListLoading = false;
     });
 
     // Get All Account List
     builder.addCase(getAllAccount.pending, (state) => {
       state.accountList = [];
+      state.accountListLoading = true;
     });
     builder.addCase(getAllAccount.fulfilled, (state, action) => {
       let accountData = action.payload.data?.accounts?.map((item) => ({
@@ -94,9 +100,11 @@ const insightMetricsSlice = createSlice({
         return false;
       });
       state.accountList = uniqueData;
+      state.accountListLoading = false;
     });
     builder.addCase(getAllAccount.rejected, (state) => {
       state.accountList = [];
+      state.accountListLoading = false;
     });
 
     //Get Insight Metrics Customer
