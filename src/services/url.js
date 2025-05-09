@@ -9,3 +9,4 @@ export const GET_ALL_ACCOUNT = "/v1/api/account_dropdown/";
 export const INSIGHT_METRICS_CUSTOMER =
   "/v1/api/get_insights_metrics_customer/";
 export const ALERT_SUBSCRIPTION = "/v1/api/get_ror_lop_data/";
+export const GET_ALERT_SUBSCRIPTION = "/v1/api/get_alert_subscription/";

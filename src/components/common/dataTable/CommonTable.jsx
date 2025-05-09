@@ -39,7 +39,7 @@ const CommonTable = ({
               toolbar: {
                 csvOptions: {
                   fileName: `${exportFileName}_${currDate}_${currTime}`,
-                  fields: columns.map((col) => col.field),
+                  fields: columns.map((col) => col?.field),
                 },
               },
             }}
