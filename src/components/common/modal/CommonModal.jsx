@@ -28,6 +28,7 @@ const CommonModal = ({
         className={`${className} modal-styles `}
         {...modalProps}
         centered
+        min
         style={{ maxWidth: maxWidth }}
         onWheel={onWheel}
         size={size ? size : "lg"}

@@ -10,3 +10,9 @@ export const INSIGHT_METRICS_CUSTOMER =
   "/v1/api/get_insights_metrics_customer/";
 export const ALERT_SUBSCRIPTION = "/v1/api/get_ror_lop_data/";
 export const GET_ALERT_SUBSCRIPTION = "/v1/api/get_alert_subscription/";
+export const GET_ALL_USER = "/v1/get_user/";
+export const GET_EXPORTED_ACCOUNTS_DATA = "/v1/api/get_export_accounts/";
+export const GET_ACCOUNT = "/v1/api/get_account/";
+export const INSIGHT_METRICS_CSN = "/v1/api/get_insights_metrics_csn/";
+export const GET_CONTRACTS = "/v1/api/get_contracts/";
+export const END_CUSTOMER_ACCOUNT = "/v1/api/get_endcustomer_account/";

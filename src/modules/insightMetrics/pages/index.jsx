@@ -20,7 +20,7 @@ import {
   getAllAccount,
   getAllBranch,
   getInsightMetrics,
-} from "../slice/insightMetrics";
+} from "../slice/insightMetricsSlice";
 
 const CommonChart = ({ title, options, series }) => {
   return (

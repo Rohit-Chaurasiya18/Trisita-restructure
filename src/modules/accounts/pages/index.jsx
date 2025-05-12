@@ -1,19 +1,26 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
 import CommonCategoryGrid from "../components/CommonCategoryGrid";
 import CommonTable from "@/components/common/dataTable/CommonTable";
-import {
-  accountData,
-  barChartData,
-  ChartData,
-  columns,
-  LineChartData,
-} from "../constants";
+import { barChartData, ChartData, LineChartData } from "../constants";
 import ReactApexChart from "react-apexcharts";
 import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import {
+  getAccount,
+  getAllUser,
+  getContracts,
+  getEndCustomerAccount,
+  getExportedAccount,
+  getInsightMetricsCsn,
+} from "../slice/accountSlice";
+import { Tooltip } from "@mui/material";
+import CommonModal from "@/components/common/modal/CommonModal";
+import CustomTabs from "../components/CustomTabs";
 
 const CommonChart = ({ title, options, series, subCategory, className }) => {
   return (
@@ -39,13 +46,80 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
 };
 
 const Account = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [filters, setFilters] = useState({
+    searchValue: "",
+    branch: null,
+    status: "All Status",
+  });
+  const [filteredData, setFilteredData] = useState([]);
+  const [modal, setModal] = useState({
+    isOpen: false,
+  });
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { branchListLoading, branch_list, filter, exportedAccountData } =
+    useSelector((state) => ({
+      branchListLoading: state?.insightMetrics?.branchListLoading,
+      branch_list: state?.insightMetrics?.branchList,
+      filter: state?.layout?.filter,
+      exportedAccountData: state?.account?.exportedAccountData,
+    }));
+
+  useEffect(() => {
+    setFilteredData(exportedAccountData);
+  }, [exportedAccountData]);
 
   const isThirdPartyAccount = useMemo(
     () => location.pathname.startsWith("/third_party_account"),
     [location?.pathname]
   );
+
+  useEffect(() => {
+    dispatch(getAllBranch());
+    dispatch(getAllUser());
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      getExportedAccount({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
+  }, [filter?.csn]);
+
+  useEffect(() => {
+    if (
+      filters?.branch?.label ||
+      filters?.status !== "All Status" ||
+      filters?.searchValue
+    ) {
+      let data = exportedAccountData;
+      if (filters?.branch?.label) {
+        data = data?.filter?.(
+          (item) => item?.branch === filters?.branch?.label
+        );
+      }
+      if (filters?.status !== "All Status") {
+        data = data?.filter(
+          (item) => item?.contract_status === filters?.status
+        );
+      }
+      if (filters?.searchValue) {
+        debugger;
+        data = data.filter((row) => {
+          return Object.values(row).some(
+            (value) =>
+              value &&
+              value
+                .toString()
+                .toLowerCase()
+                .includes(filters?.searchValue.toLowerCase())
+          );
+        });
+      }
+      setFilteredData(data);
+    } else {
+      setFilteredData(exportedAccountData);
+    }
+  }, [filters?.branch, filters?.status, filters?.searchValue]);
 
   const categories = [
     { title: "All", active: 1632, inactive: 2533, total: 4165 },
@@ -63,95 +137,263 @@ const Account = () => {
     { title: "Null", active: 0, inactive: 0, total: 0 },
   ];
 
+  const handleOpenModel = (id) => {
+    setModal((prev) => ({ ...prev, isOpen: true }));
+    const defaultCsn = filter?.csn === "All CSN" ? "5102086717" : filter?.csn;
+    let payload = {
+      accountId: id,
+      csn: defaultCsn,
+    };
+    dispatch(getAccount(payload));
+    dispatch(getInsightMetricsCsn(payload));
+    dispatch(getContracts(payload));
+    dispatch(getEndCustomerAccount(payload));
+  };
+  const columns = [
+    {
+      field: "csn",
+      headerName: "CSN",
+      width: 150,
+      renderCell: (params, index) => (
+        <span
+          onClick={() => handleOpenModel(params?.row?.id)}
+          className="action-button bg-white text-black px-3 py-1 rounded border-0"
+        >
+          {params?.value}
+        </span>
+      ),
+    },
+    {
+      field: "user_assign",
+      headerName: "BD Person Name",
+      width: 160,
+      renderCell: (params) => (
+        <div>
+          {params?.value && params?.value != " " ? (
+            params?.value.join(", ")
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "name",
+      headerName: "Account Name",
+      width: 200,
+      renderCell: (params) => (
+        <Tooltip title={params?.value || ""}>
+          <button
+            className="text-red-600 border-0"
+            // onClick={() => navigate(`/update_account/${params.id}`)}
+          >
+            <span className="table-cell-truncate">{params?.value}</span>
+          </button>
+        </Tooltip>
+      ),
+    },
+    { field: "industryGroup", headerName: "Industry", width: 100 },
+    {
+      field: "industrySegment",
+      headerName: "Segment",
+      width: 160,
+      renderCell: (params) => {
+        const { value: industrySegment } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {industrySegment?.length > maxChars
+              ? industrySegment
+              : industrySegment?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    {
+      field: "industrySubSegment",
+      headerName: "Sub Segment",
+      width: 160,
+      renderCell: (params) => {
+        const { value: industrySubSegment } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {industrySubSegment?.length > maxChars
+              ? industrySubSegment
+              : industrySubSegment?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    {
+      field: "address1",
+      headerName: "Address",
+      width: 160,
+      renderCell: (params) => {
+        const { value: address1 } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {address1?.length > maxChars
+              ? address1
+              : address1?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    { field: "city", headerName: "City", width: 150 },
+    { field: "email", headerName: "Email", width: 150 },
+    { field: "phone", headerName: "Contact No", width: 150 },
+    { field: "status", headerName: "Autodesk Account Status", width: 120 },
+    {
+      field: "contract_status",
+      headerName: "Trisita Account Status",
+      width: 120,
+    },
+    { field: "buyingReadinessScore", headerName: "Rediness Score", width: 130 },
+    {
+      field: "renewal_person",
+      headerName: "Renewal Person Name",
+      width: 160,
+      renderCell: (params) => (
+        <div>
+          {params?.value && params?.value != " " ? (
+            params?.value.join(", ")
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "branch",
+      headerName: "Branch",
+      width: 100,
+      renderCell: (params) => (
+        <div>
+          {params?.value && params?.value ? (
+            params?.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 150,
+      renderCell: (params, index) => (
+        <span
+          // onClick={() => handleAssignModel(params?.row.id)}
+          className="assign-button text-black px-3 py-1 rounded border-0"
+        >
+          Assign
+        </span>
+      ),
+    },
+  ];
+
   const getRowId = (row) => row.id;
   return (
-    <div className="account">
-      <h5 className="commom-header-title mb-0">
-        Account Information of the End Customers
-      </h5>
-      <span className="common-breadcrum-msg">
-        List of all Autodesk End Customers. The boxes below show combined
-        industry details.
-      </span>
+    <>
+      <div className="account">
+        <h5 className="commom-header-title mb-0">
+          Account Information of the End Customers
+        </h5>
+        <span className="common-breadcrum-msg">
+          List of all Autodesk End Customers. The boxes below show combined
+          industry details.
+        </span>
 
-      <div className="account-filter">
-        <span>Last Updated</span>
+        <div className="account-filter">
+          <span>Last Updated</span>
 
-        <CommonButton className="common-green-btn">All</CommonButton>
+          <CommonButton className="common-green-btn">All</CommonButton>
 
-        <CommonAutocomplete
-          label="Select a Branch"
-          options={[
-            { value: 1, label: "Mumbai" },
-            { value: 2, label: "Delhi" },
-            { value: 3, label: "Kolkata" },
-          ]}
-          onChange={(event, newValue) => {
-            console.log("Branch selected:", newValue);
-          }}
-        />
+          <CommonAutocomplete
+            onChange={(event, newValue) => {
+              setFilters((prev) => ({ ...prev, branch: newValue }));
+            }}
+            options={branch_list}
+            label="Select a Branch"
+            loading={branchListLoading}
+            value={filters?.branch}
+          />
 
-        <CommonSelect
-          value="All Status"
-          options={[
-            { value: "All Status", label: "All Status" },
-            { value: "Active", label: "Active" },
-            { value: "Expired", label: "Expired" },
-          ]}
-          onChange={(e) => {
-            console.log("Status changed:", e.target.value);
-          }}
-        />
+          <CommonSelect
+            value={filters?.status}
+            options={[
+              { value: "All Status", label: "All Status" },
+              { value: "Active", label: "Active" },
+              { value: "Expired", label: "Expired" },
+            ]}
+            onChange={(e) => {
+              setFilters((prev) => ({ ...prev, status: e.target.value }));
+            }}
+          />
 
-        <CommonSearchInput
-          value={searchValue}
-          label="Search Accounts"
-          loading={false}
-          debounceTime={400}
-          onChange={(text) => {
-            console.log("Debounced Search Text:", text);
-            setSearchValue(text);
-          }}
-        />
+          <CommonSearchInput
+            value={filters?.searchValue}
+            label="Search Accounts"
+            loading={false}
+            debounceTime={400}
+            onChange={(text) => {
+              setFilters((prev) => ({ ...prev, searchValue: text }));
+            }}
+          />
+        </div>
+        <div className="mt-4">
+          <CommonCategoryGrid
+            data={isThirdPartyAccount ? thirdPartyCategories : categories}
+          />
+        </div>
+        <div className="account-table mt-4">
+          <CommonTable
+            rows={filteredData}
+            columns={columns}
+            getRowId={getRowId}
+            checkboxSelection
+            toolbar
+            exportFileName={`account_trisita`}
+          />
+        </div>
+        <div className="account-industry-chart mt-4">
+          <CommonChart
+            title="Trend of number of accounts by Industry"
+            options={LineChartData.options}
+            series={LineChartData.series}
+            subCategory={["By Industry Group", "By Segment", "By Sub Segment"]}
+          />
+        </div>
+        <div className="account-industry-chart-2 mt-4">
+          <CommonChart
+            title="Show by rediness scores"
+            options={ChartData.options}
+            series={ChartData.series}
+            className="chart-data-1"
+          />
+          <CommonChart
+            title="Top 12 cities by number of account trend showing between active and inactive"
+            options={barChartData.options}
+            className="chart-data-2"
+            series={barChartData.series}
+          />
+        </div>
       </div>
-      <div className="mt-4">
-        <CommonCategoryGrid
-          data={isThirdPartyAccount ? thirdPartyCategories : categories}
-        />
-      </div>
-      <div className="account-table mt-4">
-        <CommonTable
-          rows={accountData}
-          columns={columns}
-          getRowId={getRowId}
-          checkboxSelection
-          toolbar
-          exportFileName={`account_trisita`}
-        />
-      </div>
-      <div className="account-industry-chart mt-4">
-        <CommonChart
-          title="Trend of number of accounts by Industry"
-          options={LineChartData.options}
-          series={LineChartData.series}
-          subCategory={["By Industry Group", "By Segment", "By Sub Segment"]}
-        />
-      </div>
-      <div className="account-industry-chart-2 mt-4">
-        <CommonChart
-          title="Show by rediness scores"
-          options={ChartData.options}
-          series={ChartData.series}
-          className="chart-data-1"
-        />
-        <CommonChart
-          title="Top 12 cities by number of account trend showing between active and inactive"
-          options={barChartData.options}
-          className="chart-data-2"
-          series={barChartData.series}
-        />
-      </div>
-    </div>
+      <CommonModal
+        isOpen={modal?.isOpen}
+        handleClose={() => {
+          setModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        title="Account information detail"
+      >
+        <CustomTabs />
+      </CommonModal>
+    </>
   );
 };
 
