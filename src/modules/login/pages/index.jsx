@@ -30,7 +30,7 @@ const Login = () => {
   }, []);
 
   const initialValues = {
-    email: "ankit.shah@trisita.com",
+    email: "ankit@trisita.com",
     password: "Rivaan@007",
   };
 
