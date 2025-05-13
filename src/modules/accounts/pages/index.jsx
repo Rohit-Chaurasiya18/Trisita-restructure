@@ -103,7 +103,6 @@ const Account = () => {
         );
       }
       if (filters?.searchValue) {
-        debugger;
         data = data.filter((row) => {
           return Object.values(row).some(
             (value) =>
