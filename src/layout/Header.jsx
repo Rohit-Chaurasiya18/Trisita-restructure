@@ -86,9 +86,9 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
               <div className="dropdown_menu">
                 <button
                   className="dropdown_item logout"
-                  onClick={() =>
-                    navigate(routesConstants.PROFILE + `/${userDetail?.id}`)
-                  }
+                  onClick={() => {
+                    navigate(routesConstants.PROFILE + `/${userDetail?.id}`);
+                  }}
                 >
                   <span className="logout_icon">
                     <ManageAccountsIcon />

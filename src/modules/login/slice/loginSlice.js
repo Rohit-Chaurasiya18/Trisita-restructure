@@ -36,6 +36,7 @@ export const getLogout = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       Cookies.remove(cookieKeys.TOKEN);
+      Cookies.clear()
       return true;
     } catch (err) {
       toast.error(err?.response?.data?.message || somethingWentWrong);
@@ -58,9 +59,10 @@ const loginSlice = createSlice({
       state.loading = true;
       state.isAuth = false;
     });
-    builder.addCase(getLogin.fulfilled, (state) => {
+    builder.addCase(getLogin.fulfilled, (state,action) => {
       state.loading = false;
       state.isAuth = true;
+      state.userDetail = action.payload?.user_serializer
     });
     builder.addCase(getLogin.rejected, (state) => {
       state.loading = false;
