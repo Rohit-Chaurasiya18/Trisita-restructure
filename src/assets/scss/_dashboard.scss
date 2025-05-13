@@ -275,6 +275,11 @@
     }
   }
 }
+@media (min-width: 413px) and (max-width: 541px) {
+  .dashboard-filter button {
+    width: 200px !important;
+  }
+}
 @media (max-width: 344px) {
   .dashboard-filter {
     .MuiInputBase-root {

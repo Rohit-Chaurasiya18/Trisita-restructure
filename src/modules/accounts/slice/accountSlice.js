@@ -10,6 +10,7 @@ import {
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
+// Get All User
 export const getAllUser = createAsyncThunk(
   `account/getAllUser`,
   async (payload, thunkAPI) => {
@@ -23,6 +24,7 @@ export const getAllUser = createAsyncThunk(
   }
 );
 
+// Get Exported Account
 export const getExportedAccount = createAsyncThunk(
   `account/getExportedAccount`,
   async (payload, thunkAPI) => {
@@ -38,7 +40,7 @@ export const getExportedAccount = createAsyncThunk(
   }
 );
 
-// Get account detail
+// Get Account Detail
 export const getAccount = createAsyncThunk(
   `account/getAccount`,
   async (payload, thunkAPI) => {
@@ -54,7 +56,7 @@ export const getAccount = createAsyncThunk(
   }
 );
 
-// Get insight metrics csn
+// Get Insight Metrics Csn
 export const getInsightMetricsCsn = createAsyncThunk(
   `account/getInsightMetricsCsn`,
   async (payload, thunkAPI) => {
@@ -104,11 +106,17 @@ export const getEndCustomerAccount = createAsyncThunk(
 
 const accountState = {
   allUserData: null,
+  exportedAccountDataLoading: false,
   exportedAccountData: [],
+  accountDetailLoading: false,
   accountDetail: null,
+  insightMetricsCsnLoading: false,
   insightMetricsCsn: null,
+  contractsDetailsLoading: false,
   contractsDetails: null,
+  endCustomerAccountLoading: false,
   endCustomerAccount: null,
+  industryGroupCount: {},
 };
 
 const accountSlice = createSlice({
@@ -130,6 +138,7 @@ const accountSlice = createSlice({
     // Get Exported Data
     builder.addCase(getExportedAccount.pending, (state) => {
       state.exportedAccountData = [];
+      state.exportedAccountDataLoading = true;
     });
     builder.addCase(getExportedAccount.fulfilled, (state, action) => {
       let formattedData = action.payload.data?.accounts?.map((account) => ({
@@ -151,54 +160,102 @@ const accountSlice = createSlice({
         user_assign: account?.user_assign_first_names ?? null,
         renewal_person: account?.renewal_person_first_names ?? null,
       }));
+
+      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown", "Null"];
+
+      const groupedCounts = {
+        All: { title: "All", active: 0, expired: 0, total: 0 },
+      };
+
+      for (const group of fixedOrder) {
+        groupedCounts[group] = {
+          title: group,
+          active: 0,
+          expired: 0,
+          total: 0,
+        };
+      }
+
+      for (const item of formattedData) {
+        const group = item.industryGroup || "Null";
+        const status = item.contract_status === "Active" ? "active" : "expired";
+
+        const key = fixedOrder.includes(group) ? group : "Unknown";
+
+        groupedCounts[key][status]++;
+        groupedCounts[key].total++;
+
+        groupedCounts.All[status]++;
+        groupedCounts.All.total++;
+      }
+
+      const industryGroupStats = [
+        groupedCounts["All"],
+        ...fixedOrder.map((key) => groupedCounts[key]),
+      ];
+      state.industryGroupCount = industryGroupStats;
       state.exportedAccountData = formattedData;
+      state.exportedAccountDataLoading = false;
     });
     builder.addCase(getExportedAccount.rejected, (state) => {
       state.exportedAccountData = [];
+      state.exportedAccountDataLoading = false;
     });
 
     // Get Account Detail
     builder.addCase(getAccount.pending, (state) => {
       state.accountDetail = null;
+      state.accountDetailLoading = true;
     });
     builder.addCase(getAccount.fulfilled, (state, action) => {
       state.accountDetail = action.payload.data;
+      state.accountDetailLoading = false;
     });
     builder.addCase(getAccount.rejected, (state) => {
       state.accountDetail = null;
+      state.accountDetailLoading = false;
     });
 
     // Get Insight Metrics CSN Summary
     builder.addCase(getInsightMetricsCsn.pending, (state) => {
       state.insightMetricsCsn = null;
+      state.insightMetricsCsnLoading = true;
     });
     builder.addCase(getInsightMetricsCsn.fulfilled, (state, action) => {
       state.insightMetricsCsn = action.payload.data?.Response;
+      state.insightMetricsCsnLoading = false;
     });
     builder.addCase(getInsightMetricsCsn.rejected, (state) => {
       state.insightMetricsCsn = null;
+      state.insightMetricsCsnLoading = false;
     });
 
     // getContracts
     builder.addCase(getContracts.pending, (state) => {
       state.contractsDetails = null;
+      state.contractsDetailsLoading = true;
     });
     builder.addCase(getContracts.fulfilled, (state, action) => {
       state.contractsDetails = action.payload.data;
+      state.contractsDetailsLoading = false;
     });
     builder.addCase(getContracts.rejected, (state) => {
       state.contractsDetails = null;
+      state.contractsDetailsLoading = false;
     });
 
     // getEndCustomerAccount
     builder.addCase(getEndCustomerAccount.pending, (state) => {
       state.endCustomerAccount = null;
+      state.endCustomerAccountLoading = true;
     });
     builder.addCase(getEndCustomerAccount.fulfilled, (state, action) => {
       state.endCustomerAccount = action.payload.data;
+      state.endCustomerAccountLoading = false;
     });
     builder.addCase(getEndCustomerAccount.rejected, (state) => {
       state.endCustomerAccount = null;
+      state.endCustomerAccountLoading = false;
     });
   },
 });

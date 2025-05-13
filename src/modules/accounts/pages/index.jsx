@@ -21,6 +21,7 @@ import {
 import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
 import CustomTabs from "../components/CustomTabs";
+import SkeletonLoader from "@/components/common/loaders/Skeleton";
 
 const CommonChart = ({ title, options, series, subCategory, className }) => {
   return (
@@ -50,20 +51,30 @@ const Account = () => {
     searchValue: "",
     branch: null,
     status: "All Status",
+    industryCategory: "",
   });
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedValue, setSelectedValue] = useState();
   const [modal, setModal] = useState({
     isOpen: false,
   });
   const location = useLocation();
   const dispatch = useDispatch();
-  const { branchListLoading, branch_list, filter, exportedAccountData } =
-    useSelector((state) => ({
-      branchListLoading: state?.insightMetrics?.branchListLoading,
-      branch_list: state?.insightMetrics?.branchList,
-      filter: state?.layout?.filter,
-      exportedAccountData: state?.account?.exportedAccountData,
-    }));
+  const {
+    branchListLoading,
+    branch_list,
+    filter,
+    exportedAccountDataLoading,
+    exportedAccountData,
+    industryGroupCount,
+  } = useSelector((state) => ({
+    branchListLoading: state?.insightMetrics?.branchListLoading,
+    branch_list: state?.insightMetrics?.branchList,
+    filter: state?.layout?.filter,
+    exportedAccountDataLoading: state?.account?.exportedAccountDataLoading,
+    exportedAccountData: state?.account?.exportedAccountData,
+    industryGroupCount: state?.account?.industryGroupCount,
+  }));
 
   useEffect(() => {
     setFilteredData(exportedAccountData);
@@ -89,7 +100,8 @@ const Account = () => {
     if (
       filters?.branch?.label ||
       filters?.status !== "All Status" ||
-      filters?.searchValue
+      filters?.searchValue ||
+      filters?.industryCategory
     ) {
       let data = exportedAccountData;
       if (filters?.branch?.label) {
@@ -103,7 +115,7 @@ const Account = () => {
         );
       }
       if (filters?.searchValue) {
-        data = data.filter((row) => {
+        data = data?.filter((row) => {
           return Object.values(row).some(
             (value) =>
               value &&
@@ -114,22 +126,24 @@ const Account = () => {
           );
         });
       }
+      // Filter by industryGroup ONLY using selected industryCategory
+      if (filters?.industryCategory !== "All") {
+        data = data?.filter(
+          (item) =>
+            item?.industryGroup?.toString()?.toLowerCase() ===
+            filters?.industryCategory?.toString()?.toLowerCase()
+        );
+      }
       setFilteredData(data);
     } else {
       setFilteredData(exportedAccountData);
     }
-  }, [filters?.branch, filters?.status, filters?.searchValue]);
-
-  const categories = [
-    { title: "All", active: 1632, inactive: 2533, total: 4165 },
-    { title: "AEC", active: 658, inactive: 1143, total: 1801 },
-    { title: "MFG", active: 551, inactive: 648, total: 1199 },
-    { title: "M&E", active: 63, inactive: 81, total: 144 },
-    { title: "EDU", active: 9, inactive: 97, total: 106 },
-    { title: "OTH", active: 157, inactive: 275, total: 432 },
-    { title: "Unknown", active: 193, inactive: 288, total: 481 },
-    { title: "Null", active: 1, inactive: 1, total: 2 },
-  ];
+  }, [
+    filters?.branch,
+    filters?.status,
+    filters?.searchValue,
+    filters?.industryCategory,
+  ]);
 
   const thirdPartyCategories = [
     { title: "All", active: 17, inactive: 0, total: 17 },
@@ -297,6 +311,15 @@ const Account = () => {
   ];
 
   const getRowId = (row) => row.id;
+
+  const handleClick = (title, status) => {
+    setFilters((prev) => ({
+      ...prev,
+      status: status === "Total" ? "All Status" : status,
+      industryCategory: title === "All" ? "All" : title,
+    }));
+    setSelectedValue({ title, status });
+  };
   return (
     <>
       <div className="account">
@@ -346,19 +369,35 @@ const Account = () => {
           />
         </div>
         <div className="mt-4">
-          <CommonCategoryGrid
-            data={isThirdPartyAccount ? thirdPartyCategories : categories}
-          />
+          {exportedAccountDataLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            industryGroupCount?.length > 0 && (
+              <CommonCategoryGrid
+                data={
+                  isThirdPartyAccount
+                    ? thirdPartyCategories
+                    : industryGroupCount
+                }
+                handleClick={handleClick}
+                selectedValue={selectedValue}
+              />
+            )
+          )}
         </div>
         <div className="account-table mt-4">
-          <CommonTable
-            rows={filteredData}
-            columns={columns}
-            getRowId={getRowId}
-            checkboxSelection
-            toolbar
-            exportFileName={`account_trisita`}
-          />
+          {exportedAccountDataLoading ? (
+            <SkeletonLoader isDashboard height="350px" />
+          ) : (
+            <CommonTable
+              rows={filteredData}
+              columns={columns}
+              getRowId={getRowId}
+              checkboxSelection
+              toolbar
+              exportFileName={`account_trisita`}
+            />
+          )}
         </div>
         <div className="account-industry-chart mt-4">
           <CommonChart

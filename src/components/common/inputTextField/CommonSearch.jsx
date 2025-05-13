@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TextField, Typography, Box, CircularProgress } from "@mui/material";
 import debounce from "lodash/debounce";
 
@@ -12,6 +12,10 @@ const CommonSearchInput = ({
   placeholder = "Type to search...",
 }) => {
   const [inputValue, setInputValue] = useState(value);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   const debouncedChange = useMemo(
     () =>
