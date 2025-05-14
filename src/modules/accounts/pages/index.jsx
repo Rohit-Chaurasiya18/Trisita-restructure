@@ -5,7 +5,7 @@ import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
 import CommonCategoryGrid from "../components/CommonCategoryGrid";
 import CommonTable from "@/components/common/dataTable/CommonTable";
-import { barChartData, ChartData, LineChartData } from "../constants";
+import { barChartData, ChartData } from "../constants";
 import ReactApexChart from "react-apexcharts";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +23,15 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import CustomTabs from "../components/CustomTabs";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 
-const CommonChart = ({ title, options, series, subCategory, className }) => {
+const CommonChart = ({
+  title,
+  options,
+  series,
+  subCategory,
+  className,
+  subCategoryChange,
+}) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
   return (
     <div className={`insight-metrics-chart ${className}`}>
       <div className="chart-data">
@@ -31,7 +39,16 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
           <h3>{title}</h3>
           <div className="chart-data-subcategory">
             {subCategory?.map((item, index) => (
-              <p key={index}>{item}</p>
+              <p
+                key={index}
+                onClick={() => {
+                  subCategoryChange(index);
+                  setSelectedIndex(index);
+                }}
+                style={{ color: `${selectedIndex === index ? "#1800ee" : ""}` }}
+              >
+                {item}
+              </p>
             ))}
           </div>
         </div>
@@ -54,7 +71,10 @@ const Account = () => {
     industryCategory: "",
   });
   const [filteredData, setFilteredData] = useState([]);
-  const [selectedValue, setSelectedValue] = useState();
+  const [selectedValue, setSelectedValue] = useState({
+    title: "All",
+    status: "Total",
+  });
   const [modal, setModal] = useState({
     isOpen: false,
   });
@@ -127,7 +147,7 @@ const Account = () => {
         });
       }
       // Filter by industryGroup ONLY using selected industryCategory
-      if (filters?.industryCategory !== "All") {
+      if (filters?.industryCategory !== "All" && filters?.industryCategory) {
         data = data?.filter(
           (item) =>
             item?.industryGroup?.toString()?.toLowerCase() ===
@@ -316,10 +336,69 @@ const Account = () => {
     setFilters((prev) => ({
       ...prev,
       status: status === "Total" ? "All Status" : status,
+      searchValue: "",
+      branch: null,
       industryCategory: title === "All" ? "All" : title,
     }));
     setSelectedValue({ title, status });
   };
+  const [lineChartData, setLineChartData] = useState({
+    series: [],
+    options: {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: 350,
+        zoom: { enabled: false },
+      },
+      dataLabels: { enabled: false },
+      stroke: { curve: "straight" },
+      title: { text: "", align: "left" },
+      grid: {
+        row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
+      },
+      xaxis: { categories: [] },
+    },
+  });
+
+  // Function to compute chart data by group (groupByKey = "industryGroup", etc.)
+  const computeChartData = (groupByKey = "industryGroup") => {
+    const groupCounts = filteredData.reduce((acc, curr) => {
+      const key = curr[groupByKey] || "Unknown";
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const sortedKeys = Object.keys(groupCounts).sort();
+    const data = sortedKeys.map((key) => groupCounts[key]);
+
+    setLineChartData({
+      series: [{ name: "Accounts", data }],
+      options: {
+        ...lineChartData.options,
+        xaxis: {
+          ...lineChartData.options.xaxis,
+          categories: sortedKeys,
+        },
+      },
+    });
+  };
+
+  // On initial data load, generate the default industryGroup chart
+  useEffect(() => {
+    if (filteredData && filteredData.length > 0) {
+      computeChartData("industryGroup");
+    }
+  }, [filteredData]);
+
+  // Handle chart switch: 0 = industryGroup, 1 = segment, 2 = subsegment
+  const subCategoryChange = (index) => {
+    if (index === 0) computeChartData("industryGroup");
+    else if (index === 1) computeChartData("industrySegment");
+    else if (index === 2) computeChartData("industrySubSegment");
+  };
+
+  console.log(filteredData?.filter((item) => item?.industryCategory == null));
   return (
     <>
       <div className="account">
@@ -339,6 +418,10 @@ const Account = () => {
           <CommonAutocomplete
             onChange={(event, newValue) => {
               setFilters((prev) => ({ ...prev, branch: newValue }));
+              setSelectedValue({
+                title: "",
+                status: "",
+              });
             }}
             options={branch_list}
             label="Select a Branch"
@@ -354,7 +437,20 @@ const Account = () => {
               { value: "Expired", label: "Expired" },
             ]}
             onChange={(e) => {
-              setFilters((prev) => ({ ...prev, status: e.target.value }));
+              setFilters((prev) => ({
+                ...prev,
+                status: e.target.value,
+                industryCategory: "All",
+              }));
+              // setSelectedValue({
+              //   title: "All",
+              //   status:
+              //     e.target.value === "All Status" ? "Total" : e.target.value,
+              // });
+              setSelectedValue({
+                title: "",
+                status: "",
+              });
             }}
           />
 
@@ -365,6 +461,10 @@ const Account = () => {
             debounceTime={400}
             onChange={(text) => {
               setFilters((prev) => ({ ...prev, searchValue: text }));
+              setSelectedValue({
+                title: "",
+                status: "",
+              });
             }}
           />
         </div>
@@ -400,12 +500,22 @@ const Account = () => {
           )}
         </div>
         <div className="account-industry-chart mt-4">
-          <CommonChart
-            title="Trend of number of accounts by Industry"
-            options={LineChartData.options}
-            series={LineChartData.series}
-            subCategory={["By Industry Group", "By Segment", "By Sub Segment"]}
-          />
+          {filteredData?.length > 0 &&
+          lineChartData?.series[0]?.data?.length > 0 ? (
+            <CommonChart
+              title="Trend of number of accounts by Industry"
+              options={lineChartData.options}
+              series={lineChartData.series}
+              subCategory={[
+                "By Industry Group",
+                "By Segment",
+                "By Sub Segment",
+              ]}
+              subCategoryChange={subCategoryChange}
+            />
+          ) : (
+            <SkeletonLoader isDashboard height="350px" />
+          )}
         </div>
         <div className="account-industry-chart-2 mt-4">
           <CommonChart

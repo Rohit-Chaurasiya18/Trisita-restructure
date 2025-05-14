@@ -147,9 +147,16 @@ const accountSlice = createSlice({
         email: account?.contract_manager_email?.[0] ?? null,
         phone: account?.contract_manager_phone?.[0] ?? null,
         name: account?.name ?? "",
-        industryGroup: account?.industryGroup ?? null,
-        industrySegment: account?.industrySegment ?? null,
-        industrySubSegment: account?.industrySubSegment ?? null,
+        
+        // industryGroup: account?.industryGroup ?? null,
+        industryGroup: account?.industryGroup ?? "Unknown",
+
+        // industrySegment: account?.industrySegment ?? null,
+        industrySegment: account?.industrySegment ?? "Unknown",
+
+        // industrySubSegment: account?.industrySubSegment ?? null,
+        industrySubSegment: account?.industrySubSegment ?? "Unknown",
+
         address1: account?.address1 ?? null,
         city: account?.city ?? null,
         status: account?.status ?? null,
@@ -161,7 +168,8 @@ const accountSlice = createSlice({
         renewal_person: account?.renewal_person_first_names ?? null,
       }));
 
-      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown", "Null"];
+      // const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown", "Null"];
+      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
 
       const groupedCounts = {
         All: { title: "All", active: 0, expired: 0, total: 0 },
