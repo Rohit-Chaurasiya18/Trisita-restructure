@@ -30,8 +30,9 @@ const CommonChart = ({
   subCategory,
   className,
   subCategoryChange,
+  setSelectedIndex,
+  selectedIndex,
 }) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
   return (
     <div className={`insight-metrics-chart ${className}`}>
       <div className="chart-data">
@@ -75,6 +76,7 @@ const Account = () => {
     title: "All",
     status: "Total",
   });
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [modal, setModal] = useState({
     isOpen: false,
   });
@@ -388,6 +390,7 @@ const Account = () => {
   useEffect(() => {
     if (filteredData && filteredData.length > 0) {
       computeChartData("industryGroup");
+      setSelectedIndex(0)
     }
   }, [filteredData]);
 
@@ -512,6 +515,8 @@ const Account = () => {
                 "By Sub Segment",
               ]}
               subCategoryChange={subCategoryChange}
+              setSelectedIndex={setSelectedIndex}
+              selectedIndex={selectedIndex}
             />
           ) : (
             <SkeletonLoader isDashboard height="350px" />
