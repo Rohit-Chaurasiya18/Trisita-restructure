@@ -22,6 +22,7 @@ import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
 import CustomTabs from "../components/CustomTabs";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import AssignUserBranch from "../components/AssignUserBranch";
 
 const CommonChart = ({
   title,
@@ -79,7 +80,28 @@ const Account = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modal, setModal] = useState({
     isOpen: false,
+    id: "",
+    isAssign: false,
   });
+  const [lineChartData, setLineChartData] = useState({
+    series: [],
+    options: {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: 350,
+        zoom: { enabled: false },
+      },
+      dataLabels: { enabled: false },
+      stroke: { curve: "straight" },
+      title: { text: "", align: "left" },
+      grid: {
+        row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
+      },
+      xaxis: { categories: [] },
+    },
+  });
+  
   const location = useLocation();
   const dispatch = useDispatch();
   const {
@@ -89,6 +111,7 @@ const Account = () => {
     exportedAccountDataLoading,
     exportedAccountData,
     industryGroupCount,
+    accountInformation,
   } = useSelector((state) => ({
     branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
@@ -96,6 +119,7 @@ const Account = () => {
     exportedAccountDataLoading: state?.account?.exportedAccountDataLoading,
     exportedAccountData: state?.account?.exportedAccountData,
     industryGroupCount: state?.account?.industryGroupCount,
+    accountInformation: state?.account?.accountInformation,
   }));
 
   useEffect(() => {
@@ -173,7 +197,7 @@ const Account = () => {
   ];
 
   const handleOpenModel = (id) => {
-    setModal((prev) => ({ ...prev, isOpen: true }));
+    setModal((prev) => ({ ...prev, isOpen: true, id: id, isAssign: false }));
     const defaultCsn = filter?.csn === "All CSN" ? "5102086717" : filter?.csn;
     let payload = {
       accountId: id,
@@ -184,6 +208,7 @@ const Account = () => {
     dispatch(getContracts(payload));
     dispatch(getEndCustomerAccount(payload));
   };
+
   const columns = [
     {
       field: "csn",
@@ -324,6 +349,14 @@ const Account = () => {
       renderCell: (params, index) => (
         <span
           // onClick={() => handleAssignModel(params?.row.id)}
+          onClick={() =>
+            setModal((prev) => ({
+              ...prev,
+              id: params?.row?.id,
+              isOpen: true,
+              isAssign: true,
+            }))
+          }
           className="assign-button text-black px-3 py-1 rounded border-0"
         >
           Assign
@@ -344,24 +377,6 @@ const Account = () => {
     }));
     setSelectedValue({ title, status });
   };
-  const [lineChartData, setLineChartData] = useState({
-    series: [],
-    options: {
-      chart: {
-        type: "line",
-        width: "100%",
-        height: 350,
-        zoom: { enabled: false },
-      },
-      dataLabels: { enabled: false },
-      stroke: { curve: "straight" },
-      title: { text: "", align: "left" },
-      grid: {
-        row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
-      },
-      xaxis: { categories: [] },
-    },
-  });
 
   // Function to compute chart data by group (groupByKey = "industryGroup", etc.)
   const computeChartData = (groupByKey = "industryGroup") => {
@@ -390,7 +405,7 @@ const Account = () => {
   useEffect(() => {
     if (filteredData && filteredData.length > 0) {
       computeChartData("industryGroup");
-      setSelectedIndex(0)
+      setSelectedIndex(0);
     }
   }, [filteredData]);
 
@@ -400,8 +415,6 @@ const Account = () => {
     else if (index === 1) computeChartData("industrySegment");
     else if (index === 2) computeChartData("industrySubSegment");
   };
-
-  console.log(filteredData?.filter((item) => item?.industryCategory == null));
   return (
     <>
       <div className="account">
@@ -540,11 +553,21 @@ const Account = () => {
       <CommonModal
         isOpen={modal?.isOpen}
         handleClose={() => {
-          setModal((prev) => ({ ...prev, isOpen: false }));
+          setModal((prev) => ({
+            ...prev,
+            isOpen: false,
+            isAssign: false,
+            id: "",
+          }));
         }}
-        title="Account information detail"
+        scrollable
+        title={
+          modal?.isAssign
+            ? `Allocate User and Branch ${accountInformation?.name ?? ""}`
+            : "Account information detail"
+        }
       >
-        <CustomTabs />
+        {modal?.isAssign ? <AssignUserBranch id={modal?.id} /> : <CustomTabs />}
       </CommonModal>
     </>
   );

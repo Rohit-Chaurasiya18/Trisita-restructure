@@ -16,3 +16,4 @@ export const GET_ACCOUNT = "/v1/api/get_account/";
 export const INSIGHT_METRICS_CSN = "/v1/api/get_insights_metrics_csn/";
 export const GET_CONTRACTS = "/v1/api/get_contracts/";
 export const END_CUSTOMER_ACCOUNT = "/v1/api/get_endcustomer_account/";
+export const GET_ACCOUNT_INFORMATION = "/v1/api/account";

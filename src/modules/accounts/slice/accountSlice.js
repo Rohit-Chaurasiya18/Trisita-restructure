@@ -2,6 +2,7 @@ import { axiosReact } from "@/services/api";
 import {
   END_CUSTOMER_ACCOUNT,
   GET_ACCOUNT,
+  GET_ACCOUNT_INFORMATION,
   GET_ALL_USER,
   GET_CONTRACTS,
   GET_EXPORTED_ACCOUNTS_DATA,
@@ -104,6 +105,22 @@ export const getEndCustomerAccount = createAsyncThunk(
   }
 );
 
+// Get Account Information
+export const getAccountInformation = createAsyncThunk(
+  `account/getAccountInformation`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const accountState = {
   allUserData: null,
   exportedAccountDataLoading: false,
@@ -117,6 +134,8 @@ const accountState = {
   endCustomerAccountLoading: false,
   endCustomerAccount: null,
   industryGroupCount: {},
+  accountInformation: null,
+  accountInformationLoading: false,
 };
 
 const accountSlice = createSlice({
@@ -124,7 +143,7 @@ const accountSlice = createSlice({
   initialState: accountState,
   reducers: {},
   extraReducers: (builder) => {
-    // Get All User List
+    // getAllUser
     builder.addCase(getAllUser.pending, (state) => {
       state.allUserData = null;
     });
@@ -135,7 +154,7 @@ const accountSlice = createSlice({
       state.allUserData = null;
     });
 
-    // Get Exported Data
+    // getExportedAccount
     builder.addCase(getExportedAccount.pending, (state) => {
       state.exportedAccountData = [];
       state.exportedAccountDataLoading = true;
@@ -147,7 +166,7 @@ const accountSlice = createSlice({
         email: account?.contract_manager_email?.[0] ?? null,
         phone: account?.contract_manager_phone?.[0] ?? null,
         name: account?.name ?? "",
-        
+
         // industryGroup: account?.industryGroup ?? null,
         industryGroup: account?.industryGroup ?? "Unknown",
 
@@ -210,7 +229,7 @@ const accountSlice = createSlice({
       state.exportedAccountDataLoading = false;
     });
 
-    // Get Account Detail
+    // getAccount
     builder.addCase(getAccount.pending, (state) => {
       state.accountDetail = null;
       state.accountDetailLoading = true;
@@ -224,7 +243,7 @@ const accountSlice = createSlice({
       state.accountDetailLoading = false;
     });
 
-    // Get Insight Metrics CSN Summary
+    // getInsightMetricsCsn
     builder.addCase(getInsightMetricsCsn.pending, (state) => {
       state.insightMetricsCsn = null;
       state.insightMetricsCsnLoading = true;
@@ -264,6 +283,20 @@ const accountSlice = createSlice({
     builder.addCase(getEndCustomerAccount.rejected, (state) => {
       state.endCustomerAccount = null;
       state.endCustomerAccountLoading = false;
+    });
+
+    // getAccountInformation
+    builder.addCase(getAccountInformation.pending, (state) => {
+      state.accountInformation = null;
+      state.accountInformationLoading = true;
+    });
+    builder.addCase(getAccountInformation.fulfilled, (state, action) => {
+      state.accountInformation = action.payload.data;
+      state.accountInformationLoading = false;
+    });
+    builder.addCase(getAccountInformation.rejected, (state) => {
+      state.accountInformation = null;
+      state.accountInformationLoading = false;
     });
   },
 });

@@ -80,11 +80,12 @@
   }
 }
 
-
 @media (max-width: 390px) {
   .apexcharts-canvas {
     height: 350px !important;
-    width: 330px !important;
+    width: 100% !important;
+    // width: 330px !important;
+    // min-width: 210px !important;
     text-align: center !important;
     margin: 0 auto !important;
   }
@@ -149,4 +150,20 @@
 .account-link-para {
   font-size: 15px;
   text-align: center;
+}
+.allocate-form {
+  .form-group {
+    display: flex;
+    margin-bottom: 10px;
+  }
+}
+@media (max-width: 492px) {
+  .allocate-form {
+    .form-group {
+      display: grid;
+      label {
+        margin-bottom: 10px;
+      }
+    }
+  }
 }
