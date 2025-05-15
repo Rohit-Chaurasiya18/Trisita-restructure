@@ -17,12 +17,14 @@ import {
   getEndCustomerAccount,
   getExportedAccount,
   getInsightMetricsCsn,
+  setIndustryGroupCount,
 } from "../slice/accountSlice";
 import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
 import CustomTabs from "../components/CustomTabs";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import AssignUserBranch from "../components/AssignUserBranch";
+import moment from "moment";
 
 const CommonChart = ({
   title,
@@ -101,13 +103,14 @@ const Account = () => {
       xaxis: { categories: [] },
     },
   });
-  
+
   const location = useLocation();
   const dispatch = useDispatch();
   const {
     branchListLoading,
     branch_list,
     filter,
+    last_updated,
     exportedAccountDataLoading,
     exportedAccountData,
     industryGroupCount,
@@ -118,6 +121,7 @@ const Account = () => {
     filter: state?.layout?.filter,
     exportedAccountDataLoading: state?.account?.exportedAccountDataLoading,
     exportedAccountData: state?.account?.exportedAccountData,
+    last_updated: state?.account?.last_updated,
     industryGroupCount: state?.account?.industryGroupCount,
     accountInformation: state?.account?.accountInformation,
   }));
@@ -150,8 +154,12 @@ const Account = () => {
       filters?.industryCategory
     ) {
       let data = exportedAccountData;
+      let industryGroup = exportedAccountData;
       if (filters?.branch?.label) {
         data = data?.filter?.(
+          (item) => item?.branch === filters?.branch?.label
+        );
+        industryGroup = data?.filter?.(
           (item) => item?.branch === filters?.branch?.label
         );
       }
@@ -171,24 +179,59 @@ const Account = () => {
                 .includes(filters?.searchValue.toLowerCase())
           );
         });
-      }
-      // Filter by industryGroup ONLY using selected industryCategory
-      if (filters?.industryCategory !== "All" && filters?.industryCategory) {
-        data = data?.filter(
-          (item) =>
-            item?.industryGroup?.toString()?.toLowerCase() ===
-            filters?.industryCategory?.toString()?.toLowerCase()
-        );
+        industryGroup = data?.filter((row) => {
+          return Object.values(row).some(
+            (value) =>
+              value &&
+              value
+                .toString()
+                .toLowerCase()
+                .includes(filters?.searchValue.toLowerCase())
+          );
+        });
       }
       setFilteredData(data);
+      dispatch(setIndustryGroupCount(industryGroup));
     } else {
       setFilteredData(exportedAccountData);
     }
+  }, [filters?.branch, filters?.status, filters?.searchValue]);
+
+  useEffect(() => {
+    let data = exportedAccountData;
+
+    if (filters?.industryCategory && filters?.industryCategory !== "All") {
+      data = data?.filter(
+        (item) =>
+          item?.industryGroup?.toString()?.toLowerCase() ===
+          filters?.industryCategory?.toString()?.toLowerCase()
+      );
+    }
+
+    if (filters?.branch?.label) {
+      data = data?.filter((item) => item?.branch === filters?.branch?.label);
+    }
+
+    if (filters?.status && filters?.status !== "All Status") {
+      data = data?.filter((item) => item?.contract_status === filters?.status);
+    }
+
+    if (filters?.searchValue) {
+      const search = filters?.searchValue.toLowerCase();
+      data = data?.filter((row) =>
+        Object.values(row).some(
+          (value) => value && value.toString().toLowerCase().includes(search)
+        )
+      );
+    }
+
+    setFilteredData(data);
   }, [
+    filters?.industryCategory,
     filters?.branch,
     filters?.status,
     filters?.searchValue,
-    filters?.industryCategory,
+    exportedAccountData,
   ]);
 
   const thirdPartyCategories = [
@@ -371,10 +414,9 @@ const Account = () => {
     setFilters((prev) => ({
       ...prev,
       status: status === "Total" ? "All Status" : status,
-      searchValue: "",
-      branch: null,
       industryCategory: title === "All" ? "All" : title,
     }));
+
     setSelectedValue({ title, status });
   };
 
@@ -415,6 +457,120 @@ const Account = () => {
     else if (index === 1) computeChartData("industrySegment");
     else if (index === 2) computeChartData("industrySubSegment");
   };
+  const handleCityBarClick = (cityName, clickedStatus) => {
+    let data = exportedAccountData;
+    if (filters?.industryCategory && filters?.industryCategory !== "All") {
+      data = data?.filter(
+        (item) =>
+          item?.industryGroup?.toString()?.toLowerCase() ===
+          filters?.industryCategory?.toString()?.toLowerCase()
+      );
+    }
+    if (cityName) {
+      data = data?.filter(
+        (item) =>
+          item?.city?.toString()?.toLowerCase() ===
+          cityName?.toString()?.toLowerCase()
+      );
+    }
+
+    if (filters?.branch?.label) {
+      data = data?.filter((item) => item?.branch === filters?.branch?.label);
+    }
+
+    if (clickedStatus) {
+      data = data?.filter((item) => item?.contract_status === clickedStatus);
+    }
+
+    if (filters?.searchValue) {
+      const search = filters?.searchValue.toLowerCase();
+      data = data?.filter((row) =>
+        Object.values(row).some(
+          (value) => value && value.toString().toLowerCase().includes(search)
+        )
+      );
+    }
+
+    setFilteredData(data);
+  };
+
+  const generateCityBarChartData = () => {
+    const cityCounts = {};
+
+    filteredData.forEach((item) => {
+      const rawCity = item.city || "Unknown";
+      const city = rawCity.toLowerCase().trim(); // Normalize city name
+      const displayCity =
+        rawCity.charAt(0).toUpperCase() + rawCity.slice(1).toLowerCase(); // Proper case for display
+      const status = item.contract_status;
+
+      if (!cityCounts[city]) {
+        cityCounts[city] = {
+          displayName: displayCity,
+          Active: 0,
+          Expired: 0,
+        };
+      }
+
+      if (status === "Active") {
+        cityCounts[city].Active++;
+      } else if (status === "Expired") {
+        cityCounts[city].Expired++;
+      }
+    });
+
+    // Sort by total and get top 12
+    const sortedCities = Object.entries(cityCounts)
+      .sort((a, b) => {
+        const totalA = a[1].Active + a[1].Expired;
+        const totalB = b[1].Active + b[1].Expired;
+        return totalB - totalA;
+      })
+      .slice(0, 12);
+
+    const categories = sortedCities.map(([_, val]) => val.displayName);
+    const activeData = sortedCities.map(([_, val]) => val.Active);
+    const expiredData = sortedCities.map(([_, val]) => val.Expired);
+
+    return {
+      options: {
+        ...barChartData.options,
+        xaxis: {
+          categories,
+        },
+        chart: {
+          ...barChartData.options.chart,
+          events: {
+            dataPointSelection: (event, chartContext, config) => {
+              const city = categories[config.dataPointIndex];
+              const clickedStatus =
+                config.seriesIndex === 0
+                  ? "Active"
+                  : config.seriesIndex === 1
+                  ? "Expired"
+                  : "Unknown";
+
+              console.log("City clicked:", city);
+              console.log("Status clicked:", clickedStatus);
+
+              handleCityBarClick(city, clickedStatus);
+            },
+          },
+        },
+      },
+
+      series:
+        filters.status === "Active"
+          ? [{ name: "Active", data: activeData }]
+          : filters.status === "Expired"
+          ? [{ name: "Expired", data: expiredData }]
+          : [
+              { name: "Active", data: activeData },
+              { name: "Expired", data: expiredData },
+            ],
+    };
+  };
+
   return (
     <>
       <div className="account">
@@ -427,9 +583,32 @@ const Account = () => {
         </span>
 
         <div className="account-filter">
-          <span>Last Updated</span>
+          <Tooltip
+            title={moment(last_updated).format("MMMM D, YYYY [at] h:mm:ss A")}
+            placement="top"
+          >
+            <span>Last Updated</span>
+          </Tooltip>
 
-          <CommonButton className="common-green-btn">All</CommonButton>
+          <CommonButton
+            className="common-green-btn"
+            onClick={() => {
+              setFilteredData(exportedAccountData);
+              setFilters({
+                searchValue: "",
+                branch: null,
+                status: "All Status",
+                industryCategory: "",
+              });
+              dispatch(setIndustryGroupCount(exportedAccountData));
+              setSelectedValue({
+                title: "All",
+                status: "Total",
+              });
+            }}
+          >
+            All
+          </CommonButton>
 
           <CommonAutocomplete
             onChange={(event, newValue) => {
@@ -481,6 +660,7 @@ const Account = () => {
                 title: "",
                 status: "",
               });
+              setSelectedIndex(0);
             }}
           />
         </div>
@@ -544,9 +724,9 @@ const Account = () => {
           />
           <CommonChart
             title="Top 12 cities by number of account trend showing between active and inactive"
-            options={barChartData.options}
+            options={generateCityBarChartData().options}
             className="chart-data-2"
-            series={barChartData.series}
+            series={generateCityBarChartData().series}
           />
         </div>
       </div>
@@ -563,7 +743,7 @@ const Account = () => {
         scrollable
         title={
           modal?.isAssign
-            ? `Allocate User and Branch ${accountInformation?.name ?? ""}`
+            ? `Allocate User and Branch -- ${accountInformation?.name ?? ""}`
             : "Account information detail"
         }
       >

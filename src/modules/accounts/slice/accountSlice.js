@@ -124,6 +124,7 @@ export const getAccountInformation = createAsyncThunk(
 const accountState = {
   allUserData: null,
   exportedAccountDataLoading: false,
+  last_updated: "",
   exportedAccountData: [],
   accountDetailLoading: false,
   accountDetail: null,
@@ -141,7 +142,46 @@ const accountState = {
 const accountSlice = createSlice({
   name: "account",
   initialState: accountState,
-  reducers: {},
+  reducers: {
+    setIndustryGroupCount: (state, action) => {
+      if (action?.payload?.length > 0) {
+        const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
+
+        const groupedCounts = {
+          All: { title: "All", active: 0, expired: 0, total: 0 },
+        };
+
+        for (const group of fixedOrder) {
+          groupedCounts[group] = {
+            title: group,
+            active: 0,
+            expired: 0,
+            total: 0,
+          };
+        }
+
+        for (const item of action?.payload) {
+          const group = item.industryGroup || "Null";
+          const status =
+            item.contract_status === "Active" ? "active" : "expired";
+
+          const key = fixedOrder.includes(group) ? group : "Unknown";
+
+          groupedCounts[key][status]++;
+          groupedCounts[key].total++;
+
+          groupedCounts.All[status]++;
+          groupedCounts.All.total++;
+        }
+
+        const industryGroupStats = [
+          groupedCounts["All"],
+          ...fixedOrder.map((key) => groupedCounts[key]),
+        ];
+        state.industryGroupCount = industryGroupStats;
+      }
+    },
+  },
   extraReducers: (builder) => {
     // getAllUser
     builder.addCase(getAllUser.pending, (state) => {
@@ -187,7 +227,6 @@ const accountSlice = createSlice({
         renewal_person: account?.renewal_person_first_names ?? null,
       }));
 
-      // const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown", "Null"];
       const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
 
       const groupedCounts = {
@@ -223,6 +262,7 @@ const accountSlice = createSlice({
       state.industryGroupCount = industryGroupStats;
       state.exportedAccountData = formattedData;
       state.exportedAccountDataLoading = false;
+      state.last_updated = action.payload.data?.last_updated;
     });
     builder.addCase(getExportedAccount.rejected, (state) => {
       state.exportedAccountData = [];
@@ -301,5 +341,5 @@ const accountSlice = createSlice({
   },
 });
 
-export const {} = accountSlice.actions;
+export const { setIndustryGroupCount } = accountSlice.actions;
 export default accountSlice.reducer;

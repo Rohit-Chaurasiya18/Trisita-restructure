@@ -1,8 +1,12 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CustomSelect from "@/components/common/dropdown/CustomSelect";
 import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
+import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { useFormik } from "formik";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
+
 const CheckboxWithLabel = ({ label, name, checked, onChange }) => {
   return (
     <div
@@ -36,20 +40,32 @@ const CheckboxWithLabel = ({ label, name, checked, onChange }) => {
   );
 };
 
+const validationSchema = Yup.object({
+  partnerCSN: Yup.object().required("Partner CSN is required."),
+  parentAccountCSN: Yup.string().required("Parent Account CSN is required."),
+  csn: Yup.string().required("CSN is required."),
+  accountName: Yup.string().required("Account name is required."),
+  branch: Yup.object().required("Branch is required."),
+  bdPerson: Yup.object().required("BD Person is required."),
+  renewalPerson: Yup.object().required("Renewal Person is required."),
+  segment: Yup.object().required("Segment is required."),
+  accountType: Yup.object().required("Account Type is required."),
+  geo: Yup.object().required("Geo is required."),
+  status: Yup.object().required("Status is required."),
+});
+
 const AddAccount = () => {
-  const validationSchema = Yup.object({
-    partnerCSN: Yup.object().required("Partner CSN is required."),
-    parentAccountCSN: Yup.string().required("Parent Account CSN is required."),
-    csn: Yup.string().required("CSN is required."),
-    accountName: Yup.string().required("Account name is required."),
-    branch: Yup.object().required("Branch is required."),
-    bdPerson: Yup.object().required("BD Person is required."),
-    renewalPerson: Yup.object().required("Renewal Person is required."),
-    segment: Yup.object().required("Segment is required."),
-    accountType: Yup.object().required("Account Type is required."),
-    geo: Yup.object().required("Geo is required."),
-    status: Yup.object().required("Status is required."),
-  });
+  const dispatch = useDispatch();
+  const { allBranch, allBranchLoading } = useSelector((state) => ({
+    allBranchLoading: state?.insightMetrics?.branchListLoading,
+    allBranch: state?.insightMetrics?.branchList,
+  }));
+
+  console.log(allBranch, allBranchLoading);
+
+  useEffect(() => {
+    dispatch(getAllBranch());
+  }, []);
 
   const onSubmit = (values) => {
     console.log("Submit", values);
@@ -137,8 +153,8 @@ const AddAccount = () => {
               handleSelectChange("partnerCSN", selectedOption)
             }
             options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
+              { value: 5102086717, label: "5102086717" },
+              { value: 5117963549, label: "5117963549" },
             ]}
             placeholder="Select a Partner CSN"
             error={errors?.partnerCSN && touched?.partnerCSN}
@@ -184,10 +200,7 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("branch", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={allBranch}
             placeholder="Select a Branch"
             error={errors?.branch && touched?.branch}
             errorText={errors?.branch}

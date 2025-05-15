@@ -630,16 +630,7 @@ export const ChartData = {
   },
 };
 export const barChartData = {
-  series: [
-    {
-      name: "Active",
-      data: [280, 355, 36, 59, 86, 17, 48, 50, 33, 22, 25, 4],
-    },
-    {
-      name: "Expired",
-      data: [847, 372, 135, 105, 51, 93, 50, 35, 38, 42, 33, 48],
-    },
-  ],
+  series: [],
   options: {
     colors: ["#5372b9", "#90be82", "#9C27B0"],
     chart: {
