@@ -1,9 +1,12 @@
+import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  ADD_EDIT_ACCOUNT,
   END_CUSTOMER_ACCOUNT,
   GET_ACCOUNT,
   GET_ACCOUNT_INFORMATION,
   GET_ALL_USER,
+  GET_BD_RENEWAL_PERSON,
   GET_CONTRACTS,
   GET_EXPORTED_ACCOUNTS_DATA,
   INSIGHT_METRICS_CSN,
@@ -113,6 +116,43 @@ export const getAccountInformation = createAsyncThunk(
       const response = await axiosReact.get(
         GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`
       );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Get Renewal and BD Person
+export const getBdRenewalPerson = createAsyncThunk(
+  `account/getBdRenewalPerson`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_BD_RENEWAL_PERSON + `/${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Get Renewal and BD Person
+export const addEditAccount = createAsyncThunk(
+  `account/addEditAccount`,
+  async (payload, thunkAPI) => {
+    try {
+      let response;
+      if (payload?.accountId) {
+        response = await axiosReact.get(
+          ADD_EDIT_ACCOUNT + `/` + payload?.accountId
+        );
+      } else {
+        response = await axiosReact.post(ADD_EDIT_ACCOUNT + `/`, payload);
+      }
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

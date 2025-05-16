@@ -17,3 +17,6 @@ export const INSIGHT_METRICS_CSN = "/v1/api/get_insights_metrics_csn/";
 export const GET_CONTRACTS = "/v1/api/get_contracts/";
 export const END_CUSTOMER_ACCOUNT = "/v1/api/get_endcustomer_account/";
 export const GET_ACCOUNT_INFORMATION = "/v1/api/account";
+export const GET_BD_RENEWAL_PERSON =
+  "/v1/api/get_bd_and_renewal_person_by_branch";
+export const ADD_EDIT_ACCOUNT = "/v1/api/third_party_account";

@@ -7,7 +7,7 @@ import CommonCategoryGrid from "../components/CommonCategoryGrid";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { barChartData, ChartData } from "../constants";
 import ReactApexChart from "react-apexcharts";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import {
@@ -25,6 +25,7 @@ import CustomTabs from "../components/CustomTabs";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import AssignUserBranch from "../components/AssignUserBranch";
 import moment from "moment";
+import routesConstants from "@/routes/routesConstants";
 
 const CommonChart = ({
   title,
@@ -105,6 +106,7 @@ const Account = () => {
   });
 
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     branchListLoading,
@@ -288,7 +290,9 @@ const Account = () => {
         <Tooltip title={params?.value || ""}>
           <button
             className="text-red-600 border-0"
-            // onClick={() => navigate(`/update_account/${params.id}`)}
+            onClick={() =>
+              navigate(routesConstants?.UPDATE_ACCOUNT + "/" + params?.id)
+            }
           >
             <span className="table-cell-truncate">{params?.value}</span>
           </button>

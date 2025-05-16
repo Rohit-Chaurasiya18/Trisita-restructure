@@ -6,6 +6,7 @@ const routesConstants = {
   GET_USAGE: "/get_usage",
   ACCOUNT: "/account",
   ADD_ACCOUNT: "/add_account",
+  UPDATE_ACCOUNT:"/update_account",
   THIRD_PARTY_ACCOUNT: "/third_party_account",
   OPPORTUNITY: "/opportunity",
   QUOTATION: "/quotation",

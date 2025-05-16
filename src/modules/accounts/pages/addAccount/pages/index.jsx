@@ -1,10 +1,19 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CustomSelect from "@/components/common/dropdown/CustomSelect";
 import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
+import { somethingWentWrong } from "@/constants/SchemaValidation";
+import {
+  addEditAccount,
+  getBdRenewalPerson,
+  getExportedAccount,
+} from "@/modules/accounts/slice/accountSlice";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import routesConstants from "@/routes/routesConstants";
 import { useFormik } from "formik";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import * as Yup from "yup";
 
 const CheckboxWithLabel = ({ label, name, checked, onChange }) => {
@@ -42,84 +51,292 @@ const CheckboxWithLabel = ({ label, name, checked, onChange }) => {
 
 const validationSchema = Yup.object({
   partnerCSN: Yup.object().required("Partner CSN is required."),
-  parentAccountCSN: Yup.string().required("Parent Account CSN is required."),
-  csn: Yup.string().required("CSN is required."),
+
+  parentAccountCSN: Yup.number()
+    .typeError("Parent Account CSN must be a number.")
+    .required("Parent Account CSN is required."),
+
+  csn: Yup.number()
+    .typeError("CSN must be a number.")
+    .required("CSN is required."),
+
   accountName: Yup.string().required("Account name is required."),
+
   branch: Yup.object().required("Branch is required."),
-  bdPerson: Yup.object().required("BD Person is required."),
-  renewalPerson: Yup.object().required("Renewal Person is required."),
+
+  bdPerson: Yup.array()
+    .of(Yup.object().required("BD Person object is required."))
+    .min(1, "At least one BD Person is required.")
+    .required("BD Person is required."),
+
+  renewalPerson: Yup.array()
+    .of(Yup.object().required("Renewal Person object is required."))
+    .min(1, "At least one Renewal Person is required.")
+    .required("Renewal Person is required."),
+
   segment: Yup.object().required("Segment is required."),
+
   accountType: Yup.object().required("Account Type is required."),
+
   geo: Yup.object().required("Geo is required."),
+
   status: Yup.object().required("Status is required."),
+
+  readinessScore: Yup.number()
+    .typeError("Buying Readiness Score must be a number.")
+    .nullable(true),
+
+  website: Yup.string()
+    .matches(
+      /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+      "Enter a valid website URL."
+    )
+    .nullable(true),
+
+  account_associated_with: Yup.array()
+    .nullable()
+    .test({
+      name: "accountAssociatedWith",
+      test: function (value, context) {
+        const isThirdParty = context?.from?.[0]?.value?.thirdParty;
+
+        if (isThirdParty) {
+          if (Array.isArray(value) && value.length > 0) {
+            return true;
+          } else {
+            return this.createError({
+              message: "At least one associated account is required.",
+            });
+          }
+        }
+
+        // If thirdParty is false, no validation error
+        return true;
+      },
+    }),
 });
+const allPartnerCsn = [
+  { value: 5102086717, label: "5102086717" },
+  { value: 5117963549, label: "5117963549" },
+];
+const allSegmentList = [
+  { value: "Emerging", label: "Emerging" },
+  { value: "Strategic Account", label: "Strategic Account" },
+  { value: "Mature", label: "Mature" },
+  { value: "Named Account", label: "Named Account" },
+  { value: "Territory New", label: "Territory New" },
+  { value: "Midmarket Federal", label: "Midmarket Federal" },
+  { value: "Territory", label: "Territory" },
+  { value: "Midmarket", label: "Midmarket" },
+];
+
+const allAccountList = [
+  { value: "End Customer", label: "End Customer" },
+  { value: "Government", label: "Government" },
+  { value: "Strategic Account", label: "Strategic Account" },
+  { value: "Reseller", label: "Reseller" },
+  { value: "Distributor", label: "Distributor" },
+];
+
+const allGeoList = [
+  { value: "Americas", label: "Americas" },
+  { value: "APAC", label: "APAC" },
+  { value: "EMEA", label: "EMEA" },
+];
+
+const allStatusList = [
+  { value: "Active", label: "Active" },
+  { value: "Contract Pending", label: "Contract Pending" },
+  { value: "Inactive", label: "Inactive" },
+  { value: "Marked for Deletion", label: "Marked for Deletion" },
+  { value: "Out of Business", label: "Out of Business" },
+];
+
+const allIndustryGroup = [
+  { value: "EDU", label: "EDU" },
+  { value: "MFG", label: "MFG" },
+  { value: "OTH", label: "OTH" },
+  { value: "AEC", label: "AEC" },
+  { value: "M&E", label: "M&E" },
+];
 
 const AddAccount = () => {
   const dispatch = useDispatch();
-  const { allBranch, allBranchLoading } = useSelector((state) => ({
-    allBranchLoading: state?.insightMetrics?.branchListLoading,
-    allBranch: state?.insightMetrics?.branchList,
-  }));
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-  console.log(allBranch, allBranchLoading);
+  const [bdPersonList, setBdPersonList] = useState([]);
+  const [renewalPersonList, setRenewalPersonList] = useState([]);
+  const [accountDetail, setAccountDetail] = useState();
+  const { allBranch, allBranchLoading, filter, exportedAccountData } =
+    useSelector((state) => ({
+      allBranchLoading: state?.insightMetrics?.branchListLoading,
+      allBranch: state?.insightMetrics?.branchList,
+      filter: state?.layout?.filter,
+      exportedAccountData: state?.account?.exportedAccountData,
+    }));
+
+  const accountOptions = useMemo(
+    () =>
+      exportedAccountData?.map((account) => ({
+        value: account?.id,
+        label: `${account?.name} (${account?.csn})`,
+      })) || [],
+    [exportedAccountData]
+  );
 
   useEffect(() => {
     dispatch(getAllBranch());
   }, []);
 
+  useEffect(() => {
+    dispatch(
+      getExportedAccount({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
+  }, [filter?.csn]);
+
   const onSubmit = (values) => {
-    console.log("Submit", values);
+    const requestData = {
+      partner_csn: values?.partnerCSN?.value,
+      csn: +values?.csn,
+      name: values?.accountName,
+      flexCustomerFlag: values?.flexCustomerFlag,
+      buyingReadinessScore: values?.readinessScore,
+      isNamedAccount: values?.isNamedAccount,
+      segment: values?.segment?.value,
+      individualFlag: values?.individualFlag,
+      address1: values?.addressLine1,
+      address2: values?.addressLine2,
+      address3: values?.addressLine3,
+      city: values?.city,
+      country: values?.country,
+      countryCode: values?.countryCode,
+      county: values?.county,
+      geo: values?.geo?.value,
+      industry: values?.industry,
+      phoneNumber: values?.phoneNumber,
+      stateProvince: values?.stateProvince,
+      postal: values?.postalCode,
+      parentAccountCsn: values?.parentAccountCSN,
+      autodeskMainContact: values?.autodeskMainContact,
+      autodeskMainContactEmail: values?.autodeskMainContactEmail,
+      salesRegion: values?.salesRegion,
+      language: values?.language,
+      website: values?.website,
+      third_party: values?.thirdParty,
+      status: values?.status?.value,
+      latitude: values?.latitude,
+      longitude: values?.longitude,
+      parentIsNamedAccount: values?.parentIsNamedAccount,
+      localName: values?.localName,
+      branch: values?.branch?.value,
+      renewal_person: values?.renewalPerson?.map((item) => item?.value),
+      industryGroup: values?.industryGroup?.value,
+      industrySegment: values?.industrySegment,
+      industrySubSegment: values?.industrySubSegment,
+      victimCsns: values?.victimCSNs,
+      type: values?.accountType?.value,
+      user_assign: values?.bdPerson?.map((item) => item?.value),
+      account_associated_with: values?.thirdParty
+        ? values?.account_associated_with?.map((item) => item?.value)
+        : [],
+    };
+    if (id) {
+    } else {
+      dispatch(addEditAccount(requestData)).then((res) => {
+        if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+          toast.success("Third Party Account created Successfully");
+          navigate(routesConstants?.ACCOUNT);
+          resetForm();
+        } else {
+          toast.error(somethingWentWrong);
+        }
+      });
+    }
   };
+  console.log(
+    bdPersonList.filter((option) =>
+      accountDetail?.user_assign.includes(option?.value)
+    ),
+    accountDetail,
+    bdPersonList
+  );
 
   const initialValues = {
-    partnerCSN: "",
-    csn: "",
-    accountName: "",
-    branch: "",
-    bdPerson: "",
-    renewalPerson: "",
-    readinessScore: "",
-    segment: "",
-    accountType: "",
-    addressLine1: "",
-    addressLine2: "",
-    addressLine3: "",
-    city: "",
-    country: "",
-    countryCode: "",
-    county: "",
-    geo: "",
-    industry: "",
-    phoneNumber: "",
-    stateProvince: "",
-    postalCode: "",
-    parentAccountCSN: "",
-    autodeskMainContact: "",
-    autodeskMainContactEmail: "",
-    salesRegion: "",
-    status: "",
-    language: "",
-    website: "",
-    industryGroup: "",
-    industrySegment: "",
-    industrySubSegment: "",
-    localName: "",
-    victimCSNs: "",
-    latitude: "",
-    longitude: "",
-    flexCustomerFlag: false,
-    isNamedAccount: false,
-    individualFlag: false,
-    parentIsNamedAccount: false,
-    thirdParty: false,
+    partnerCSN:
+      allPartnerCsn?.filter(
+        (item) => item?.value === accountDetail?.partner_csn
+      ) || "",
+    csn: accountDetail?.csn || "",
+    accountName: accountDetail?.name || "",
+    branch:
+      allBranch?.filter((item) => item?.value == accountDetail?.branch) || "",
+    bdPerson:
+      bdPersonList.filter((option) =>
+        accountDetail?.user_assign.includes(option?.value)
+      ) || "",
+    renewalPerson:
+      renewalPersonList.filter((option) =>
+        accountDetail?.renewal_person.includes(option?.value)
+      ) || "",
+    readinessScore: accountDetail?.buyingReadinessScore || "",
+    segment:
+      allSegmentList?.find((item) => item?.value === accountDetail?.segment) ||
+      "",
+    accountType:
+      allAccountList?.find((item) => item?.value === accountDetail?.type) || "",
+    addressLine1: accountDetail?.address1 || "",
+    addressLine2: accountDetail?.address2 || "",
+    addressLine3: accountDetail?.address3 || "",
+    city: accountDetail?.city || "",
+    country: accountDetail?.country || "",
+    countryCode: accountDetail?.countryCode || "",
+    county: accountDetail?.county || "",
+    geo: allGeoList?.find((item) => item?.value === accountDetail?.geo) || "",
+    industry: accountDetail?.industry || "",
+    phoneNumber: accountDetail?.phoneNumber || "",
+    stateProvince: accountDetail?.stateProvince || "",
+    postalCode: accountDetail?.postal || "",
+    parentAccountCSN: accountDetail?.parentAccountCsn || "",
+    autodeskMainContact: accountDetail?.autodeskMainContact || "",
+    autodeskMainContactEmail: accountDetail?.autodeskMainContactEmail || "",
+    salesRegion: accountDetail?.salesRegion || "",
+    status: accountDetail?.status || "",
+    language: accountDetail?.language || "",
+    website: accountDetail?.website || "",
+    industryGroup:
+      allIndustryGroup?.find(
+        (item) => item?.value === accountDetail?.industryGroup
+      ) || "",
+    industrySegment: accountDetail?.industrySegment || "",
+    industrySubSegment: accountDetail?.industrySubSegment || "",
+    localName: accountDetail?.localName || "",
+    victimCSNs: accountDetail?.victimCsns || "",
+    latitude: accountDetail?.latitude || "",
+    longitude: accountDetail?.longitude || "",
+    flexCustomerFlag: accountDetail?.flexCustomerFlag || false,
+    isNamedAccount: accountDetail?.isNamedAccount || false,
+    individualFlag: accountDetail?.individualFlag || false,
+    parentIsNamedAccount: accountDetail?.parentIsNamedAccount || false,
+    thirdParty: accountDetail?.third_party || false,
+    account_associated_with: "",
   };
 
-  const { values, touched, errors, handleSubmit, handleChange, handleBlur } =
-    useFormik({
-      initialValues,
-      validationSchema,
-      onSubmit,
-    });
+  const {
+    values,
+    touched,
+    errors,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    setFieldValue,
+    resetForm,
+  } = useFormik({
+    initialValues,
+    enableReinitialize: true,
+    validationSchema,
+    onSubmit,
+  });
   const handleCheckboxChange = (name, event) => {
     const { checked } = event.target;
     handleChange({
@@ -137,12 +354,45 @@ const AddAccount = () => {
       },
     });
   };
-
+  const handleBdRenewalPerson = (selectedOption) => {
+    dispatch(getBdRenewalPerson(selectedOption)).then((res) => {
+      if (res?.payload?.data?.bd_person) {
+        const bdPersonOptions =
+          res?.payload?.data?.bd_person?.map((user) => ({
+            value: user?.id,
+            label: `${user?.first_name} ${user?.last_name}`,
+          })) || [];
+        setBdPersonList(bdPersonOptions);
+      }
+      if (res?.payload?.data?.renewal_person) {
+        const renewalOptions =
+          res?.payload?.data?.renewal_person?.map((user) => ({
+            value: user?.id,
+            label: `${user?.first_name} ${user?.last_name}`,
+          })) || [];
+        setRenewalPersonList(renewalOptions);
+      }
+      setFieldValue("bdPerson", "");
+      setFieldValue("renewalPerson", "");
+    });
+  };
+  useEffect(() => {
+    if (id) {
+      dispatch(addEditAccount({ accountId: id })).then((res) => {
+        if (res?.payload?.data?.account) {
+          setAccountDetail(res?.payload?.data?.account);
+          if (res?.payload?.data?.account?.branch) {
+            handleBdRenewalPerson(res?.payload?.data?.account?.branch);
+          }
+        }
+      });
+    }
+  }, [id]);
   return (
     <div>
-      <h2>Add Account</h2>
+      <h2>{id ? "Update" : "Add"} Account</h2>
       <div className="add-account-form">
-        <h2 className="title">Add Account</h2>
+        <h2 className="title">{id ? "Update" : "Add"} Account</h2>
         <form className="">
           <CustomSelect
             label="Partner CSN"
@@ -152,10 +402,7 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("partnerCSN", selectedOption)
             }
-            options={[
-              { value: 5102086717, label: "5102086717" },
-              { value: 5117963549, label: "5117963549" },
-            ]}
+            options={allPartnerCsn}
             placeholder="Select a Partner CSN"
             error={errors?.partnerCSN && touched?.partnerCSN}
             errorText={errors.partnerCSN}
@@ -197,9 +444,12 @@ const AddAccount = () => {
             required
             name="branch"
             value={values?.branch}
-            onChange={(selectedOption) =>
-              handleSelectChange("branch", selectedOption)
-            }
+            onChange={(selectedOption) => {
+              handleSelectChange("branch", selectedOption);
+              if (selectedOption?.value) {
+                handleBdRenewalPerson(selectedOption?.value);
+              }
+            }}
             options={allBranch}
             placeholder="Select a Branch"
             error={errors?.branch && touched?.branch}
@@ -213,10 +463,8 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("bdPerson", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            isMulti
+            options={bdPersonList}
             placeholder="Select a BD Person"
             error={errors?.bdPerson && touched?.bdPerson}
             errorText={errors?.bdPerson}
@@ -225,14 +473,12 @@ const AddAccount = () => {
             label="Renewal Person"
             required
             name="renewalPerson"
+            isMulti
             value={values?.renewalPerson}
             onChange={(selectedOption) =>
               handleSelectChange("renewalPerson", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={renewalPersonList}
             placeholder="Select a Renewal Person"
             error={errors?.renewalPerson && touched?.renewalPerson}
             errorText={errors?.renewalPerson}
@@ -259,10 +505,7 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("segment", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={allSegmentList}
             placeholder="Select a Segment"
             error={errors?.segment && touched?.segment}
             errorText={errors?.segment}
@@ -275,10 +518,7 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("accountType", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={allAccountList}
             placeholder="Select a Account Type"
             error={errors?.accountType && touched?.accountType}
             errorText={errors?.accountType}
@@ -389,10 +629,7 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("geo", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={allGeoList}
             placeholder="Select a Geo"
             error={errors?.geo && touched?.geo}
             errorText={errors?.geo}
@@ -524,10 +761,7 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("status", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={allStatusList}
             placeholder="Select a Status"
             error={errors?.status && touched?.status}
             errorText={errors?.status}
@@ -567,12 +801,9 @@ const AddAccount = () => {
             onChange={(selectedOption) =>
               handleSelectChange("industryGroup", selectedOption)
             }
-            options={[
-              { value: 1, label: "Partner 1" },
-              { value: 2, label: "Partner 2" },
-            ]}
+            options={allIndustryGroup}
             placeholder="Select a Status"
-            // error="yes"
+            isClearable
           />
           <CommonInputTextField
             labelName="Industry Segment"
@@ -696,12 +927,31 @@ const AddAccount = () => {
               onChange={(e) => handleCheckboxChange("thirdParty", e)}
             />
           </div>
+          {values?.thirdParty && (
+            <CustomSelect
+              label="Account Associated With"
+              name="account_associated_with"
+              value={values?.account_associated_with}
+              onChange={(selectedOption) =>
+                handleSelectChange("account_associated_with", selectedOption)
+              }
+              options={accountOptions}
+              placeholder="Select a account associated with"
+              required
+              isMulti
+              error={
+                errors?.account_associated_with &&
+                touched?.account_associated_with
+              }
+              errorText={errors?.account_associated_with}
+            />
+          )}
           <CommonButton
             onClick={() => handleSubmit()}
             type="button"
             className="add-account-btn"
           >
-            Submit
+            {id ? "Update" : "Submit"}
           </CommonButton>
         </form>
       </div>

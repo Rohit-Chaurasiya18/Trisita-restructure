@@ -13,6 +13,7 @@ const CustomSelect = ({
   errorText = "",
   name,
   isDisabled = false,
+  isClearable,
 }) => {
   // Custom style for red border on error
   const customStyles = {
@@ -61,6 +62,7 @@ const CustomSelect = ({
         placeholder={placeholder}
         classNamePrefix="react-select"
         styles={customStyles}
+        isClearable={isClearable}
       />
       {error && (
         <span

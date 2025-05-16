@@ -13,7 +13,7 @@ import {
   AddAccount,
   Quotations,
   AddQuotation,
-  Subscription
+  Subscription,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -46,6 +46,10 @@ const routesConfig = {
     },
     {
       path: routesConstants.ADD_ACCOUNT,
+      component: AddAccount,
+    },
+    {
+      path: routesConstants.UPDATE_ACCOUNT + `/:id`,
       component: AddAccount,
     },
     {
