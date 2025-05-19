@@ -128,14 +128,14 @@ const Account = () => {
     accountInformation: state?.account?.accountInformation,
   }));
 
-  useEffect(() => {
-    setFilteredData(exportedAccountData);
-  }, [exportedAccountData]);
-
   const isThirdPartyAccount = useMemo(
     () => location.pathname.startsWith("/third_party_account"),
     [location?.pathname]
   );
+
+  useEffect(() => {
+    setFilteredData(exportedAccountData);
+  }, [exportedAccountData, isThirdPartyAccount]);
 
   useEffect(() => {
     dispatch(getAllBranch());

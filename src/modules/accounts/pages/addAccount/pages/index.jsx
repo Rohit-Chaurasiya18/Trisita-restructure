@@ -325,7 +325,10 @@ const AddAccount = () => {
     individualFlag: accountDetail?.individualFlag || false,
     parentIsNamedAccount: accountDetail?.parentIsNamedAccount || false,
     thirdParty: accountDetail?.third_party || false,
-    account_associated_with: "",
+    account_associated_with:
+      accountOptions.filter((option) =>
+        accountDetail?.account_associated_with.includes(option?.value)
+      ) || "",
   };
 
   const {
