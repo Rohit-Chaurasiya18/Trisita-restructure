@@ -168,13 +168,11 @@ const AddAccount = () => {
   const [bdPersonList, setBdPersonList] = useState([]);
   const [renewalPersonList, setRenewalPersonList] = useState([]);
   const [accountDetail, setAccountDetail] = useState();
-  const { allBranch, allBranchLoading, filter, exportedAccountData } =
-    useSelector((state) => ({
-      allBranchLoading: state?.insightMetrics?.branchListLoading,
-      allBranch: state?.insightMetrics?.branchList,
-      filter: state?.layout?.filter,
-      exportedAccountData: state?.account?.exportedAccountData,
-    }));
+  const { allBranch, filter, exportedAccountData } = useSelector((state) => ({
+    allBranch: state?.insightMetrics?.branchList,
+    filter: state?.layout?.filter,
+    exportedAccountData: state?.account?.exportedAccountData,
+  }));
 
   const accountOptions = useMemo(
     () =>
@@ -242,6 +240,17 @@ const AddAccount = () => {
         : [],
     };
     if (id) {
+      dispatch(
+        addEditAccount({ updatedAccountId: id, updatedPayload: requestData })
+      ).then((res) => {
+        if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+          toast.success("Third Party Account updated Successfully");
+          navigate(routesConstants?.ACCOUNT);
+          resetForm();
+        } else {
+          toast.error(somethingWentWrong);
+        }
+      });
     } else {
       dispatch(addEditAccount(requestData)).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
@@ -254,23 +263,16 @@ const AddAccount = () => {
       });
     }
   };
-  console.log(
-    bdPersonList.filter((option) =>
-      accountDetail?.user_assign.includes(option?.value)
-    ),
-    accountDetail,
-    bdPersonList
-  );
 
   const initialValues = {
     partnerCSN:
-      allPartnerCsn?.filter(
+      allPartnerCsn?.find(
         (item) => item?.value === accountDetail?.partner_csn
       ) || "",
     csn: accountDetail?.csn || "",
     accountName: accountDetail?.name || "",
     branch:
-      allBranch?.filter((item) => item?.value == accountDetail?.branch) || "",
+      allBranch?.find((item) => item?.value == accountDetail?.branch) || "",
     bdPerson:
       bdPersonList.filter((option) =>
         accountDetail?.user_assign.includes(option?.value)
@@ -301,7 +303,9 @@ const AddAccount = () => {
     autodeskMainContact: accountDetail?.autodeskMainContact || "",
     autodeskMainContactEmail: accountDetail?.autodeskMainContactEmail || "",
     salesRegion: accountDetail?.salesRegion || "",
-    status: accountDetail?.status || "",
+    status:
+      allStatusList?.find((item) => item?.value === accountDetail?.status) ||
+      "",
     language: accountDetail?.language || "",
     website: accountDetail?.website || "",
     industryGroup:
@@ -386,8 +390,11 @@ const AddAccount = () => {
           }
         }
       });
+    } else {
+      setAccountDetail(null);
     }
   }, [id]);
+
   return (
     <div>
       <h2>{id ? "Update" : "Add"} Account</h2>
@@ -947,7 +954,9 @@ const AddAccount = () => {
             />
           )}
           <CommonButton
-            onClick={() => handleSubmit()}
+            onClick={() => {
+              handleSubmit();
+            }}
             type="button"
             className="add-account-btn"
           >

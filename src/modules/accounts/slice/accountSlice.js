@@ -150,6 +150,11 @@ export const addEditAccount = createAsyncThunk(
         response = await axiosReact.get(
           ADD_EDIT_ACCOUNT + `/` + payload?.accountId
         );
+      } else if (payload?.updatedAccountId) {
+        response = await axiosReact.put(
+          ADD_EDIT_ACCOUNT + `/` + payload?.updatedAccountId,
+          payload?.updatedPayload
+        );
       } else {
         response = await axiosReact.post(ADD_EDIT_ACCOUNT + `/`, payload);
       }
