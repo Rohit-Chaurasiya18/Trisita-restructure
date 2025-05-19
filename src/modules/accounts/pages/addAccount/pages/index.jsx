@@ -251,8 +251,6 @@ const AddAccount = () => {
           toast.success("Third Party Account updated Successfully");
           navigate(routesConstants?.ACCOUNT);
           resetForm();
-        } else {
-          toast.error(somethingWentWrong);
         }
         setIsSubmitting(false);
       });
@@ -262,8 +260,6 @@ const AddAccount = () => {
           toast.success("Third Party Account created Successfully");
           navigate(routesConstants?.ACCOUNT);
           resetForm();
-        } else {
-          toast.error(somethingWentWrong);
         }
         setIsSubmitting(false);
       });
