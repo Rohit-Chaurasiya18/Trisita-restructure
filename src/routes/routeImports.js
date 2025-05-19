@@ -14,9 +14,6 @@ export const Account = lazy(() => import("@/modules/accounts/pages/index"));
 export const AddAccount = lazy(() =>
   import("@/modules/accounts/pages/addAccount/pages/index")
 );
-export const ThirdPartyAccount = lazy(() =>
-  import("@/modules/accounts/pages/thirdAccount/pages/index")
-);
 export const Quotations = lazy(() =>
   import("@/modules/quotations/pages/index")
 );

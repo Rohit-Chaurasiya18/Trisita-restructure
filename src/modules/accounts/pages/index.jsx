@@ -144,9 +144,12 @@ const Account = () => {
 
   useEffect(() => {
     dispatch(
-      getExportedAccount({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+      getExportedAccount({
+        id: filter?.csn === "All CSN" ? "" : filter?.csn,
+        isThirdParty: isThirdPartyAccount,
+      })
     );
-  }, [filter?.csn]);
+  }, [filter?.csn, isThirdPartyAccount]);
 
   useEffect(() => {
     if (
@@ -261,7 +264,9 @@ const Account = () => {
       width: 150,
       renderCell: (params, index) => (
         <span
-          onClick={() => handleOpenModel(params?.row?.id)}
+          onClick={() =>
+            !isThirdPartyAccount && handleOpenModel(params?.row?.id)
+          }
           className="action-button bg-white text-black px-3 py-1 rounded border-0"
         >
           {params?.value}
@@ -289,7 +294,7 @@ const Account = () => {
       renderCell: (params) => (
         <Tooltip title={params?.value || ""}>
           <button
-            className="text-red-600 border-0"
+            className="text-red-600 border-0 "
             onClick={() =>
               navigate(routesConstants?.UPDATE_ACCOUNT + "/" + params?.id)
             }
@@ -471,11 +476,15 @@ const Account = () => {
       );
     }
     if (cityName) {
-      data = data?.filter(
-        (item) =>
-          item?.city?.toString()?.toLowerCase() ===
-          cityName?.toString()?.toLowerCase()
-      );
+      if (cityName === "Unknown") {
+        data = data?.filter((item) => !item?.city);
+      } else {
+        data = data?.filter(
+          (item) =>
+            item?.city?.toString()?.toLowerCase() ===
+            cityName?.toString()?.toLowerCase()
+        );
+      }
     }
 
     if (filters?.branch?.label) {
@@ -502,7 +511,9 @@ const Account = () => {
     const cityCounts = {};
 
     filteredData.forEach((item) => {
-      const rawCity = item.city || "Unknown";
+      // const rawCity = item?.city || "Unknown";
+      const rawCity = item?.city || "Unknown";
+
       const city = rawCity.toLowerCase().trim(); // Normalize city name
       const displayCity =
         rawCity.charAt(0).toUpperCase() + rawCity.slice(1).toLowerCase(); // Proper case for display
@@ -553,10 +564,6 @@ const Account = () => {
                   : config.seriesIndex === 1
                   ? "Expired"
                   : "Unknown";
-
-              console.log("City clicked:", city);
-              console.log("Status clicked:", clickedStatus);
-
               handleCityBarClick(city, clickedStatus);
             },
           },
@@ -674,11 +681,7 @@ const Account = () => {
           ) : (
             industryGroupCount?.length > 0 && (
               <CommonCategoryGrid
-                data={
-                  isThirdPartyAccount
-                    ? thirdPartyCategories
-                    : industryGroupCount
-                }
+                data={industryGroupCount}
                 handleClick={handleClick}
                 selectedValue={selectedValue}
               />

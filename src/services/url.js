@@ -20,3 +20,4 @@ export const GET_ACCOUNT_INFORMATION = "/v1/api/account";
 export const GET_BD_RENEWAL_PERSON =
   "/v1/api/get_bd_and_renewal_person_by_branch";
 export const ADD_EDIT_ACCOUNT = "/v1/api/third_party_account";
+export const GET_THIRD_PARTY_ACCOUNT = "/v1/api/get_third_party_accounts/";

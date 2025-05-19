@@ -14,7 +14,6 @@ import {
   Quotations,
   AddQuotation,
   Subscription,
-  ThirdPartyAccount,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -55,7 +54,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.THIRD_PARTY_ACCOUNT,
-      component: ThirdPartyAccount,
+      component: Account,
     },
     {
       path: routesConstants.OPPORTUNITY,

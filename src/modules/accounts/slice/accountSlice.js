@@ -9,6 +9,7 @@ import {
   GET_BD_RENEWAL_PERSON,
   GET_CONTRACTS,
   GET_EXPORTED_ACCOUNTS_DATA,
+  GET_THIRD_PARTY_ACCOUNT,
   INSIGHT_METRICS_CSN,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -33,9 +34,13 @@ export const getExportedAccount = createAsyncThunk(
   `account/getExportedAccount`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(
-        GET_EXPORTED_ACCOUNTS_DATA + `${payload?.id}`
-      );
+      let url;
+      if (payload?.isThirdParty) {
+        url = GET_THIRD_PARTY_ACCOUNT;
+      } else {
+        url = GET_EXPORTED_ACCOUNTS_DATA;
+      }
+      const response = await axiosReact.get(url + `${payload?.id}`);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
