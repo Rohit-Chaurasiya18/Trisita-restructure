@@ -1,15 +1,80 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
-import { useState } from "react";
-import { columns } from "../constants";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import routesConstants from "@/routes/routesConstants";
+import { useDispatch, useSelector } from "react-redux";
+import { getQuotationData } from "../slice/quotationSlice";
+import moment from "moment";
 
 const Quotations = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
   const getRowId = (row) => row.id;
+  useEffect(() => {
+    dispatch(getQuotationData());
+  }, []);
+
+  const { quotationData, userDetail } = useSelector((state) => ({
+    quotationData: state?.quotation?.quotationData,
+    userDetail: state?.login?.userDetail,
+  }));
+  useEffect(() => {
+    setFilteredData(quotationData);
+  }, [quotationData]);
+  const columns = [
+    { field: "quotation_date", headerName: "Quotation Date", width: 150 },
+    { field: "quotation_no", headerName: "Quotation No", width: 150 },
+    { field: "name", headerName: "Name", width: 150 },
+    { field: "general_total", headerName: "General Total", width: 150 },
+    { field: "sales_stage", headerName: "Sales Stage", width: 150 },
+    { field: "opportunity", headerName: "Opportunity", width: 150 },
+    { field: "account", headerName: "Account", width: 150 },
+    { field: "billing_contact", headerName: "Billing Contact", width: 150 },
+    { field: "valid_until", headerName: "Valid Until", width: 150 },
+    {
+      field: "updated_at",
+      headerName: "Updated At",
+      width: 150,
+      renderCell: (params, index) => (
+        <span
+          title={moment(params?.row?.updated_at).format(
+            "DD MMM YYYY [at] hh:mm A"
+          )}
+        >
+          {moment(params?.row?.updated_at).format("DD MMM YYYY [at] hh:mm A")}
+        </span>
+      ),
+    },
+    { field: "updated_by", headerName: "Updated By", width: 150 },
+    {
+      field: "created_at",
+      headerName: "Created At",
+      width: 150,
+      renderCell: (params, index) => (
+        <span
+          title={moment(params?.row?.created_at).format(
+            "DD MMM YYYY [at] hh:mm A"
+          )}
+        >
+          {moment(params?.row?.created_at).format("DD MMM YYYY [at] hh:mm A")}
+        </span>
+      ),
+    },
+    { field: "created_by", headerName: "Created By", width: 150 },
+  ];
+
+  const filterData = (data, text) => {
+    return data?.filter((row) => {
+      return Object.values(row).some(
+        (value) =>
+          value && value.toString().toLowerCase().includes(text.toLowerCase())
+      );
+    });
+  };
 
   return (
     <>
@@ -32,25 +97,29 @@ const Quotations = () => {
           </CommonButton>
           <CommonSearchInput
             value={searchValue}
-            label="Search..."
+            label="Search Quotation"
             loading={false}
-            debounceTime={500}
+            debounceTime={400}
             onChange={(text) => {
-              console.log("Debounced Search Text:", text);
               setSearchValue(text);
-              account_trisita;
+              if (text?.trim()) {
+                const data = filterData(quotationData, text?.trim());
+                setFilteredData(data);
+              } else {
+                setFilteredData(quotationData);
+              }
             }}
           />
         </div>
       </div>
       <div className="quotation-table">
         <CommonTable
-          rows={[]}
+          rows={filteredData}
           columns={columns}
           getRowId={getRowId}
           checkboxSelection
           toolbar
-          exportFileName={`quotation_master`}
+          exportFileName={`quotation_master_${userDetail?.first_name}_${userDetail?.last_name}`}
         />
       </div>
     </>

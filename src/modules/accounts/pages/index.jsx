@@ -582,6 +582,20 @@ const Account = () => {
     };
   };
 
+  const handleCallback = () => {
+    setModal({
+      isOpen: false,
+      id: "",
+      isAssign: false,
+    });
+    dispatch(
+      getExportedAccount({
+        id: filter?.csn === "All CSN" ? "" : filter?.csn,
+        isThirdParty: isThirdPartyAccount,
+      })
+    );
+  };
+
   return (
     <>
       <div className="account">
@@ -754,7 +768,11 @@ const Account = () => {
             : "Account information detail"
         }
       >
-        {modal?.isAssign ? <AssignUserBranch id={modal?.id} /> : <CustomTabs />}
+        {modal?.isAssign ? (
+          <AssignUserBranch id={modal?.id} handleCallback={handleCallback} />
+        ) : (
+          <CustomTabs />
+        )}
       </CommonModal>
     </>
   );

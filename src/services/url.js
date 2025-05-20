@@ -21,3 +21,5 @@ export const GET_BD_RENEWAL_PERSON =
   "/v1/api/get_bd_and_renewal_person_by_branch";
 export const ADD_EDIT_ACCOUNT = "/v1/api/third_party_account";
 export const GET_THIRD_PARTY_ACCOUNT = "/v1/api/get_third_party_accounts/";
+export const GET_ADD_QUOTATION = "/v1/product/quotation/";
+export const GET_ADD_SALES_STAGE = "/v1/product/sales_stage/";

@@ -4,6 +4,7 @@ import { getAccountInformation } from "../slice/accountSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Autocomplete, TextField } from "@mui/material";
+import { toast } from "react-toastify";
 
 // Reusable Autocomplete Field
 const AutocompleteField = ({
@@ -40,7 +41,7 @@ const AutocompleteField = ({
   </div>
 );
 
-const AssignUserBranch = ({ id }) => {
+const AssignUserBranch = ({ id, handleCallback }) => {
   const dispatch = useDispatch();
   const { accountInformation, allUserData, allClientData, branch_list } =
     useSelector((state) => ({
@@ -57,11 +58,16 @@ const AssignUserBranch = ({ id }) => {
   }, [id, dispatch]);
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      bdPerson: [],
-      branch: null,
-      renewalPerson: [],
-      client: [],
+      bdPerson: accountInformation?.user_assign ?? [],
+      branch: accountInformation?.branch?.id
+        ? branch_list?.find(
+            (item) => item?.value === accountInformation?.branch?.id
+          )
+        : null,
+      renewalPerson: accountInformation?.renewal_person ?? [],
+      client: accountInformation?.client ?? [],
     },
     validationSchema: Yup.object({
       bdPerson: Yup.array().min(1, "At least one BD person is required"),
@@ -73,11 +79,23 @@ const AssignUserBranch = ({ id }) => {
       client: Yup.array().min(1, "At least one client is required"),
     }),
     onSubmit: (values) => {
-      console.log("Form submitted:", values);
       // Submit your API call here
+      const requestBody = {
+        user_assign: values?.bdPerson?.map((user) => user?.id),
+        branch: values?.branch?.value || null,
+        renewal_person: values?.renewalPerson?.map((user) => user?.id),
+        client: values?.client?.map((user) => user?.id),
+      };
+      dispatch(
+        getAccountInformation({ accountId: id, isUpdate: true, requestBody })
+      ).then((res) => {
+        if (res?.payload?.status === 200) {
+          toast.success("Account Allocated");
+        }
+        handleCallback();
+      });
     },
   });
-
   return (
     <form className="allocate-form" onSubmit={formik.handleSubmit}>
       <AutocompleteField

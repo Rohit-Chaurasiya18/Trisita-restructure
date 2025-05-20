@@ -118,9 +118,17 @@ export const getAccountInformation = createAsyncThunk(
   `account/getAccountInformation`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(
-        GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`
-      );
+      let response;
+      if (payload?.isUpdate) {
+        response = await axiosReact.put(
+          GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`,
+          payload?.requestBody
+        );
+      } else {
+        response = await axiosReact.get(
+          GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`
+        );
+      }
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

@@ -6,6 +6,7 @@ import layoutReducer from "@/layout/slice/layoutSlice";
 import insightMetricsReducer from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import alertSubscriptionReducer from "@/modules/alertSubscription/slice/alertSubscription";
 import accountReducer from "@/modules/accounts/slice/accountSlice";
+import quotationReducer from "@/modules/quotations/slice/quotationSlice";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -15,5 +16,6 @@ const reducer = combineReducers({
   insightMetrics: insightMetricsReducer,
   alertSubscription: alertSubscriptionReducer,
   account: accountReducer,
+  quotation: quotationReducer,
 });
 export default reducer;
