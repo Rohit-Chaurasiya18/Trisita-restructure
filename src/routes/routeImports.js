@@ -20,6 +20,9 @@ export const Quotations = lazy(() =>
 export const AddQuotation = lazy(() =>
   import("@/modules/quotations/pages/AddQuotation")
 );
+export const Opportunity = lazy(() =>
+  import("@/modules/opportunity/pages/index")
+);
 export const Subscription = lazy(() =>
   import("@/modules/subscription/pages/index")
 );

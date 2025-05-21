@@ -13,6 +13,7 @@ import {
   AddAccount,
   Quotations,
   AddQuotation,
+  Opportunity,
   Subscription,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
@@ -58,7 +59,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.OPPORTUNITY,
-      component: Get_usage,
+      component: Opportunity,
     },
     // {
     //   path: routesConstants.QUOTATION,

@@ -1,0 +1,90 @@
+.opportunity-container {
+  .account-filter {
+    .MuiStack-root {
+      padding-top: 0px;
+
+      .MuiPickersInputBase-root {
+        height: 45px;
+      }
+
+      .Mui-focused {
+        .MuiFormLabel-root {
+          top: 5px;
+        }
+      }
+    }
+
+    @media (max-width: 984px) {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 859px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 568px) {
+      grid-template-columns: repeat(1, 1fr);
+
+      .MuiAutocomplete-root {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 391px) {
+      .MuiAutocomplete-root {
+        width: 100%;
+
+        .MuiInputBase-root {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+}
+.opportunity-card-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  .opportunity-card {
+    padding: 0.75rem;
+    border-radius: 3px;
+    cursor: pointer;
+    min-height: 70px;
+    width: 25%;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+  @media (max-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 568px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+.opportunity-chart-section {
+  margin-top: 10px;
+}
+.opportunity-retention-account {
+  @media (max-width: 1024px) {
+    display: grid;
+    gap: 0px;
+  }
+  display: flex;
+  gap: 20px;
+  .insight-metrics-chart {
+    width: 50%;
+    @media (max-width: 1024px) {
+      width: 100%;
+    }
+    @media (max-width: 341px) {
+      width: 95%;
+    }
+    .chart-data {
+      height: 100%;
+    }
+  }
+}

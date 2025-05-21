@@ -188,7 +188,7 @@ const Dashboard = () => {
                     <p className="mb-0 title">
                       {item?.account_name.slice(0, 14) + "..."}
                     </p>
-                    <span>Ankit</span>
+                    <span>{item?.bd_person_name}</span>
                   </Tooltip>
                 </div>
                 <p>{item?.bd_person_name}</p>

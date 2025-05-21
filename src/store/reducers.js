@@ -7,7 +7,7 @@ import insightMetricsReducer from "@/modules/insightMetrics/slice/insightMetrics
 import alertSubscriptionReducer from "@/modules/alertSubscription/slice/alertSubscription";
 import accountReducer from "@/modules/accounts/slice/accountSlice";
 import quotationReducer from "@/modules/quotations/slice/quotationSlice";
-
+import opportunityReducer from "@/modules/opportunity/slice/opportunitySlice";
 const reducer = combineReducers({
   dashboard: dashboardReducer,
   login: loginReducer,
@@ -17,5 +17,6 @@ const reducer = combineReducers({
   alertSubscription: alertSubscriptionReducer,
   account: accountReducer,
   quotation: quotationReducer,
+  opportunity: opportunityReducer,
 });
 export default reducer;
