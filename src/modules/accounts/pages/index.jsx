@@ -717,8 +717,7 @@ const Account = () => {
           )}
         </div>
         <div className="account-industry-chart mt-4">
-          {filteredData?.length > 0 &&
-          lineChartData?.series[0]?.data?.length > 0 ? (
+          {!exportedAccountDataLoading ? (
             <CommonChart
               title="Trend of number of accounts by Industry"
               options={lineChartData.options}
