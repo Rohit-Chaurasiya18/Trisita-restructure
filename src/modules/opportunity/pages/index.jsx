@@ -4,7 +4,6 @@ import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete"
 import { Tooltip } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { columns } from "../constant";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
