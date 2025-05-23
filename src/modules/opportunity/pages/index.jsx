@@ -385,7 +385,7 @@ const Opportunity = () => {
       width: 220,
     },
   ];
-  
+
   return (
     <>
       <div className="opportunity-container">
