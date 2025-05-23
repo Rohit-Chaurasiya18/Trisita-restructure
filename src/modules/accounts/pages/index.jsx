@@ -158,7 +158,6 @@ const Account = () => {
       filters?.searchValue ||
       filters?.industryCategory
     ) {
-      debugger;
       let data = exportedAccountData;
       let industryGroup = exportedAccountData;
       if (filters?.branch?.label) {
