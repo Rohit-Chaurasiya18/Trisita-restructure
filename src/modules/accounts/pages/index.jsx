@@ -158,6 +158,7 @@ const Account = () => {
       filters?.searchValue ||
       filters?.industryCategory
     ) {
+      debugger;
       let data = exportedAccountData;
       let industryGroup = exportedAccountData;
       if (filters?.branch?.label) {
@@ -199,6 +200,7 @@ const Account = () => {
       dispatch(setIndustryGroupCount(industryGroup));
     } else {
       setFilteredData(exportedAccountData);
+      dispatch(setIndustryGroupCount(exportedAccountData));
     }
   }, [filters?.branch, filters?.status, filters?.searchValue]);
 
@@ -238,11 +240,6 @@ const Account = () => {
     filters?.searchValue,
     exportedAccountData,
   ]);
-
-  const thirdPartyCategories = [
-    { title: "All", active: 17, inactive: 0, total: 17 },
-    { title: "Null", active: 0, inactive: 0, total: 0 },
-  ];
 
   const handleOpenModel = (id) => {
     setModal((prev) => ({ ...prev, isOpen: true, id: id, isAssign: false }));
@@ -454,7 +451,8 @@ const Account = () => {
 
   // On initial data load, generate the default industryGroup chart
   useEffect(() => {
-    if (filteredData && filteredData.length > 0) {
+    // if (filteredData && filteredData.length > 0) {
+    if (filteredData) {
       computeChartData("industryGroup");
       setSelectedIndex(0);
     }

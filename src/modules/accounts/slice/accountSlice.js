@@ -202,7 +202,7 @@ const accountSlice = createSlice({
   initialState: accountState,
   reducers: {
     setIndustryGroupCount: (state, action) => {
-      if (action?.payload?.length > 0) {
+      // if (action?.payload) {
         const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
 
         const groupedCounts = {
@@ -238,7 +238,7 @@ const accountSlice = createSlice({
         ];
         state.industryGroupCount = industryGroupStats;
       }
-    },
+    // },
   },
   extraReducers: (builder) => {
     // getAllUser
