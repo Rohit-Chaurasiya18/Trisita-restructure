@@ -10,6 +10,11 @@
     .MuiFormLabel-root {
       top: -6px;
     }
+    .multiple-select-container {
+      .MuiAutocomplete-inputRoot {
+        height: 100%;
+      }
+    }
   }
 }
 .insight-metrics-chart {

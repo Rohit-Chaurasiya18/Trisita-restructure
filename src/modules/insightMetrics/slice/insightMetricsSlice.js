@@ -54,6 +54,7 @@ const insightMetricsState = {
   accountList: null,
   branchListLoading: false,
   branchList: null,
+  insightMetricsCustomerLoading: false,
   insightMetricsCustomer: null,
   lastUpdated: null,
 };
@@ -111,14 +112,29 @@ const insightMetricsSlice = createSlice({
     builder.addCase(getInsightMetrics.pending, (state, action) => {
       state.lastUpdated = null;
       state.insightMetricsCustomer = null;
+      state.insightMetricsCustomerLoading = true;
     });
+
     builder.addCase(getInsightMetrics.fulfilled, (state, action) => {
       state.lastUpdated = action.payload.data?.last_updated;
-      state.insightMetricsCustomer = action.payload.data?.response_data;
+      state.insightMetricsCustomer = action.payload.data?.response_data?.map(
+        (item) => ({
+          ...item,
+          bd_person: item?.bd_person_name
+            ? item?.bd_person_name.join(", ")
+            : "",
+          renewal_person: item?.renewal_person_name
+            ? item?.renewal_person_name.join(", ")
+            : "",
+        })
+      );
+      state.insightMetricsCustomerLoading = false;
     });
+    
     builder.addCase(getInsightMetrics.rejected, (state, action) => {
       state.lastUpdated = null;
       state.insightMetricsCustomer = null;
+      state.insightMetricsCustomerLoading = false;
     });
   },
 });

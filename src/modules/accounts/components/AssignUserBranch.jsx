@@ -7,7 +7,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { toast } from "react-toastify";
 
 // Reusable Autocomplete Field
-const AutocompleteField = ({
+export const AutocompleteField = ({
   label,
   name,
   options,

@@ -7,7 +7,7 @@ const SkeletonLoader = ({
     <>
       {isDashboard ? (
         <div
-          className="skeleton-rectangle"
+          className="skeleton-rectangle mt-2 mb-2"
           style={{ height: height, width: width }}
         />
       ) : (

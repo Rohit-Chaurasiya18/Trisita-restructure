@@ -8,6 +8,7 @@ const CommonSelect = ({
   placeholder = "Select",
   sx = {},
   defaultValue,
+  loading = false,
 }) => {
   return (
     <Select
@@ -19,6 +20,7 @@ const CommonSelect = ({
       inputProps={{ "aria-label": "common select" }}
       // style={style}
       sx={{ height: "45px", ...sx }}
+      disabled={loading}
     >
       {/* <MenuItem value="">{placeholder}</MenuItem> */}
       {options.map((opt) => (
