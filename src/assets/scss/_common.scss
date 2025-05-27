@@ -395,3 +395,7 @@
 .action-button {
   cursor: pointer;
 }
+.MuiDateRangeCalendar-root > div:first-child {
+  /* your styles here */
+  display: none !important;
+}
