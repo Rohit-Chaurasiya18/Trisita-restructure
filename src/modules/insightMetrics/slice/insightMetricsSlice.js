@@ -3,6 +3,7 @@ import { axiosReact } from "@/services/api";
 import {
   GET_ALL_ACCOUNT,
   GET_ALL_BRANCH,
+  GET_INSIGHT_METRICS_CONTRACT,
   INSIGHT_METRICS_CUSTOMER,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -20,6 +21,7 @@ export const getAllBranch = createAsyncThunk(
     }
   }
 );
+
 export const getAllAccount = createAsyncThunk(
   `insightMetrics/getAllAccount`,
   async (payload, thunkAPI) => {
@@ -32,6 +34,7 @@ export const getAllAccount = createAsyncThunk(
     }
   }
 );
+
 export const getInsightMetrics = createAsyncThunk(
   `insightMetrics/getInsightMetrics`,
   async (payload, thunkAPI) => {
@@ -49,6 +52,23 @@ export const getInsightMetrics = createAsyncThunk(
   }
 );
 
+// getInsightMetricsContract
+export const getInsightMetricsContract = createAsyncThunk(
+  `insightMetrics/getInsightMetricsContract`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_INSIGHT_METRICS_CONTRACT +
+          `/${payload?.id}/${payload?.contractNumber}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const insightMetricsState = {
   accountListLoading: false,
   accountList: null,
@@ -57,6 +77,8 @@ const insightMetricsState = {
   insightMetricsCustomerLoading: false,
   insightMetricsCustomer: null,
   lastUpdated: null,
+  insightMetricsContractLoading: false,
+  insightMetricsContract: null,
 };
 
 const insightMetricsSlice = createSlice({
@@ -130,12 +152,27 @@ const insightMetricsSlice = createSlice({
       );
       state.insightMetricsCustomerLoading = false;
     });
-    
+
     builder.addCase(getInsightMetrics.rejected, (state, action) => {
       state.lastUpdated = null;
       state.insightMetricsCustomer = null;
       state.insightMetricsCustomerLoading = false;
     });
+
+    // Get Insight Metrics Contract
+    builder.addCase(getInsightMetricsContract.pending, (state) => {
+      state.insightMetricsContract = null;
+      state.insightMetricsContractLoading = true;
+    });
+    builder.addCase(getInsightMetricsContract.fulfilled, (state, action) => {
+      state.insightMetricsContract = action.payload.data;
+      state.insightMetricsContractLoading = false;
+    });
+    builder.addCase(getInsightMetricsContract.rejected, (state) => {
+      state.insightMetricsContract = null;
+      state.insightMetricsContractLoading = false;
+    });
+
   },
 });
 

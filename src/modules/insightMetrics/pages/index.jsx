@@ -11,10 +11,13 @@ import {
   getAllAccount,
   getAllBranch,
   getInsightMetrics,
+  getInsightMetricsContract,
 } from "../slice/insightMetricsSlice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
+import CommonModal from "@/components/common/modal/CommonModal";
+import InsightMetricsContract from "../components/InsightMetricsContract";
 
 const CommonChart = ({ title, options, series }) => {
   return (
@@ -66,9 +69,16 @@ const InsightMetrics = () => {
     status: "All Status",
     account: [],
   });
+  const [modal, setModal] = useState({
+    isOpen: false,
+  });
 
   useEffect(() => {
-    if (filters?.branch?.label || filters?.status || filters?.account?.value) {
+    if (
+      filters?.branch?.label ||
+      filters?.status ||
+      filters?.account?.length > 0
+    ) {
       let data = insightMetricsCustomer;
       if (filters?.branch?.value) {
         data = data?.filter((item) => item?.branch === filters?.branch?.label);
@@ -80,10 +90,10 @@ const InsightMetrics = () => {
             filters?.status?.toString()?.toLowerCase()
         );
       }
-      if (filters?.account?.value) {
+      if (filters?.account?.length > 0) {
         data = data?.filter((item) => {
           const name = item["Account"];
-          return filters?.account?.value.some(
+          return filters?.account.some(
             (value) =>
               name && name.toLowerCase().includes(value.label.toLowerCase())
           );
@@ -94,6 +104,7 @@ const InsightMetrics = () => {
       setFilteredData(insightMetricsCustomer);
     }
   }, [filters?.account, filters?.branch, filters?.status]);
+  
   useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllAccount());
@@ -404,6 +415,15 @@ const InsightMetrics = () => {
     [riskcategory, risk_category]
   );
 
+  //
+  const handleOpenModel = (id, contractNumber) => {
+    setModal((prev) => ({
+      ...prev,
+      isOpen: true,
+    }));
+
+    dispatch(getInsightMetricsContract({ id, contractNumber }));
+  };
   // Table Data
   const columns = [
     {
@@ -414,7 +434,7 @@ const InsightMetrics = () => {
         <div>
           <span
             onClick={() =>
-              handleOpenModel(params?.row.id, params?.row.contractNumber)
+              handleOpenModel(params?.row.id, params?.row?.contractNumber)
             }
             className="action-button bg-white text-black px-3 py-1 rounded border-0"
           >
@@ -511,156 +531,171 @@ const InsightMetrics = () => {
 
   return (
     <>
-      <div className="insight-metrics-header">
-        <div className="commom-header-title">User Insight Metrics</div>
-        <div className="insight-filters">
-          <Tooltip
-            title={
-              lastUpdated
-                ? moment(lastUpdated).format("MMMM D, YYYY [at] h:mm:ss A")
-                : ""
-            }
-            placement="top"
-          >
-            {" "}
-            <span>Last Updated</span>
-          </Tooltip>
+      <div>
+        <div className="insight-metrics-header">
+          <div className="commom-header-title">User Insight Metrics</div>
+          <div className="insight-filters">
+            <Tooltip
+              title={
+                lastUpdated
+                  ? moment(lastUpdated).format("MMMM D, YYYY [at] h:mm:ss A")
+                  : ""
+              }
+              placement="top"
+            >
+              {" "}
+              <span>Last Updated</span>
+            </Tooltip>
 
-          <CommonButton
-            className="common-green-btn"
-            onClick={() => {
-              setFilters({
-                branch: null,
-                status: "All Status",
-                account: [],
-              });
-            }}
-          >
-            All
-          </CommonButton>
+            <CommonButton
+              className="common-green-btn"
+              onClick={() => {
+                setFilters({
+                  branch: null,
+                  status: "All Status",
+                  account: [],
+                });
+              }}
+            >
+              All
+            </CommonButton>
 
-          <CommonAutocomplete
-            onChange={(event, newValue) => {
-              setFilters((prev) => ({
-                ...prev,
-                branch: newValue,
-              }));
-            }}
-            options={branch_list}
-            label="Select a Branch"
-            loading={branchListLoading}
-            value={filters?.branch}
-            getOptionLabel={(option) => option?.label}
-          />
-          <CommonSelect
-            onChange={(e) => {
-              setFilters((prev) => ({
-                ...prev,
-                status: e.target.value,
-              }));
-            }}
-            value={filters?.status}
-            options={statusOption}
-          />
-          <div
-            className={`${
-              filters?.account?.length > 0 && "multiple-select-container"
-            }`}
-          >
-            <Autocomplete
-              value={filters?.account}
-              onChange={(event, newValues) => {
+            <CommonAutocomplete
+              onChange={(event, newValue) => {
                 setFilters((prev) => ({
                   ...prev,
-                  account: newValues,
+                  branch: newValue,
                 }));
               }}
-              options={account_list || []}
-              multiple
-              getOptionLabel={(option) => `${option?.label} (${option?.csn})`}
-              loading={accountListLoading}
-              disabled={accountListLoading || !account_list?.length}
-              sx={{
-                width: 300,
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Select an Account"
-                  variant="outlined"
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {params.InputProps.endAdornment}
-                        {accountListLoading && (
-                          <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            // sx={{ ml: 1 }}
-                          >
-                            Loading...
-                          </Typography>
-                        )}
-                      </>
-                    ),
-                  }}
-                />
-              )}
+              options={branch_list}
+              label="Select a Branch"
+              loading={branchListLoading}
+              value={filters?.branch}
+              getOptionLabel={(option) => option?.label}
             />
+            <CommonSelect
+              onChange={(e) => {
+                setFilters((prev) => ({
+                  ...prev,
+                  status: e.target.value,
+                }));
+              }}
+              value={filters?.status}
+              options={statusOption}
+            />
+            <div
+              className={`${
+                filters?.account?.length > 0 && "multiple-select-container"
+              }`}
+            >
+              <Autocomplete
+                value={filters?.account}
+                onChange={(event, newValues) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    account: newValues,
+                  }));
+                }}
+                options={account_list || []}
+                multiple
+                getOptionLabel={(option) => `${option?.label} (${option?.csn})`}
+                loading={accountListLoading}
+                disabled={accountListLoading || !account_list?.length}
+                sx={{
+                  width: 300,
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select an Account"
+                    variant="outlined"
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {params.InputProps.endAdornment}
+                          {accountListLoading && (
+                            <Typography
+                              variant="body2"
+                              color="textSecondary"
+                              // sx={{ ml: 1 }}
+                            >
+                              Loading...
+                            </Typography>
+                          )}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="insight-chart-container">
-        {insightMetricsCustomerLoading ? (
-          <SkeletonLoader isDashboard />
-        ) : (
-          <CommonChart
-            title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (without prorated)"
-            options={withoutProparated.options}
-            series={withoutProparated.series}
-          />
-        )}
-        {insightMetricsCustomerLoading ? (
-          <SkeletonLoader isDashboard />
-        ) : (
-          <CommonChart
-            title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (prorated)"
-            options={withProparated.options}
-            series={withProparated.series}
-          />
-        )}
-        {insightMetricsCustomerLoading ? (
-          <SkeletonLoader isDashboard />
-        ) : (
-          <CommonChart
-            title="Retention Risk shows summary of the renewal risk for the subscription's contract"
-            options={risk.options}
-            series={risk.series}
-          />
-        )}
-      </div>
-      {insightMetricsCustomerLoading ? (
-        <SkeletonLoader isDashboard />
-      ) : (
-        <div className="table-container">
-          <ExportToExcel
-            data={filteredData}
-            columns={columns}
-            fileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
-            className="insight-export-btn"
-          />
-          <h3 className="common-insight-title">Table Data</h3>
-          <CommonTable
-            rows={filteredData}
-            columns={columns}
-            getRowId={getRowId}
-            checkboxSelection
-            toolbar
-            exportFileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
-          />
+        <div className="insight-chart-container">
+          {insightMetricsCustomerLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            <CommonChart
+              title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (without prorated)"
+              options={withoutProparated.options}
+              series={withoutProparated.series}
+            />
+          )}
+          {insightMetricsCustomerLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            <CommonChart
+              title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (prorated)"
+              options={withProparated.options}
+              series={withProparated.series}
+            />
+          )}
+          {insightMetricsCustomerLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            <CommonChart
+              title="Retention Risk shows summary of the renewal risk for the subscription's contract"
+              options={risk.options}
+              series={risk.series}
+            />
+          )}
         </div>
-      )}
+        {insightMetricsCustomerLoading ? (
+          <SkeletonLoader isDashboard />
+        ) : (
+          <div className="table-container">
+            <ExportToExcel
+              data={filteredData}
+              columns={columns}
+              fileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+              className="insight-export-btn"
+            />
+            <h3 className="common-insight-title">Table Data</h3>
+            <CommonTable
+              rows={filteredData}
+              columns={columns}
+              getRowId={getRowId}
+              checkboxSelection
+              toolbar
+              exportFileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+            />
+          </div>
+        )}
+      </div>
+      <CommonModal
+        isOpen={modal?.isOpen}
+        handleClose={() => {
+          setModal((prev) => ({
+            ...prev,
+            isOpen: false,
+          }));
+        }}
+        scrollable
+        title={"Insight metrics contract detail"}
+      >
+        <InsightMetricsContract />
+      </CommonModal>
     </>
   );
 };

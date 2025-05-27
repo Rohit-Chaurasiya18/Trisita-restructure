@@ -4,6 +4,7 @@ import loginReducer from "@/modules/login/slice/loginSlice";
 import profileReducer from "@/modules/profile/slice/profileSlice";
 import layoutReducer from "@/layout/slice/layoutSlice";
 import insightMetricsReducer from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import insightMetricsReducerV2 from "@/modules/insightMetricsV2/slice/insightMetricsV2Slice";
 import alertSubscriptionReducer from "@/modules/alertSubscription/slice/alertSubscription";
 import accountReducer from "@/modules/accounts/slice/accountSlice";
 import quotationReducer from "@/modules/quotations/slice/quotationSlice";
@@ -14,6 +15,7 @@ const reducer = combineReducers({
   profile: profileReducer,
   layout: layoutReducer,
   insightMetrics: insightMetricsReducer,
+  insightMetricsV2: insightMetricsReducerV2,
   alertSubscription: alertSubscriptionReducer,
   account: accountReducer,
   quotation: quotationReducer,
