@@ -7,6 +7,7 @@ import {
   Insight_metrics_v2,
   Alert_subscription,
   Get_usage,
+  Usuage,
   Profile,
   ChangePassword,
   Account,
@@ -39,7 +40,12 @@ const routesConfig = {
     },
     {
       path: routesConstants.GET_USAGE,
-      component: Get_usage,
+      // component: Get_usage,
+      component: Outlet,
+      children: [
+        { index: true, component: Get_usage },
+        { path: "usage/:csn/:from_date/:to_date", component: Usuage },
+      ],
     },
     {
       path: routesConstants.ACCOUNT,
@@ -61,10 +67,6 @@ const routesConfig = {
       path: routesConstants.OPPORTUNITY,
       component: Opportunity,
     },
-    // {
-    //   path: routesConstants.QUOTATION,
-    //   component: Quotations,
-    // },
     {
       path: routesConstants.QUOTATION,
       component: Outlet,

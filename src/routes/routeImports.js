@@ -10,6 +10,8 @@ export const Alert_subscription = lazy(() =>
   import("@/modules/alertSubscription/pages/index")
 );
 export const Get_usage = lazy(() => import("@/modules/getUsage/pages/index"));
+export const Usuage = lazy(() => import("@/modules/getUsage/pages/Usuage"));
+
 export const Account = lazy(() => import("@/modules/accounts/pages/index"));
 export const AddAccount = lazy(() =>
   import("@/modules/accounts/pages/addAccount/pages/index")

@@ -399,3 +399,63 @@
   /* your styles here */
   display: none !important;
 }
+.get-usuage-filter {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+  & .MuiAutocomplete-root {
+    & .MuiFormControl-root {
+      height: 45px;
+    }
+  }
+  .get-usuage-btn {
+    width: fit-content;
+    margin-top: 8px;
+  }
+  .get-usuage-btn-disabled {
+    color: rgba(0, 0, 0, 0.26);
+    box-shadow: none;
+    background-color: rgba(0, 0, 0, 0.12);
+  }
+  .get-usuage-btn-active {
+    color: #fff;
+    background-color: #2e7d32;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+  }
+  @media (max-width: 966px) {
+    display: grid;
+    grid-template-columns: repeat(2, 300px);
+  }
+  @media (max-width: 651px) {
+    display: grid;
+    grid-template-columns: repeat(1, 300px);
+  }
+  @media (max-width: 344px) {
+    & .MuiStack-root {
+      & .MuiMultiInputDateRangeField-root {
+        display: grid;
+        & .MuiFormControl-root {
+          width: 100%;
+        }
+        p {
+          display: none;
+        }
+      }
+    }
+    .MuiMultiInputDateRangeField-root > .MuiFormControl-root:nth-of-type(2) {
+      margin-top: 15px;
+      margin-left: 0px;
+    }
+  }
+  @media (max-width: 320px) {
+    & .MuiStack-root {
+      & .MuiMultiInputDateRangeField-root {
+        & .MuiFormControl-root {
+          width: 260px;
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ import alertSubscriptionReducer from "@/modules/alertSubscription/slice/alertSub
 import accountReducer from "@/modules/accounts/slice/accountSlice";
 import quotationReducer from "@/modules/quotations/slice/quotationSlice";
 import opportunityReducer from "@/modules/opportunity/slice/opportunitySlice";
+import usugesReducer from "@/modules/getUsage/slice/UsuagesSlice";
 const reducer = combineReducers({
   dashboard: dashboardReducer,
   login: loginReducer,
@@ -20,5 +21,6 @@ const reducer = combineReducers({
   account: accountReducer,
   quotation: quotationReducer,
   opportunity: opportunityReducer,
+  usuages: usugesReducer,
 });
 export default reducer;

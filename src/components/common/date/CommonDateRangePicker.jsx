@@ -27,14 +27,18 @@ const CommonDateRangePicker = ({
   };
 
   const handleAccept = (newValue) => {
-    // If start date is selected but end date is null, set end date = start date
+    let finalValue = newValue;
+
     if (newValue && newValue[0] && !newValue[1]) {
-      setValue([newValue[0], newValue[0]]);
+      finalValue = [newValue[0], newValue[0]];
+    }
+
+    if (isControlled) {
+      propOnChange(finalValue);
     } else {
-      setValue(newValue);
+      setInternalValue(finalValue);
     }
   };
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={["MultiInputDateRangeField"]}>
