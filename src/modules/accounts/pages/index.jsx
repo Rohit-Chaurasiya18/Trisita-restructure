@@ -17,6 +17,7 @@ import {
   getEndCustomerAccount,
   getExportedAccount,
   getInsightMetricsCsn,
+  getThirdPartyExportedAccount,
   setIndustryGroupCount,
 } from "../slice/accountSlice";
 import { Tooltip } from "@mui/material";
@@ -108,6 +109,10 @@ const Account = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isThirdPartyAccount = useMemo(
+    () => location.pathname.startsWith("/third_party_account"),
+    [location?.pathname]
+  );
   const {
     branchListLoading,
     branch_list,
@@ -121,17 +126,20 @@ const Account = () => {
     branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
     filter: state?.layout?.filter,
-    exportedAccountDataLoading: state?.account?.exportedAccountDataLoading,
-    exportedAccountData: state?.account?.exportedAccountData,
-    last_updated: state?.account?.last_updated,
-    industryGroupCount: state?.account?.industryGroupCount,
+    exportedAccountDataLoading: isThirdPartyAccount
+      ? state?.account?.thirdPartyExportedAccountDataLoading
+      : state?.account?.exportedAccountDataLoading,
+    exportedAccountData: isThirdPartyAccount
+      ? state?.account?.thirdPartyExportedAccountData
+      : state?.account?.exportedAccountData,
+    last_updated: isThirdPartyAccount
+      ? state?.account?.thirdPartyLast_updated
+      : state?.account?.last_updated,
+    industryGroupCount: isThirdPartyAccount
+      ? state?.account?.thirdPartyIndustryGroupCount
+      : state?.account?.industryGroupCount,
     accountInformation: state?.account?.accountInformation,
   }));
-
-  const isThirdPartyAccount = useMemo(
-    () => location.pathname.startsWith("/third_party_account"),
-    [location?.pathname]
-  );
 
   useEffect(() => {
     setFilteredData(exportedAccountData);
@@ -143,12 +151,21 @@ const Account = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(
-      getExportedAccount({
-        id: filter?.csn === "All CSN" ? "" : filter?.csn,
-        isThirdParty: isThirdPartyAccount,
-      })
-    );
+    if (isThirdPartyAccount) {
+      dispatch(
+        getThirdPartyExportedAccount({
+          id: filter?.csn === "All CSN" ? "" : filter?.csn,
+          isThirdParty: isThirdPartyAccount,
+        })
+      );
+    } else {
+      dispatch(
+        getExportedAccount({
+          id: filter?.csn === "All CSN" ? "" : filter?.csn,
+          isThirdParty: isThirdPartyAccount,
+        })
+      );
+    }
   }, [filter?.csn, isThirdPartyAccount]);
 
   useEffect(() => {
@@ -238,6 +255,7 @@ const Account = () => {
     filters?.status,
     filters?.searchValue,
     exportedAccountData,
+    isThirdPartyAccount,
   ]);
 
   const handleOpenModel = (id) => {

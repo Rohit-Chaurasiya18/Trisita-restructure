@@ -49,6 +49,24 @@ export const getExportedAccount = createAsyncThunk(
   }
 );
 
+// Get Third Party Exported Account
+export const getThirdPartyExportedAccount = createAsyncThunk(
+  `account/getThirdPartyExportedAccount`,
+  async (payload, thunkAPI) => {
+    try {
+      let url;
+      if (payload?.isThirdParty) {
+        url = GET_THIRD_PARTY_ACCOUNT;
+      }
+      const response = await axiosReact.get(url + `${payload?.id}`);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 // Get Account Detail
 export const getAccount = createAsyncThunk(
   `account/getAccount`,
@@ -181,9 +199,12 @@ export const addEditAccount = createAsyncThunk(
 
 const accountState = {
   allUserData: null,
-  exportedAccountDataLoading: false,
   last_updated: "",
+  thirdPartyLast_updated: "",
+  exportedAccountDataLoading: false,
   exportedAccountData: [],
+  thirdPartyExportedAccountDataLoading: false,
+  thirdPartyExportedAccountData: [],
   accountDetailLoading: false,
   accountDetail: null,
   insightMetricsCsnLoading: false,
@@ -192,6 +213,7 @@ const accountState = {
   contractsDetails: null,
   endCustomerAccountLoading: false,
   endCustomerAccount: null,
+  thirdPartyIndustryGroupCount: {},
   industryGroupCount: {},
   accountInformation: null,
   accountInformationLoading: false,
@@ -203,41 +225,40 @@ const accountSlice = createSlice({
   reducers: {
     setIndustryGroupCount: (state, action) => {
       // if (action?.payload) {
-        const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
+      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
 
-        const groupedCounts = {
-          All: { title: "All", active: 0, expired: 0, total: 0 },
+      const groupedCounts = {
+        All: { title: "All", active: 0, expired: 0, total: 0 },
+      };
+
+      for (const group of fixedOrder) {
+        groupedCounts[group] = {
+          title: group,
+          active: 0,
+          expired: 0,
+          total: 0,
         };
-
-        for (const group of fixedOrder) {
-          groupedCounts[group] = {
-            title: group,
-            active: 0,
-            expired: 0,
-            total: 0,
-          };
-        }
-
-        for (const item of action?.payload) {
-          const group = item.industryGroup || "Null";
-          const status =
-            item.contract_status === "Active" ? "active" : "expired";
-
-          const key = fixedOrder.includes(group) ? group : "Unknown";
-
-          groupedCounts[key][status]++;
-          groupedCounts[key].total++;
-
-          groupedCounts.All[status]++;
-          groupedCounts.All.total++;
-        }
-
-        const industryGroupStats = [
-          groupedCounts["All"],
-          ...fixedOrder.map((key) => groupedCounts[key]),
-        ];
-        state.industryGroupCount = industryGroupStats;
       }
+
+      for (const item of action?.payload) {
+        const group = item.industryGroup || "Null";
+        const status = item.contract_status === "Active" ? "active" : "expired";
+
+        const key = fixedOrder.includes(group) ? group : "Unknown";
+
+        groupedCounts[key][status]++;
+        groupedCounts[key].total++;
+
+        groupedCounts.All[status]++;
+        groupedCounts.All.total++;
+      }
+
+      const industryGroupStats = [
+        groupedCounts["All"],
+        ...fixedOrder.map((key) => groupedCounts[key]),
+      ];
+      state.industryGroupCount = industryGroupStats;
+    },
     // },
   },
   extraReducers: (builder) => {
@@ -325,6 +346,82 @@ const accountSlice = createSlice({
     builder.addCase(getExportedAccount.rejected, (state) => {
       state.exportedAccountData = [];
       state.exportedAccountDataLoading = false;
+    });
+
+    // getThirdPartyExportedAccount
+
+    builder.addCase(getThirdPartyExportedAccount.pending, (state) => {
+      state.thirdPartyExportedAccountData = [];
+      state.thirdPartyExportedAccountDataLoading = true;
+    });
+    builder.addCase(getThirdPartyExportedAccount.fulfilled, (state, action) => {
+      let formattedData = action.payload.data?.accounts?.map((account) => ({
+        id: account?.id,
+        csn: account?.csn ?? null,
+        email: account?.contract_manager_email?.[0] ?? null,
+        phone: account?.contract_manager_phone?.[0] ?? null,
+        name: account?.name ?? "",
+
+        // industryGroup: account?.industryGroup ?? null,
+        industryGroup: account?.industryGroup ?? "Unknown",
+
+        // industrySegment: account?.industrySegment ?? null,
+        industrySegment: account?.industrySegment ?? "Unknown",
+
+        // industrySubSegment: account?.industrySubSegment ?? null,
+        industrySubSegment: account?.industrySubSegment ?? "Unknown",
+
+        address1: account?.address1 ?? null,
+        city: account?.city ?? null,
+        status: account?.status ?? null,
+        contract_status: account?.contract_status ?? null,
+        buyingReadinessScore: account?.buyingReadinessScore ?? null,
+        branch: account?.branch_name ?? null,
+        branch_object: account?.branch ?? null,
+        user_assign: account?.user_assign_first_names ?? null,
+        renewal_person: account?.renewal_person_first_names ?? null,
+      }));
+
+      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
+
+      const groupedCounts = {
+        All: { title: "All", active: 0, expired: 0, total: 0 },
+      };
+
+      for (const group of fixedOrder) {
+        groupedCounts[group] = {
+          title: group,
+          active: 0,
+          expired: 0,
+          total: 0,
+        };
+      }
+
+      for (const item of formattedData) {
+        const group = item.industryGroup || "Null";
+        const status = item.contract_status === "Active" ? "active" : "expired";
+
+        const key = fixedOrder.includes(group) ? group : "Unknown";
+
+        groupedCounts[key][status]++;
+        groupedCounts[key].total++;
+
+        groupedCounts.All[status]++;
+        groupedCounts.All.total++;
+      }
+
+      const industryGroupStats = [
+        groupedCounts["All"],
+        ...fixedOrder.map((key) => groupedCounts[key]),
+      ];
+      state.thirdPartyExportedAccountData = formattedData;
+      state.thirdPartyExportedAccountDataLoading = false;
+      state.thirdPartyLast_updated = action.payload.data?.last_updated;
+      state.thirdPartyIndustryGroupCount = industryGroupStats;
+    });
+    builder.addCase(getThirdPartyExportedAccount.rejected, (state) => {
+      state.thirdPartyExportedAccountData = [];
+      state.thirdPartyExportedAccountDataLoading = false;
     });
 
     // getAccount
