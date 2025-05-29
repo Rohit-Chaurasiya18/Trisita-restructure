@@ -2,7 +2,7 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import DatePickerFilter from "@/components/common/date/DatePickerFilter";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
-import { accountOption } from "@/modules/insightMetrics/constants";
+// import { accountOption } from "@/modules/insightMetrics/constants";
 import {
   accountGroupChartData,
   accountTypeChartData,
@@ -85,7 +85,7 @@ const Subscription = () => {
               onChange={(event, newValue) => {
                 console.log("Account selected:", newValue);
               }}
-              options={accountOption}
+              // options={accountOption}
               label="Select an Account"
             />
           </div>
