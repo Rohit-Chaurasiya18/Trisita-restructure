@@ -2,7 +2,6 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import { getAllAccount } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { Autocomplete, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -51,7 +50,6 @@ const GetUsage = () => {
       return false;
     }
   };
-
 
   return (
     <>

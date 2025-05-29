@@ -32,3 +32,6 @@ export const GET_INSIGHT_METRICS_CONTRACT =
 export const GET_INSIGHT_METRICS_V2_CONTRACT =
   "/v1/api/get_insight_metrics_v2_pop_up";
 export const GET_USUAGE_DATA = "/v1/api/get_usage_data/";
+export const GET_USUAGE_PRODUCT_FEATURE_CHART =
+  "/v1/api/get_usage_product_feature_chart/";
+export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/usage_user_count/";

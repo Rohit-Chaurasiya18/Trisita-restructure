@@ -11,6 +11,9 @@ export const Alert_subscription = lazy(() =>
 );
 export const Get_usage = lazy(() => import("@/modules/getUsage/pages/index"));
 export const Usuage = lazy(() => import("@/modules/getUsage/pages/Usuage"));
+export const UniqueUserCount = lazy(() =>
+  import("@/modules/getUsage/pages/UniqueUserCount")
+);
 
 export const Account = lazy(() => import("@/modules/accounts/pages/index"));
 export const AddAccount = lazy(() =>

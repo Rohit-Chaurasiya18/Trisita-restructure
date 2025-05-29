@@ -16,6 +16,7 @@ import {
   AddQuotation,
   Opportunity,
   Subscription,
+  UniqueUserCount,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -45,6 +46,10 @@ const routesConfig = {
       children: [
         { index: true, component: Get_usage },
         { path: "usage/:csn/:from_date/:to_date", component: Usuage },
+        {
+          path: "usage_user_count/:csn/:from_date/:to_date",
+          component: UniqueUserCount,
+        },
       ],
     },
     {
