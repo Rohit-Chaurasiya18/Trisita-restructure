@@ -27,6 +27,7 @@ import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import AssignUserBranch from "../components/AssignUserBranch";
 import moment from "moment";
 import routesConstants from "@/routes/routesConstants";
+import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 
 const CommonChart = ({
   title,
@@ -67,6 +68,25 @@ const CommonChart = ({
       </div>
     </div>
   );
+};
+
+// Helper function to compute industry chart data
+const computeIndustryChartData = (data, groupByKey) => {
+  if (!data || data.length === 0) return { series: [], categories: [] };
+
+  const groupCounts = data.reduce((acc, item) => {
+    const key = item[groupByKey] || "Unknown";
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const sortedKeys = Object.keys(groupCounts).sort();
+  const seriesData = sortedKeys.map((key) => groupCounts[key]);
+
+  return {
+    series: [{ name: "Accounts", data: seriesData }],
+    categories: sortedKeys,
+  };
 };
 
 const Account = () => {
@@ -122,6 +142,7 @@ const Account = () => {
     exportedAccountData,
     industryGroupCount,
     accountInformation,
+    userDetail,
   } = useSelector((state) => ({
     branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
@@ -139,7 +160,9 @@ const Account = () => {
       ? state?.account?.thirdPartyIndustryGroupCount
       : state?.account?.industryGroupCount,
     accountInformation: state?.account?.accountInformation,
+    userDetail: state?.login?.userDetail,
   }));
+  const [selectedId, setSelectedId] = useState([]);
 
   useEffect(() => {
     setFilteredData(exportedAccountData);
@@ -467,13 +490,13 @@ const Account = () => {
   };
 
   // On initial data load, generate the default industryGroup chart
-  useEffect(() => {
-    // if (filteredData && filteredData.length > 0) {
-    if (filteredData) {
-      computeChartData("industryGroup");
-      setSelectedIndex(0);
-    }
-  }, [filteredData]);
+  // useEffect(() => {
+  //   // if (filteredData && filteredData.length > 0) {
+  //   if (filteredData) {
+  //     computeChartData("industryGroup");
+  //     setSelectedIndex(0);
+  //   }
+  // }, [filteredData]);
 
   // Handle chart switch: 0 = industryGroup, 1 = segment, 2 = subsegment
   const subCategoryChange = (index) => {
@@ -610,7 +633,36 @@ const Account = () => {
       })
     );
   };
+  const handleSelectionChange = (selectedRows) => {
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
 
+  const exportedData = useMemo(
+    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
+    [selectedId]
+  );
+  // Compute chart data based on selected grouping
+  // const [selectedIndex, setSelectedIndex] = useState(0);
+  const industryChartData = useMemo(() => {
+    const groupByKey =
+      selectedIndex === 0
+        ? "industryGroup"
+        : selectedIndex === 1
+        ? "industrySegment"
+        : "industrySubSegment";
+
+    return computeIndustryChartData(filteredData, groupByKey);
+  }, [filteredData, selectedIndex]);
+
+  // Handle chart grouping change
+  const handleGroupChange = (index) => {
+    setSelectedIndex(index);
+  };
   return (
     <>
       <div className="account">
@@ -721,29 +773,63 @@ const Account = () => {
           {exportedAccountDataLoading ? (
             <SkeletonLoader isDashboard height="350px" />
           ) : (
-            <CommonTable
-              rows={filteredData}
-              columns={columns}
-              getRowId={getRowId}
-              checkboxSelection
-              toolbar
-              exportFileName={`account_trisita`}
-            />
+            <div className="">
+              <ExportToExcel
+                data={exportedData}
+                columns={columns}
+                fileName={`account_trisita_${userDetail?.first_name}_${
+                  userDetail?.last_name
+                }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
+                className="account-export-btn"
+              />
+              <CommonTable
+                rows={filteredData}
+                columns={columns}
+                getRowId={getRowId}
+                checkboxSelection
+                handleRowSelection={handleSelectionChange}
+                toolbar
+                exportFileName={`account_trisita`}
+              />
+            </div>
           )}
         </div>
         <div className="account-industry-chart mt-4">
           {!exportedAccountDataLoading ? (
             <CommonChart
+              // title="Trend of number of accounts by Industry"
+              // options={lineChartData.options}
+              // series={lineChartData.series}
+              // subCategory={[
+              //   "By Industry Group",
+              //   "By Segment",
+              //   "By Sub Segment",
+              // ]}
+              // subCategoryChange={subCategoryChange}
+              // setSelectedIndex={setSelectedIndex}
+              // selectedIndex={selectedIndex}
               title="Trend of number of accounts by Industry"
-              options={lineChartData.options}
-              series={lineChartData.series}
+              options={{
+                chart: {
+                  type: "line",
+                  height: 350,
+                  zoom: { enabled: false },
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: "straight" },
+                grid: {
+                  row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
+                },
+                xaxis: { categories: industryChartData.categories },
+                yaxis: { title: { text: "Number of Accounts" } },
+              }}
+              series={industryChartData.series}
               subCategory={[
                 "By Industry Group",
                 "By Segment",
                 "By Sub Segment",
               ]}
-              subCategoryChange={subCategoryChange}
-              setSelectedIndex={setSelectedIndex}
+              subCategoryChange={handleGroupChange}
               selectedIndex={selectedIndex}
             />
           ) : (

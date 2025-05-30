@@ -15,11 +15,11 @@ const CommonTable = ({
   additionalToolbar = null,
   checkboxSelection = false,
   disableSelection = false,
+  handleRowSelection,
   sx = {},
 }) => {
   const currDate = new Date().toLocaleDateString();
   const currTime = new Date().toLocaleTimeString();
-
   return (
     <div style={{ height, width: "100%" }} className="data-grid-wrapper">
       {loading ? (
@@ -33,6 +33,7 @@ const CommonTable = ({
             columns={columns}
             getRowId={getRowId}
             checkboxSelection={checkboxSelection}
+            onRowSelectionModelChange={handleRowSelection}
             disableRowSelectionOnClick={disableSelection}
             showToolbar={toolbar}
             slotProps={{
@@ -68,7 +69,7 @@ const CommonTable = ({
               },
               "& .MuiTablePagination-toolbar": {
                 alignItems: "baseline !important", // Customize as needed
-                paddingTop:"10px !important"
+                paddingTop: "10px !important",
               },
               ...sx,
             }}

@@ -63,6 +63,7 @@ const InsightMetricsV2 = () => {
   }));
 
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedId, setSelectedId] = useState([]);
   const [productlinecount, SetProductLineCount] = useState();
   const [riskcategory, SetRiskCategory] = useState();
   const [filters, setFilters] = useState({
@@ -74,32 +75,40 @@ const InsightMetricsV2 = () => {
     isOpen: false,
   });
 
+  // Hanlde Filtered Data
+  const handleFilterData = (data) => {
+    let allData = data;
+    if (filters?.branch?.value) {
+      allData = allData?.filter(
+        (item) => item?.branch === filters?.branch?.label
+      );
+    }
+    if (filters?.status !== "All Status") {
+      allData = allData?.filter(
+        (item) =>
+          item?.contract_status?.toString()?.toLowerCase() ===
+          filters?.status?.toString()?.toLowerCase()
+      );
+    }
+    if (filters?.account?.length > 0) {
+      allData = allData?.filter((item) => {
+        const name = item["Account"];
+        return filters?.account.some(
+          (value) =>
+            name && name.toLowerCase().includes(value.label.toLowerCase())
+        );
+      });
+    }
+    return allData;
+  };
+
   useEffect(() => {
     if (
       filters?.branch?.label ||
       filters?.status ||
       filters?.account?.length > 0
     ) {
-      let data = insightMetricsCustomerV2;
-      if (filters?.branch?.value) {
-        data = data?.filter((item) => item?.branch === filters?.branch?.label);
-      }
-      if (filters?.status !== "All Status") {
-        data = data?.filter(
-          (item) =>
-            item?.contract_status?.toString()?.toLowerCase() ===
-            filters?.status?.toString()?.toLowerCase()
-        );
-      }
-      if (filters?.account?.length > 0) {
-        data = data?.filter((item) => {
-          const name = item["Account"];
-          return filters?.account.some(
-            (value) =>
-              name && name.toLowerCase().includes(value.label.toLowerCase())
-          );
-        });
-      }
+      let data = handleFilterData(insightMetricsCustomerV2);
       setFilteredData(data);
     } else {
       setFilteredData(insightMetricsCustomerV2);
@@ -124,9 +133,8 @@ const InsightMetricsV2 = () => {
   const getRowId = (row) => row.id;
 
   const handleBarClick = (data) => {
-    const updatedData = insightMetricsCustomerV2?.filter(
-      (item) => item?.riskCategory === data
-    );
+    const allData = handleFilterData(insightMetricsCustomerV2);
+    const updatedData = allData?.filter((item) => item?.riskCategory === data);
     setFilteredData(updatedData);
   };
 
@@ -156,23 +164,21 @@ const InsightMetricsV2 = () => {
     onboardall["Red"] = Red || [];
     onboardall["Unknown"] = Unknown || [];
 
-    const risk_counting = insightMetricsCustomerV2?.reduce(
-      (accumulator, item) => {
-        const { riskCategory } = item;
+    const allData = handleFilterData(insightMetricsCustomerV2);
+    const risk_counting = allData?.reduce((accumulator, item) => {
+      const { riskCategory } = item;
 
-        if (riskCategory === "Green") {
-          riskCounts.Green++;
-        } else if (riskCategory === "Yellow") {
-          riskCounts.Yellow++;
-        } else if (riskCategory === "Red") {
-          riskCounts.Red++;
-        } else {
-          riskCounts.Unknown++;
-        }
-        return accumulator;
-      },
-      {}
-    );
+      if (riskCategory === "Green") {
+        riskCounts.Green++;
+      } else if (riskCategory === "Yellow") {
+        riskCounts.Yellow++;
+      } else if (riskCategory === "Red") {
+        riskCounts.Red++;
+      } else {
+        riskCounts.Unknown++;
+      }
+      return accumulator;
+    }, {});
 
     const counts = filteredData?.reduce((accumulator, item) => {
       const { productLineCode, seatsPurchased, usersAssigned, seatsInUse } =
@@ -304,7 +310,7 @@ const InsightMetricsV2 = () => {
     [riskcategory, risk_category]
   );
 
-  //
+  // Hanlde Modal Pop-up
   const handleOpenModel = (id, contractNumber) => {
     setModal((prev) => ({
       ...prev,
@@ -313,6 +319,7 @@ const InsightMetricsV2 = () => {
 
     dispatch(getInsightMetricsV2Contract({ id, contractNumber }));
   };
+
   // Table Data
   const columns = [
     {
@@ -417,7 +424,19 @@ const InsightMetricsV2 = () => {
     },
     { field: "tenantId", headerName: "tenantId", width: 200 },
   ];
+  const handleSelectionChange = (selectedRows) => {
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
 
+  const exportedData = useMemo(
+    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
+    [selectedId]
+  );
   return (
     <>
       <div>
@@ -546,7 +565,7 @@ const InsightMetricsV2 = () => {
         ) : (
           <div className="table-container">
             <ExportToExcel
-              data={filteredData}
+              data={exportedData}
               columns={columns}
               fileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
@@ -557,6 +576,7 @@ const InsightMetricsV2 = () => {
               columns={columns}
               getRowId={getRowId}
               checkboxSelection
+              handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
             />

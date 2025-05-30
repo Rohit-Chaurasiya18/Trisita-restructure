@@ -11,6 +11,8 @@ import {
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonModal from "@/components/common/modal/CommonModal";
 import CustomTabs from "../components/CustomTabs";
+import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
+import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 
 const AlertSubscription = () => {
   const dispatch = useDispatch();
@@ -20,12 +22,15 @@ const AlertSubscription = () => {
     alertSubscriptionLoading,
     alertSubscriptionList,
     userDetail,
+    branch_list,
+    branchListLoading,
   } = useSelector((state) => ({
     filter: state?.layout?.filter,
     alertSubscriptionLoading:
       state?.alertSubscription?.alertSubscriptionLoading,
     alertSubscriptionList: state?.alertSubscription?.alertSubscriptionList,
-   
+    branch_list: state?.insightMetrics?.branchList,
+    branchListLoading: state?.insightMetrics?.branchListLoading,
     userDetail: state?.login?.userDetail,
   }));
 
@@ -34,11 +39,13 @@ const AlertSubscription = () => {
     status: "All Status",
     startDate: null,
     endDate: null,
+    branch: null,
   });
   const [modal, setModal] = useState({
     isOpen: false,
   });
   const [subscriptionType, setSubscriptionType] = useState("Backup");
+  const [selectedId, setSelectedId] = useState([]);
 
   // Single useEffect to fetch data on any relevant filter change
   useEffect(() => {
@@ -62,7 +69,9 @@ const AlertSubscription = () => {
     pageFilter.startDate,
     pageFilter.endDate,
   ]);
-
+  useEffect(() => {
+    dispatch(getAllBranch());
+  }, []);
   const handleChange = (e, key) => {
     setPageFilter((prev) => ({ ...prev, [key]: e.target.value }));
   };
@@ -72,13 +81,35 @@ const AlertSubscription = () => {
   };
 
   const filteredData = useMemo(() => {
-    const { status } = pageFilter;
-    return status === "All Status"
-      ? alertSubscriptionList
-      : alertSubscriptionList?.filter(
-          (item) => item?.trisita_status === status
-        );
-  }, [alertSubscriptionList, pageFilter.status]);
+    if (!alertSubscriptionList) return [];
+
+    const { status, branch, startDate, endDate } = pageFilter;
+
+    let data = [...alertSubscriptionList];
+
+    if (branch?.label) {
+      data = data?.filter((item) => item.branch === branch.label);
+    }
+
+    if (status && status !== "All Status") {
+      data = data?.filter((item) => item.trisita_status === status);
+    }
+
+    // Filter by Subs End Date range
+    if (startDate && endDate) {
+      // data = data?.filter((item) => {
+      // debugger;
+      //   const itemStartDate = new Date(item?.contract_start_date);
+      //   const itemEndDate = new Date(item?.contract_end_date);
+      //   const isAfterStart = startDate
+      //     ? itemStartDate >= new Date(startDate)
+      //     : true;
+      //   const isBeforeEnd = endDate ? itemEndDate <= new Date(endDate) : true;
+      //   return isAfterStart && isBeforeEnd;
+      // });
+    }
+    return data;
+  }, [alertSubscriptionList, pageFilter]);
 
   const renderFallback = (value, fallback = "Undefined") =>
     value ? (
@@ -180,6 +211,18 @@ const AlertSubscription = () => {
     userDetail?.last_name
   }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`;
 
+  const handleSelectionChange = (selectedRows) => {
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
+  const exportedData = useMemo(
+    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
+    [selectedId]
+  );
   return (
     <>
       <div className="alert-subscription">
@@ -208,6 +251,19 @@ const AlertSubscription = () => {
             ]}
             sx={{ width: "100px" }}
           />
+          <CommonAutocomplete
+            onChange={(event, newValue) => {
+              setPageFilter((prev) => ({
+                ...prev,
+                branch: newValue,
+              }));
+            }}
+            options={branch_list}
+            label="Select a Branch"
+            loading={branchListLoading}
+            value={pageFilter?.branch}
+            getOptionLabel={(option) => option?.label}
+          />
           <CommonSelect
             onChange={(e) => handleChange(e, "status")}
             value={pageFilter.status}
@@ -227,7 +283,7 @@ const AlertSubscription = () => {
       ) : (
         <div className="alert-subscription-table">
           <ExportToExcel
-            data={filteredData}
+            data={exportedData}
             columns={columns}
             fileName={fileName}
             className="insight-export-btn"
@@ -240,6 +296,7 @@ const AlertSubscription = () => {
             checkboxSelection
             toolbar
             exportFileName={fileName}
+            handleRowSelection={handleSelectionChange}
           />
         </div>
       )}

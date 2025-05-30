@@ -1,18 +1,21 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import routesConstants from "@/routes/routesConstants";
 import { useDispatch, useSelector } from "react-redux";
 import { getQuotationData } from "../slice/quotationSlice";
 import moment from "moment";
+import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 
 const Quotations = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedId, setSelectedId] = useState([]);
+
   const getRowId = (row) => row.id;
   useEffect(() => {
     dispatch(getQuotationData());
@@ -76,6 +79,20 @@ const Quotations = () => {
     });
   };
 
+  const handleSelectionChange = (selectedRows) => {
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
+
+  const exportedData = useMemo(
+    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
+    [selectedId]
+  );
+
   return (
     <>
       <div className="quotation-header">
@@ -113,11 +130,20 @@ const Quotations = () => {
         </div>
       </div>
       <div className="quotation-table">
+        <ExportToExcel
+          data={exportedData}
+          columns={columns}
+          fileName={`quotation_master_${userDetail?.first_name}_${
+            userDetail?.last_name
+          }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
+          className="account-export-btn"
+        />
         <CommonTable
           rows={filteredData}
           columns={columns}
           getRowId={getRowId}
           checkboxSelection
+          handleRowSelection={handleSelectionChange}
           toolbar
           exportFileName={`quotation_master_${userDetail?.first_name}_${userDetail?.last_name}`}
         />

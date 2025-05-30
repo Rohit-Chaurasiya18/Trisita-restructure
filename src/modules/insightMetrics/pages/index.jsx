@@ -72,39 +72,8 @@ const InsightMetrics = () => {
   const [modal, setModal] = useState({
     isOpen: false,
   });
+  const [selectedId, setSelectedId] = useState([]);
 
-  useEffect(() => {
-    if (
-      filters?.branch?.label ||
-      filters?.status ||
-      filters?.account?.length > 0
-    ) {
-      let data = insightMetricsCustomer;
-      if (filters?.branch?.value) {
-        data = data?.filter((item) => item?.branch === filters?.branch?.label);
-      }
-      if (filters?.status !== "All Status") {
-        data = data?.filter(
-          (item) =>
-            item?.contract_status?.toString()?.toLowerCase() ===
-            filters?.status?.toString()?.toLowerCase()
-        );
-      }
-      if (filters?.account?.length > 0) {
-        data = data?.filter((item) => {
-          const name = item["Account"];
-          return filters?.account.some(
-            (value) =>
-              name && name.toLowerCase().includes(value.label.toLowerCase())
-          );
-        });
-      }
-      setFilteredData(data);
-    } else {
-      setFilteredData(insightMetricsCustomer);
-    }
-  }, [filters?.account, filters?.branch, filters?.status]);
-  
   useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllAccount());
@@ -122,10 +91,49 @@ const InsightMetrics = () => {
 
   const getRowId = (row) => row.id;
 
+  // Hanlde Filtered Data
+  const handleFilterData = (data) => {
+    let allData = data;
+    if (filters?.branch?.value) {
+      allData = allData?.filter(
+        (item) => item?.branch === filters?.branch?.label
+      );
+    }
+    if (filters?.status !== "All Status") {
+      allData = allData?.filter(
+        (item) =>
+          item?.contract_status?.toString()?.toLowerCase() ===
+          filters?.status?.toString()?.toLowerCase()
+      );
+    }
+    if (filters?.account?.length > 0) {
+      allData = allData?.filter((item) => {
+        const name = item["Account"];
+        return filters?.account.some(
+          (value) =>
+            name && name.toLowerCase().includes(value.label.toLowerCase())
+        );
+      });
+    }
+    return allData;
+  };
+
+  useEffect(() => {
+    if (
+      filters?.branch?.label ||
+      filters?.status ||
+      filters?.account?.length > 0
+    ) {
+      let data = handleFilterData(insightMetricsCustomer);
+      setFilteredData(data);
+    } else {
+      setFilteredData(insightMetricsCustomer);
+    }
+  }, [filters?.account, filters?.branch, filters?.status]);
+
   const handleBarClick = (data) => {
-    const updatedData = insightMetricsCustomer?.filter(
-      (item) => item?.riskCategory === data
-    );
+    const allData = handleFilterData(insightMetricsCustomer);
+    const updatedData = allData?.filter((item) => item?.riskCategory === data);
     setFilteredData(updatedData);
   };
 
@@ -155,23 +163,21 @@ const InsightMetrics = () => {
     onboardall["Red"] = Red || [];
     onboardall["Unknown"] = Unknown || [];
 
-    const risk_counting = insightMetricsCustomer?.reduce(
-      (accumulator, item) => {
-        const { riskCategory } = item;
+    const allData = handleFilterData(insightMetricsCustomer);
+    const risk_counting = allData?.reduce((accumulator, item) => {
+      const { riskCategory } = item;
 
-        if (riskCategory === "Green") {
-          riskCounts.Green++;
-        } else if (riskCategory === "Yellow") {
-          riskCounts.Yellow++;
-        } else if (riskCategory === "Red") {
-          riskCounts.Red++;
-        } else {
-          riskCounts.Unknown++;
-        }
-        return accumulator;
-      },
-      {}
-    );
+      if (riskCategory === "Green") {
+        riskCounts.Green++;
+      } else if (riskCategory === "Yellow") {
+        riskCounts.Yellow++;
+      } else if (riskCategory === "Red") {
+        riskCounts.Red++;
+      } else {
+        riskCounts.Unknown++;
+      }
+      return accumulator;
+    }, {});
 
     const counts = filteredData?.reduce((accumulator, item) => {
       const { productLineCode, seatsPurchased, usersAssigned, seatsInUse } =
@@ -312,7 +318,6 @@ const InsightMetrics = () => {
   const prorated_categories = productlineproratedcount
     ? Object.keys(productlineproratedcount)
     : [];
-
   const withProparated = useMemo(
     () => ({
       options: {
@@ -415,7 +420,7 @@ const InsightMetrics = () => {
     [riskcategory, risk_category]
   );
 
-  //
+  // Handle MOdal Pop - Up
   const handleOpenModel = (id, contractNumber) => {
     setModal((prev) => ({
       ...prev,
@@ -424,6 +429,7 @@ const InsightMetrics = () => {
 
     dispatch(getInsightMetricsContract({ id, contractNumber }));
   };
+
   // Table Data
   const columns = [
     {
@@ -529,6 +535,19 @@ const InsightMetrics = () => {
     { field: "tenantId", headerName: "tenantId", width: 200 },
   ];
 
+  const handleSelectionChange = (selectedRows) => {
+    debugger;
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
+  const exportedData = useMemo(
+    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
+    [selectedId]
+  );
   return (
     <>
       <div>
@@ -666,7 +685,7 @@ const InsightMetrics = () => {
         ) : (
           <div className="table-container">
             <ExportToExcel
-              data={filteredData}
+              data={exportedData}
               columns={columns}
               fileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
@@ -677,6 +696,7 @@ const InsightMetrics = () => {
               columns={columns}
               getRowId={getRowId}
               checkboxSelection
+              handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
             />

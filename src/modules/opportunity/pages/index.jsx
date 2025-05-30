@@ -12,6 +12,7 @@ import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import moment from "moment";
 import CommonModal from "@/components/common/modal/CommonModal";
 import OpportunityDetail from "../components/OpportunityDetail";
+import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 
 const CommonChart = ({ title, options, series }) => {
   return (
@@ -85,6 +86,7 @@ const Opportunity = () => {
     isOpen: false,
     opportunity_number: "",
   });
+  const [selectedId, setSelectedId] = useState([]);
 
   const cardData = useMemo(
     () => [
@@ -384,6 +386,22 @@ const Opportunity = () => {
       width: 220,
     },
   ];
+  const handleSelectionChange = (selectedRows) => {
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
+
+  const exportedData = useMemo(
+    () =>
+      opportunityList?.filter((item) =>
+        selectedId.includes(item?.opportunity_number)
+      ),
+    [selectedId]
+  );
 
   return (
     <>
@@ -478,11 +496,20 @@ const Opportunity = () => {
           </div>
         ) : (
           <div className="opportunity-table">
+            <ExportToExcel
+              data={exportedData}
+              columns={columns}
+              fileName={`oppn_trisita_${userDetail?.first_name}_${
+                userDetail?.last_name
+              }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
+              className="account-export-btn"
+            />
             <CommonTable
               rows={opportunityList}
               columns={columns}
               getRowId={getRowId}
               checkboxSelection
+              handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`oppn_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
             />

@@ -61,7 +61,8 @@ export const BarChart = ({ data }) => {
       const allCities = new Set();
       productLineKeys.forEach((line) => {
         Object.keys(data[line]).forEach((city) => {
-          if (city !== "null") allCities.add(city);
+          // if (city !== "null")
+          allCities.add(city);
         });
       });
 
