@@ -547,7 +547,6 @@ const InsightMetrics = () => {
   ];
 
   const handleSelectionChange = (selectedRows) => {
-    debugger;
     const idArray = [...selectedRows?.ids];
     if (idArray?.length > 0) {
       setSelectedId(idArray);

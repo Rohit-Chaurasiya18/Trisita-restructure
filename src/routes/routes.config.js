@@ -16,6 +16,7 @@ import {
   AddQuotation,
   Opportunity,
   Subscription,
+  NewSubscription,
   UniqueUserCount,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
@@ -41,7 +42,6 @@ const routesConfig = {
     },
     {
       path: routesConstants.GET_USAGE,
-      // component: Get_usage,
       component: Outlet,
       children: [
         { index: true, component: Get_usage },
@@ -86,7 +86,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.NEW_SUBSCRIPTION,
-      component: Get_usage,
+      component: NewSubscription,
     },
     {
       path: routesConstants.DELETED_SUBSCRIPTION,

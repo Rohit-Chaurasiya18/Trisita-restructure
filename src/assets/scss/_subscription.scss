@@ -15,9 +15,15 @@
   }
   & .MuiStack-root {
     padding-top: 0px !important;
+    overflow: hidden;
   }
   & .MuiPickersInputBase-root {
     height: 45px !important;
+  }
+  .multiple-select-container {
+    .MuiAutocomplete-inputRoot {
+      height: 100%;
+    }
   }
 }
 .subscription-chart {
@@ -112,5 +118,54 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
     }
+  }
+}
+
+// New Subscription Page
+.new-subscription-header {
+  display: flex;
+  justify-content: space-between;
+  .new-subscription-filter {
+    display: flex;
+    gap: 15px;
+    @media (max-width: 600px) {
+      display: grid;
+      gap: 15px;
+      & .MuiFormControl-root {
+        width: 100%;
+      }
+    }
+    @media (max-width: 373px) {
+      & .MuiStack-root {
+        display: grid;
+        p {
+          display: none;
+        }
+        & .MuiFormControl-root {
+          margin-left: 0px;
+          margin-top: 12px;
+        }
+      }
+    }
+  }
+  & .MuiInputBase-root {
+    height: 45px;
+  }
+  & .MuiFormLabel-root {
+    top: -6px;
+  }
+  & .MuiInputLabel-shrink {
+    top: 6px !important;
+  }
+  & .MuiStack-root {
+    padding-top: 0px !important;
+    overflow: hidden;
+  }
+  & .MuiPickersInputBase-root {
+    height: 45px !important;
+  }
+  @media (max-width: 845px) {
+    display: grid;
+    gap: 15px;
   }
 }

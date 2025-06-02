@@ -35,3 +35,6 @@ export const GET_USUAGE_DATA = "/v1/api/get_usage_data/";
 export const GET_USUAGE_PRODUCT_FEATURE_CHART =
   "/v1/api/get_usage_product_feature_chart/";
 export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/usage_user_count/";
+export const GET_SUBSCRIPTION_DATA = "/v1/api/get_export_subscriptions/";
+export const GET_NEW_SUBSCRIPTION_DATA = "/v1/api/get_new_subscriptions/";
+export const GET_NEW_SUBSCRIPTION_DETAIL = "/v1/api/new_subscription/";
