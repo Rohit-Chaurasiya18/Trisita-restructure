@@ -68,6 +68,7 @@ const InsightMetrics = () => {
     branch: null,
     status: "All Status",
     account: [],
+    barColor: "",
   });
   const [modal, setModal] = useState({
     isOpen: false,
@@ -133,7 +134,17 @@ const InsightMetrics = () => {
 
   const handleBarClick = (data) => {
     const allData = handleFilterData(insightMetricsCustomer);
-    const updatedData = allData?.filter((item) => item?.riskCategory === data);
+    const isSameColor = filters?.barColor === data;
+
+    setFilters((prev) => ({
+      ...prev,
+      barColor: isSameColor ? "" : data,
+    }));
+
+    const updatedData = isSameColor
+      ? allData
+      : allData.filter((item) => item?.riskCategory === data);
+
     setFilteredData(updatedData);
   };
 
