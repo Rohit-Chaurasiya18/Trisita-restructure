@@ -15,7 +15,7 @@ const routesConstants = {
   NEW_SUBSCRIPTION: "/new_subscription",
   DELETED_SUBSCRIPTION: "/deleted_subscription",
   CHANGED_LOG_SUBSCRIPTION: "/change_log_subscription",
-  SUBSCRIPTION_DATA_COMPARISON: "/campare_subscription",
+  SUBSCRIPTION_DATA_COMPARISON: "/compare_subscription",
   ORDER_LOADING_PO: "/order_loading_po",
   ORDER_LOADING_DISTRIBUTOR: "/order_loading_distributor",
   RA_ORDER: "/ra_order_subscription",

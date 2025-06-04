@@ -61,6 +61,16 @@
   z-index: 1;
   right: 5px;
 }
+@media (max-width: 384px) {
+  .insight-export-btn {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+    margin-left: 0px !important;
+    width: 100%;
+    top: 0px !important;
+    right: 0px !important;
+  }
+}
 .common-insight-title {
   background-color: #f2f0f0;
   border-bottom: 0.8px solid;

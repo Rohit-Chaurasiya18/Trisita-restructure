@@ -9,67 +9,11 @@ import SubscriptionDetail from "../components/SubscriptionDetail";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getNewSubscriptionData,
-  getNewSubscriptionDetail,
+  getDeletedSubscriptionData,
+  getDeletedSubscriptionDetail,
 } from "../slice/subscriptionSlice";
-import { Autocomplete, TextField, Typography } from "@mui/material";
-import CommonButton from "@/components/common/buttons/CommonButton";
 
-const SetAction = () => {
-  return (
-    <>
-      <div className="col-12 d-flex my-2">
-        <div className="col-6 fw-bold">Subscription Acquired :</div>
-        <div className="col-6">
-          <Autocomplete
-            disablePortal
-            multiple
-            options={[]}
-            // value={filters?.account}
-            getOptionLabel={(option) => option?.name}
-            sx={{
-              width: 300,
-            }}
-            onChange={(event, newValues) => {
-              console.log(newValues);
-            }}
-            loading={false}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select Type"
-                variant="outlined"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {params.InputProps.endAdornment}
-                      {false && (
-                        <Typography variant="body2" color="textSecondary">
-                          Loading...
-                        </Typography>
-                      )}
-                    </>
-                  ),
-                }}
-              />
-            )}
-          />
-        </div>
-      </div>
-      <div className="d-flex justify-content-center mt-4">
-        <CommonButton
-          className={"w-auto"}
-          style={{ background: "rgb(21, 149, 221)" }}
-        >
-          Action
-        </CommonButton>
-      </div>
-    </>
-  );
-};
-
-const NewSubscription = () => {
+const DeletedSubscription = () => {
   const dispatch = useDispatch();
 
   const [dateRange, setDateRange] = useState([null, null]);
@@ -78,7 +22,6 @@ const NewSubscription = () => {
   const [modal, setModal] = useState({
     show: false,
     id: null,
-    isAssign: false,
   });
   const [filters, setFilters] = useState({
     startDate: null,
@@ -89,13 +32,14 @@ const NewSubscription = () => {
   const {
     userDetail,
     filter,
-    newSubscriptionDataLoading,
-    newSubscriptionData,
+    deletedSubscriptionDataLoading,
+    deletedSubscriptionData,
   } = useSelector((state) => ({
     userDetail: state?.login?.userDetail,
     filter: state?.layout?.filter,
-    newSubscriptionDataLoading: state?.subscription?.newSubscriptionDataLoading,
-    newSubscriptionData: state?.subscription?.newSubscriptionData,
+    deletedSubscriptionDataLoading:
+      state?.subscription?.deletedSubscriptionDataLoading,
+    deletedSubscriptionData: state?.subscription?.deletedSubscriptionData,
   }));
 
   // Date filter handler
@@ -112,12 +56,12 @@ const NewSubscription = () => {
   useEffect(() => {
     const statusFiltered =
       filters.status === "All Status"
-        ? newSubscriptionData
-        : newSubscriptionData?.filter(
+        ? deletedSubscriptionData
+        : deletedSubscriptionData?.filter(
             (item) => item?.trisita_status === filters.status
           );
     setFilteredData(statusFiltered);
-  }, [newSubscriptionData, filters.status]);
+  }, [deletedSubscriptionData, filters.status]);
 
   // API fetch on filters
   useEffect(() => {
@@ -132,13 +76,13 @@ const NewSubscription = () => {
       csn: filter?.csn === "All CSN" ? "" : filter?.csn,
       payload: dateFilter,
     };
-    dispatch(getNewSubscriptionData(payload));
+    dispatch(getDeletedSubscriptionData(payload));
   }, [filter?.csn, filters.endDate]);
 
   // Handle modal open
-  const handleOpenModel = (id, isAssign = false) => {
-    setModal({ show: true, id, isAssign });
-    dispatch(getNewSubscriptionDetail({ id }));
+  const handleOpenModel = (id) => {
+    setModal({ show: true, id });
+    dispatch(getDeletedSubscriptionDetail({ id }));
   };
 
   // Get unique ID for rows
@@ -164,7 +108,7 @@ const NewSubscription = () => {
         width: 150,
         renderCell: (params) => (
           <span
-            onClick={() => handleOpenModel(params?.row.id, false)}
+            onClick={() => handleOpenModel(params?.row.id)}
             className="action-button bg-white text-black px-3 py-1 rounded border-0"
           >
             {params?.value}
@@ -241,24 +185,11 @@ const NewSubscription = () => {
         ),
       },
       {
-        field: "created_date",
+        field: "deleted_date",
         headerName: "Created Date",
         width: 130,
         renderCell: ({ value }) => (
           <span>{new Date(value).toLocaleDateString()}</span>
-        ),
-      },
-      {
-        field: "action",
-        headerName: "Action",
-        width: 150,
-        renderCell: (params) => (
-          <span
-            onClick={() => handleOpenModel(params?.row?.id, true)}
-            className="assign-button text-black px-3 py-1 rounded border-0"
-          >
-            Assign Trigger
-          </span>
         ),
       },
     ],
@@ -270,7 +201,7 @@ const NewSubscription = () => {
       <div>
         <div className="new-subscription-header">
           <h5 className="commom-header-title mb-0">
-            New Subscription Data (Newest)
+            Old Subscription Data (Deleted)
           </h5>
           <div className="new-subscription-filter">
             <CommonDateRangePicker
@@ -294,7 +225,7 @@ const NewSubscription = () => {
           </div>
         </div>
 
-        {newSubscriptionDataLoading ? (
+        {deletedSubscriptionDataLoading ? (
           <SkeletonLoader isDashboard />
         ) : (
           <div className="new-subscription-table">
@@ -320,14 +251,14 @@ const NewSubscription = () => {
 
       <CommonModal
         isOpen={modal.show}
-        handleClose={() => setModal({ show: false, id: null, isAssign: false })}
+        handleClose={() => setModal({ show: false, id: null })}
         scrollable
-        title={modal.isAssign ? "Set Action" : "New Subscription Detail"}
+        title={"Deleted Subscription Detail"}
       >
-        {modal?.isAssign ? <SetAction /> : <SubscriptionDetail />}
+        <SubscriptionDetail />
       </CommonModal>
     </>
   );
 };
 
-export default NewSubscription;
+export default DeletedSubscription;

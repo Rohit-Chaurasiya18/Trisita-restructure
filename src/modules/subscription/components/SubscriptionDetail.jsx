@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import { useLocation } from "react-router-dom";
+import routesConstants from "@/routes/routesConstants";
 
 const tabsData = [
   { id: "1", label: "End Customer" },
@@ -18,9 +20,42 @@ const DetailRow = ({ label, value }) => (
 );
 
 const useContractData = () => {
+  const location = useLocation();
+  const isDeletedSubscription = useMemo(
+    () => location.pathname.startsWith(routesConstants?.DELETED_SUBSCRIPTION),
+    [location?.pathname]
+  );
+  const isChangedLogSubscription = useMemo(
+    () =>
+      location.pathname.startsWith(routesConstants?.CHANGED_LOG_SUBSCRIPTION),
+    [location?.pathname]
+  );
+  const isCompareSubscription = useMemo(
+    () =>
+      location.pathname.startsWith(
+        routesConstants?.SUBSCRIPTION_DATA_COMPARISON
+      ),
+    [location?.pathname]
+  );
+
   return useSelector((state) => ({
-    loading: state?.subscription?.newSubscriptionDetailsLoading,
-    data: state?.subscription?.newSubscriptionDetails,
+    loading: isDeletedSubscription
+      ? state?.subscription?.deletedSubscriptionDetailsLoading
+      : isChangedLogSubscription
+      ? state?.subscription?.changedLogSubscriptionDetailsLoading
+      : isCompareSubscription
+      ? state?.subscription?.compareSubscriptionDetailsLoading
+      : state?.subscription?.newSubscriptionDetailsLoading,
+    data: isDeletedSubscription
+      ? state?.subscription?.deletedSubscriptionDetails
+      : isChangedLogSubscription
+      ? state?.subscription?.changedLogSubscriptionDetails
+      : isCompareSubscription
+      ? state?.subscription?.compareSubscriptionDetails
+      : state?.subscription?.newSubscriptionDetails,
+    isDeletedSubscription,
+    isChangedLogSubscription,
+    isCompareSubscription,
   }));
 };
 
@@ -41,6 +76,7 @@ const EndCustomerTab = () => {
   const { loading, data } = useContractData();
   const customer = data?.endCustomer_account;
   const manager = data?.endCustomer_contractManager;
+
   return (
     <>
       <SectionWrapper title="End Customer Details" loading={loading}>
@@ -110,9 +146,10 @@ const Contract = () => {
       <DetailRow label="Contract#" value={contract?.contract_number} />
       <DetailRow label="Type" value={contract?.subType} />
       <DetailRow label="Product Line Name" value={data?.productLine} />
-      <DetailRow label="Term" value={data?.contract_term} />
+      <DetailRow label="Term" value={contract?.contract_term} />
       <DetailRow label="Duration" value={contract?.contract} />
       <DetailRow label="Retention Health" value={data?.ews_retentionHealth} />
+      <DetailRow label="Sub end date" value={data?.startDate} />
       <DetailRow label="Sub end date" value={data?.endDate} />
       <DetailRow label="Quantity" value={data?.quantity} />
     </SectionWrapper>
@@ -142,7 +179,7 @@ const LineItems = () => {
   );
 };
 
-const NewSubscriptionDetail = () => {
+const SubscriptionDetail = () => {
   const tabRefs = useRef([]);
   const [activeTab, setActiveTab] = useState("1");
 
@@ -210,4 +247,4 @@ const NewSubscriptionDetail = () => {
   );
 };
 
-export default NewSubscriptionDetail;
+export default SubscriptionDetail;

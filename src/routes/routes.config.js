@@ -17,6 +17,9 @@ import {
   Opportunity,
   Subscription,
   NewSubscription,
+  DeletedSubscription,
+  ChangeLogSubscription,
+  CompareSubscription,
   UniqueUserCount,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
@@ -90,15 +93,15 @@ const routesConfig = {
     },
     {
       path: routesConstants.DELETED_SUBSCRIPTION,
-      component: Get_usage,
+      component: DeletedSubscription,
     },
     {
       path: routesConstants.CHANGED_LOG_SUBSCRIPTION,
-      component: Get_usage,
+      component: ChangeLogSubscription,
     },
     {
       path: routesConstants.SUBSCRIPTION_DATA_COMPARISON,
-      component: Get_usage,
+      component: CompareSubscription,
     },
     {
       path: routesConstants.ORDER_LOADING_PO,

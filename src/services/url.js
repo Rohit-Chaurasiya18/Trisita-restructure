@@ -38,3 +38,14 @@ export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/usage_user_count/";
 export const GET_SUBSCRIPTION_DATA = "/v1/api/get_export_subscriptions/";
 export const GET_NEW_SUBSCRIPTION_DATA = "/v1/api/get_new_subscriptions/";
 export const GET_NEW_SUBSCRIPTION_DETAIL = "/v1/api/new_subscription/";
+export const GET_DELETED_SUBSCRIPTION_DATA =
+  "/v1/api/get_deleted_subscriptions/";
+export const GET_DELETED_SUBSCRIPTION_DETAIL =
+  "/v1/api/get_deleted_subscription/";
+export const GET_CHANGED_LOG_SUBSCRIPTION_DATA =
+  "/v1/api/get_change_log_subscriptions/";
+export const GET_CHANGED_LOG_SUBSCRIPTION_DETAIL =
+  "/v1/api/change_log_subscription/";
+export const GET_COMPARE_SUBSCRIPTION_DATA = "/v1/api/compare_subscriptions/";
+export const GET_BACKUP_SUBSCRIPTION = "/v1/api/get_backup_subscription/";
+export const GET_SUBSCRIPTION = "/v1/api/get_subscription/";
