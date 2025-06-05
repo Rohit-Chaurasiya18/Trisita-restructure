@@ -1,5 +1,4 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
-import DatePickerFilter from "@/components/common/date/DatePickerFilter";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 // import { accountOption } from "@/modules/insightMetrics/constants";
@@ -7,8 +6,6 @@ import {
   accountGroupChartData,
   accountTypeChartData,
   amountPerMOnth,
-  columns,
-  expiredContractSpeedMeterData,
   onBoardHealth,
   options,
   processedData,
@@ -23,9 +20,17 @@ import {
   getAllAccount,
   getAllBranch,
 } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { Autocomplete, TextField, Typography } from "@mui/material";
+import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
-import { getSubscriptionData } from "../slice/subscriptionSlice";
+import {
+  getBackupSubscriptionDetail,
+  getSubscriptionData,
+} from "../slice/subscriptionSlice";
+import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import CommonModal from "@/components/common/modal/CommonModal";
+import SubscriptionDetail from "../components/SubscriptionDetail";
+import moment from "moment";
+
 const CommonChart = ({ title, options, series, subCategory, className }) => {
   return (
     <div className={`insight-metrics-chart ${className}`}>
@@ -47,6 +52,12 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
       </div>
     </div>
   );
+};
+const seatPurchaseProductLine = {
+  byProductLine: 1,
+  byAccountName: 2,
+  byTeamName: 3,
+  byLastYear: 4,
 };
 const getRowId = (row) => row.id;
 
@@ -74,13 +85,18 @@ const Subscription = () => {
     subscriptionData: state?.subscription?.subscriptionData,
     subscriptionDataLoading: state?.subscription?.subscriptionDataLoading,
   }));
-
+  const [filteredData, setFilteredData] = useState();
   const [dateRange, setDateRange] = useState([null, null]);
   const [filters, setFilters] = useState({
     account: [],
     branch: null,
+    status: "All Status",
     startDate: null,
     endDate: null,
+  });
+  const [modal, setModal] = useState({
+    show: false,
+    id: null,
   });
 
   useEffect(() => {
@@ -97,23 +113,17 @@ const Subscription = () => {
       },
     };
     dispatch(getSubscriptionData(payload));
-  }, [filter?.csn, filters?.startDate, filters?.endDate]);
+  }, [filter?.csn, filters?.endDate]);
 
   const handleChange = (newValue) => {
     const [start, end] = newValue;
 
-    if (start) {
-      setFilters((prev) => ({
-        ...prev,
-        startDate: start.format("YYYY-MM-DD"),
-      }));
-    }
-    if (end) {
-      setFilters((prev) => ({
-        ...prev,
-        endDate: end.format("YYYY-MM-DD"),
-      }));
-    }
+    setFilters((prev) => ({
+      ...prev,
+      startDate: start ? start.format("YYYY-MM-DD") : "",
+      endDate: end ? end.format("YYYY-MM-DD") : "",
+    }));
+
     setDateRange(newValue);
   };
 
@@ -167,14 +177,227 @@ const Subscription = () => {
     }),
     [speedometerRatio]
   );
-  
+
+  // Table Data Handle
+
+  // Handle modal open
+  const handleOpenModel = (id) => {
+    setModal({ show: true, id });
+    dispatch(getBackupSubscriptionDetail({ id, isSubscription: true }));
+  };
+
+  const columns = [
+    {
+      field: "subscriptionReferenceNumber",
+      headerName: "subscription",
+      width: 150,
+      renderCell: (params, index) => (
+        <span
+          onClick={() => handleOpenModel(params?.row.id)}
+          className="action-button bg-white text-black px-3 py-1 rounded border-0"
+        >
+          {params?.value}
+        </span>
+      ),
+    },
+    {
+      field: "account_name",
+      headerName: "Account Name",
+      width: 200,
+      renderCell: (params) => {
+        const { value: account } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {account?.length > maxChars ? account : account?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    {
+      field: "third_party",
+      headerName: "Third Party Name",
+      width: 200,
+      renderCell: (params) => {
+        const { value: third_party_name } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {third_party_name?.length > maxChars
+              ? third_party_name
+              : third_party_name?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    { field: "part_number", headerName: "Part Number", width: 200 },
+    {
+      field: "bd_person",
+      headerName: "BD Person Name",
+      width: 200,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "renewal_person",
+      headerName: "Renewal Person Name",
+      width: 200,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    { field: "account_csn", headerName: "Account CSN", width: 100 },
+    {
+      field: "retention_health_riskBand",
+      headerName: "Retention health riskBand",
+      width: 100,
+    },
+    {
+      field: "branch",
+      headerName: "Branch",
+      width: 100,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "contract_manager_email",
+      headerName: "Contract Mgr. Email",
+      width: 200,
+      renderCell: (params) => {
+        const { value: email } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {email?.length > maxChars ? email : email?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    { field: "account_type", headerName: "Account Type", width: 130 },
+    { field: "seats", headerName: "Seats", width: 70 },
+    { field: "startDate", headerName: "Subs Start Date", width: 130 },
+    { field: "endDate", headerName: "Subs End Date ", width: 130 },
+    { field: "trisita_status", headerName: "Trisita Status", width: 130 },
+    { field: "subscriptionStatus", headerName: "Status", width: 100 },
+    { field: "lastPurchaseDate", headerName: "Last Purchase date", width: 130 },
+    { field: "account_group", headerName: "Account Group", width: 100 },
+    { field: "programType", headerName: "Program Type", width: 100 },
+    { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
+    { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
+    { field: "productLineCode", headerName: "Product Line Code", width: 130 },
+    { field: "contract_term", headerName: "Contract Term", width: 130 },
+    { field: "switchType", headerName: "Switch Type", width: 130 },
+    { field: "switchYear", headerName: "Switch Year", width: 130 },
+    { field: "acv_price", headerName: "Total ACV Price", width: 130 },
+    { field: "dtp_price", headerName: "Total DTP Price", width: 130 },
+    {
+      field: "productLine",
+      headerName: "Product Line",
+      width: 250,
+      renderCell: (params) => {
+        const { value: productLine } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {productLine?.length > maxChars
+              ? productLine
+              : productLine?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    {
+      field: "set-trigger",
+      headerName: "Set Trigger",
+      width: 150,
+      renderCell: (params, index) => (
+        <span
+          // onClick={() => handleOpenModel(params?.row?.id)}
+          className="assign-button text-black px-3 py-1 rounded border-0"
+        >
+          Assign Trigger
+        </span>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    setFilteredData(subscriptionData);
+  }, [subscriptionData]);
+
+  const handleFilter = (Arr) => {
+    let data = Arr;
+    if (filters?.branch) {
+      data = data?.filter((item) => item?.branch === filters?.branch?.label);
+    }
+    if (filters?.status !== "All Status") {
+      data = data?.filter((item) => item?.trisita_status === filters?.status);
+    }
+    if (filters?.account?.length > 0) {
+      data = data?.filter((item) => {
+        const name = item["account_name"];
+        return filters?.account.some(
+          (value) =>
+            name && name.toLowerCase().includes(value.label.toLowerCase())
+        );
+      });
+    }
+    return data;
+  };
+
+  useEffect(() => {
+    if (
+      filters?.account?.length > 0 ||
+      filters?.status !== "All Status" ||
+      filters?.branch
+    ) {
+      let data = handleFilter(subscriptionData);
+      setFilteredData(data);
+    } else {
+      setFilteredData(subscriptionData);
+    }
+  }, [filters?.account, filters?.branch, filters?.status, subscriptionData]);
+
   return (
     <>
       <div>
         <div className="subscription-header">
           <h5 className="commom-header-title mb-0">Subscription</h5>
           <div className="subscription-filter">
-            <span>Last Updated</span>
+            <Tooltip
+              title={
+                last_updated
+                  ? moment(last_updated).format("MMMM D, YYYY [at] h:mm:ss A")
+                  : ""
+              }
+              placement="top"
+            >
+              <span>Last Updated</span>
+            </Tooltip>
             <CommonButton className="common-green-btn">All</CommonButton>
 
             <CommonDateRangePicker
@@ -197,14 +420,17 @@ const Subscription = () => {
               value={filters?.branch}
             />
             <CommonSelect
-              value="All Status"
+              value={filters?.status}
               options={[
                 { value: "All Status", label: "All Status" },
                 { value: "Active", label: "Active" },
                 { value: "Expired", label: "Expired" },
               ]}
               onChange={(e) => {
-                console.log("Status changed:", e.target.value);
+                setFilters((prev) => ({
+                  ...prev,
+                  status: e?.target?.value,
+                }));
               }}
             />
             <div
@@ -278,12 +504,16 @@ const Subscription = () => {
               />
             </div>
             <div className="account-industry-chart-2 mt-4">
-              <CommonChart
-                title="Expired subscriptions ratio of nurtrued and customer"
-                options={expiredContractSpeedMeterData?.options}
-                series={expiredContractSpeedMeterData?.series}
-                className="chart-data-1"
-              />
+              {subscriptionDataLoading ? (
+                <SkeletonLoader isDashboard />
+              ) : (
+                <CommonChart
+                  title="Expired subscriptions ratio of nurtrued and customer"
+                  options={expiredContractSpeedMeterData?.options}
+                  series={expiredContractSpeedMeterData?.series}
+                  className="chart-data-1"
+                />
+              )}
               <div className="chart-section">
                 <CommonChart
                   title="Retention Risk shows summary of the renewal risk for the subscription contract"
@@ -305,18 +535,30 @@ const Subscription = () => {
               series={onBoardHealth.series}
             />
           </div>
-          <div className="subscription-table">
-            <CommonTable
-              rows={processedData}
-              columns={columns}
-              getRowId={getRowId}
-              checkboxSelection
-              toolbar
-              exportFileName={`subs_trisita`}
-            />
-          </div>
+          {subscriptionDataLoading ? (
+            <SkeletonLoader isDashboard />
+          ) : (
+            <div className="subscription-table">
+              <CommonTable
+                rows={filteredData}
+                columns={columns}
+                getRowId={getRowId}
+                checkboxSelection
+                toolbar
+                exportFileName={`subs_trisita`}
+              />
+            </div>
+          )}
         </div>
       </div>
+      <CommonModal
+        isOpen={modal.show}
+        handleClose={() => setModal({ show: false, id: null })}
+        scrollable
+        title={"Subscription Detail"}
+      >
+        <SubscriptionDetail />
+      </CommonModal>
     </>
   );
 };

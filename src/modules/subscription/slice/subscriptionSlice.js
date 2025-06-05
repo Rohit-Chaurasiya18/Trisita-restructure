@@ -181,6 +181,9 @@ const intialState = {
   speedometerRatio: null,
   subscriptionData: [],
   subscriptionDataLoading: false,
+  subscriptionDetails: null,
+  subscriptionDetailsLoading: false,
+
   newSubscriptionData: [],
   newSubscriptionDataLoading: false,
   newSubscriptionDetails: null,
@@ -354,17 +357,32 @@ const subscriptionSlice = createSlice({
     });
 
     // Get Compare Subscription Details
-    builder.addCase(getBackupSubscriptionDetail.pending, (state) => {
-      state.compareSubscriptionDetails = null;
-      state.compareSubscriptionDetailsLoading = true;
+    builder.addCase(getBackupSubscriptionDetail.pending, (state, action) => {
+      if (action.meta.arg?.isSubscription) {
+        state.subscriptionDetails = null;
+        state.subscriptionDetailsLoading = false;
+      } else {
+        state.compareSubscriptionDetails = null;
+        state.compareSubscriptionDetailsLoading = true;
+      }
     });
     builder.addCase(getBackupSubscriptionDetail.fulfilled, (state, action) => {
-      state.compareSubscriptionDetails = action.payload.data;
-      state.compareSubscriptionDetailsLoading = false;
+      if (action.meta.arg?.isSubscription) {
+        state.subscriptionDetails = action.payload.data;
+        state.subscriptionDetailsLoading = false;
+      } else {
+        state.compareSubscriptionDetails = action.payload.data;
+        state.compareSubscriptionDetailsLoading = false;
+      }
     });
-    builder.addCase(getBackupSubscriptionDetail.rejected, (state) => {
-      state.compareSubscriptionDetailsLoading = false;
-      state.compareSubscriptionDetails = null;
+    builder.addCase(getBackupSubscriptionDetail.rejected, (state, action) => {
+      if (action.meta.arg?.isSubscription) {
+        state.subscriptionDetails = null;
+        state.subscriptionDetailsLoading = false;
+      } else {
+        state.compareSubscriptionDetailsLoading = false;
+        state.compareSubscriptionDetails = null;
+      }
     });
   },
 });

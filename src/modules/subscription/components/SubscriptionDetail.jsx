@@ -21,6 +21,14 @@ const DetailRow = ({ label, value }) => (
 
 const useContractData = () => {
   const location = useLocation();
+  const isSubscription = useMemo(
+    () => location.pathname.startsWith(routesConstants?.SUBSCRIPTION),
+    [location?.pathname]
+  );
+  const isNewSubscription = useMemo(
+    () => location.pathname.startsWith(routesConstants?.NEW_SUBSCRIPTION),
+    [location?.pathname]
+  );
   const isDeletedSubscription = useMemo(
     () => location.pathname.startsWith(routesConstants?.DELETED_SUBSCRIPTION),
     [location?.pathname]
@@ -39,14 +47,18 @@ const useContractData = () => {
   );
 
   return useSelector((state) => ({
-    loading: isDeletedSubscription
+    loading: isSubscription
+      ? state?.subscription?.subscriptionDetailsLoading
+      : isDeletedSubscription
       ? state?.subscription?.deletedSubscriptionDetailsLoading
       : isChangedLogSubscription
       ? state?.subscription?.changedLogSubscriptionDetailsLoading
       : isCompareSubscription
       ? state?.subscription?.compareSubscriptionDetailsLoading
       : state?.subscription?.newSubscriptionDetailsLoading,
-    data: isDeletedSubscription
+    data: isSubscription
+      ? state?.subscription?.subscriptionDetails
+      : isDeletedSubscription
       ? state?.subscription?.deletedSubscriptionDetails
       : isChangedLogSubscription
       ? state?.subscription?.changedLogSubscriptionDetails
@@ -56,6 +68,8 @@ const useContractData = () => {
     isDeletedSubscription,
     isChangedLogSubscription,
     isCompareSubscription,
+    isSubscription,
+    isNewSubscription,
   }));
 };
 
@@ -73,7 +87,8 @@ const SectionWrapper = ({ title, children, loading }) => (
 );
 
 const EndCustomerTab = () => {
-  const { loading, data } = useContractData();
+  const { loading, data, isDeletedSubscription, isNewSubscription } =
+    useContractData();
   const customer = data?.endCustomer_account;
   const manager = data?.endCustomer_contractManager;
 
@@ -81,7 +96,9 @@ const EndCustomerTab = () => {
     <>
       <SectionWrapper title="End Customer Details" loading={loading}>
         <DetailRow
-          label="DeletedSubscription#"
+          label={`${
+            isDeletedSubscription ? "Deleted" : isNewSubscription ? "New" : ""
+          } Subscription#`}
           value={data?.subscriptionReferenceNumber}
         />
         <DetailRow label="CSN" value={customer?.endCustomerCsn} />
@@ -120,12 +137,15 @@ const Reseller = () => {
 };
 
 const Distributor = () => {
-  const { loading, data } = useContractData();
+  const { loading, data, isDeletedSubscription, isNewSubscription } =
+    useContractData();
   const distributor = data?.accounts_soldTo;
   return (
     <SectionWrapper title="Distributor Details" loading={loading}>
       <DetailRow
-        label="DeletedSubscription#"
+        label={`${
+          isDeletedSubscription ? "Deleted" : isNewSubscription ? "New" : ""
+        } Subscription#`}
         value={data?.subscriptionReferenceNumber}
       />
       <DetailRow label="CSN" value={distributor?.csn} />
@@ -149,7 +169,7 @@ const Contract = () => {
       <DetailRow label="Term" value={contract?.contract_term} />
       <DetailRow label="Duration" value={contract?.contract} />
       <DetailRow label="Retention Health" value={data?.ews_retentionHealth} />
-      <DetailRow label="Sub end date" value={data?.startDate} />
+      <DetailRow label="Sub start date" value={data?.startDate} />
       <DetailRow label="Sub end date" value={data?.endDate} />
       <DetailRow label="Quantity" value={data?.quantity} />
     </SectionWrapper>
