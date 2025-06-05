@@ -240,7 +240,7 @@ const accountSlice = createSlice({
         };
       }
 
-      for (const item of action?.payload) {
+      for (const item of action?.payload?.data) {
         const group = item.industryGroup || "Null";
         const status = item.contract_status === "Active" ? "active" : "expired";
 
@@ -257,7 +257,11 @@ const accountSlice = createSlice({
         groupedCounts["All"],
         ...fixedOrder.map((key) => groupedCounts[key]),
       ];
-      state.industryGroupCount = industryGroupStats;
+      const key = action?.payload?.isThirdPartyAccount
+        ? "thirdPartyIndustryGroupCount"
+        : "industryGroupCount";
+
+      state[key] = industryGroupStats;
     },
     // },
   },

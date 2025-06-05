@@ -107,25 +107,6 @@ const Account = () => {
     id: "",
     isAssign: false,
   });
-  const [lineChartData, setLineChartData] = useState({
-    series: [],
-    options: {
-      chart: {
-        type: "line",
-        width: "100%",
-        height: 350,
-        zoom: { enabled: false },
-      },
-      dataLabels: { enabled: false },
-      stroke: { curve: "straight" },
-      title: { text: "", align: "left" },
-      grid: {
-        row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
-      },
-      xaxis: { categories: [] },
-    },
-  });
-
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -174,94 +155,22 @@ const Account = () => {
   }, []);
 
   useEffect(() => {
+    let payload = {
+      id: filter?.csn === "All CSN" ? "" : filter?.csn,
+      isThirdParty: isThirdPartyAccount,
+    };
     if (isThirdPartyAccount) {
-      dispatch(
-        getThirdPartyExportedAccount({
-          id: filter?.csn === "All CSN" ? "" : filter?.csn,
-          isThirdParty: isThirdPartyAccount,
-        })
-      );
+      dispatch(getThirdPartyExportedAccount(payload));
     } else {
-      dispatch(
-        getExportedAccount({
-          id: filter?.csn === "All CSN" ? "" : filter?.csn,
-          isThirdParty: isThirdPartyAccount,
-        })
-      );
+      dispatch(getExportedAccount(payload));
     }
   }, [filter?.csn, isThirdPartyAccount]);
 
-  useEffect(() => {
-    if (
-      filters?.branch?.label ||
-      filters?.status !== "All Status" ||
-      filters?.searchValue ||
-      filters?.industryCategory
-    ) {
-      let data = exportedAccountData;
-      let industryGroup = exportedAccountData;
-      if (filters?.branch?.label) {
-        data = data?.filter?.(
-          (item) => item?.branch === filters?.branch?.label
-        );
-        industryGroup = data?.filter?.(
-          (item) => item?.branch === filters?.branch?.label
-        );
-      }
-      if (filters?.status !== "All Status") {
-        data = data?.filter(
-          (item) => item?.contract_status === filters?.status
-        );
-      }
-      if (filters?.searchValue) {
-        data = data?.filter((row) => {
-          return Object.values(row).some(
-            (value) =>
-              value &&
-              value
-                .toString()
-                .toLowerCase()
-                .includes(filters?.searchValue.toLowerCase())
-          );
-        });
-        industryGroup = data?.filter((row) => {
-          return Object.values(row).some(
-            (value) =>
-              value &&
-              value
-                .toString()
-                .toLowerCase()
-                .includes(filters?.searchValue.toLowerCase())
-          );
-        });
-      }
-      setFilteredData(data);
-      dispatch(setIndustryGroupCount(industryGroup));
-    } else {
-      setFilteredData(exportedAccountData);
-      dispatch(setIndustryGroupCount(exportedAccountData));
-    }
-  }, [filters?.branch, filters?.status, filters?.searchValue]);
-
-  useEffect(() => {
+  const handleFilters = () => {
     let data = exportedAccountData;
-
-    if (filters?.industryCategory && filters?.industryCategory !== "All") {
-      data = data?.filter(
-        (item) =>
-          item?.industryGroup?.toString()?.toLowerCase() ===
-          filters?.industryCategory?.toString()?.toLowerCase()
-      );
-    }
-
     if (filters?.branch?.label) {
-      data = data?.filter((item) => item?.branch === filters?.branch?.label);
+      data = data?.filter?.((item) => item?.branch === filters?.branch?.label);
     }
-
-    if (filters?.status && filters?.status !== "All Status") {
-      data = data?.filter((item) => item?.contract_status === filters?.status);
-    }
-
     if (filters?.searchValue) {
       const search = filters?.searchValue.toLowerCase();
       data = data?.filter((row) =>
@@ -270,16 +179,31 @@ const Account = () => {
         )
       );
     }
+    if (filters?.status && filters?.status !== "All Status") {
+      data = data?.filter((item) => item?.contract_status === filters?.status);
+    }
+    return data;
+  };
 
-    setFilteredData(data);
-  }, [
-    filters?.industryCategory,
-    filters?.branch,
-    filters?.status,
-    filters?.searchValue,
-    exportedAccountData,
-    isThirdPartyAccount,
-  ]);
+  useEffect(() => {
+    if (
+      filters?.branch?.label ||
+      filters?.status !== "All Status" ||
+      filters?.searchValue
+    ) {
+      let data = handleFilters();
+      setFilteredData(data);
+      dispatch(setIndustryGroupCount({ data, isThirdPartyAccount }));
+    } else {
+      setFilteredData(exportedAccountData);
+      dispatch(
+        setIndustryGroupCount({
+          data: exportedAccountData,
+          isThirdPartyAccount,
+        })
+      );
+    }
+  }, [filters?.branch, filters?.status, filters?.searchValue]);
 
   const handleOpenModel = (id) => {
     setModal((prev) => ({ ...prev, isOpen: true, id: id, isAssign: false }));
@@ -457,62 +381,29 @@ const Account = () => {
   const getRowId = (row) => row.id;
 
   const handleClick = (title, status) => {
-    setFilters((prev) => ({
-      ...prev,
-      status: status === "Total" ? "All Status" : status,
-      industryCategory: title === "All" ? "All" : title,
-    }));
-
     setSelectedValue({ title, status });
-  };
-
-  // Function to compute chart data by group (groupByKey = "industryGroup", etc.)
-  const computeChartData = (groupByKey = "industryGroup") => {
-    const groupCounts = filteredData.reduce((acc, curr) => {
-      const key = curr[groupByKey] || "Unknown";
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-
-    const sortedKeys = Object.keys(groupCounts).sort();
-    const data = sortedKeys.map((key) => groupCounts[key]);
-
-    setLineChartData({
-      series: [{ name: "Accounts", data }],
-      options: {
-        ...lineChartData.options,
-        xaxis: {
-          ...lineChartData.options.xaxis,
-          categories: sortedKeys,
-        },
-      },
-    });
-  };
-
-  // On initial data load, generate the default industryGroup chart
-  // useEffect(() => {
-  //   // if (filteredData && filteredData.length > 0) {
-  //   if (filteredData) {
-  //     computeChartData("industryGroup");
-  //     setSelectedIndex(0);
-  //   }
-  // }, [filteredData]);
-
-  // Handle chart switch: 0 = industryGroup, 1 = segment, 2 = subsegment
-  const subCategoryChange = (index) => {
-    if (index === 0) computeChartData("industryGroup");
-    else if (index === 1) computeChartData("industrySegment");
-    else if (index === 2) computeChartData("industrySubSegment");
-  };
-  const handleCityBarClick = (cityName, clickedStatus) => {
-    let data = exportedAccountData;
-    if (filters?.industryCategory && filters?.industryCategory !== "All") {
-      data = data?.filter(
-        (item) =>
-          item?.industryGroup?.toString()?.toLowerCase() ===
-          filters?.industryCategory?.toString()?.toLowerCase()
-      );
+    let data = handleFilters();
+    if (title !== "All") {
+      if (title === "Unknown") {
+        data = data?.filter(
+          (item) => !item?.industryGroup || item?.industryGroup === "Unknown"
+        );
+      } else {
+        data = data?.filter(
+          (item) =>
+            item?.industryGroup?.toString()?.toLowerCase() ===
+            title?.toString()?.toLowerCase()
+        );
+      }
     }
+    if (status !== "Total") {
+      data = data?.filter((item) => item?.contract_status === status);
+    }
+    setFilteredData(data);
+  };
+
+  const handleCityBarClick = (cityName, clickedStatus) => {
+    let data = handleFilters();
     if (cityName) {
       if (cityName === "Unknown") {
         data = data?.filter((item) => !item?.city);
@@ -524,24 +415,10 @@ const Account = () => {
         );
       }
     }
-
-    if (filters?.branch?.label) {
-      data = data?.filter((item) => item?.branch === filters?.branch?.label);
-    }
-
     if (clickedStatus) {
       data = data?.filter((item) => item?.contract_status === clickedStatus);
     }
-
-    if (filters?.searchValue) {
-      const search = filters?.searchValue.toLowerCase();
-      data = data?.filter((row) =>
-        Object.values(row).some(
-          (value) => value && value.toString().toLowerCase().includes(search)
-        )
-      );
-    }
-
+    dispatch(setIndustryGroupCount({ data, isThirdPartyAccount }));
     setFilteredData(data);
   };
 
@@ -646,8 +523,8 @@ const Account = () => {
     () => filteredData?.filter((item) => selectedId.includes(item?.id)),
     [selectedId]
   );
+
   // Compute chart data based on selected grouping
-  // const [selectedIndex, setSelectedIndex] = useState(0);
   const industryChartData = useMemo(() => {
     const groupByKey =
       selectedIndex === 0
@@ -690,9 +567,13 @@ const Account = () => {
                 searchValue: "",
                 branch: null,
                 status: "All Status",
-                industryCategory: "",
               });
-              dispatch(setIndustryGroupCount(exportedAccountData));
+              dispatch(
+                setIndustryGroupCount({
+                  data: exportedAccountData,
+                  isThirdPartyAccount,
+                })
+              );
               setSelectedValue({
                 title: "All",
                 status: "Total",
@@ -729,11 +610,6 @@ const Account = () => {
                 status: e.target.value,
                 industryCategory: "All",
               }));
-              // setSelectedValue({
-              //   title: "All",
-              //   status:
-              //     e.target.value === "All Status" ? "Total" : e.target.value,
-              // });
               setSelectedValue({
                 title: "",
                 status: "",
