@@ -187,3 +187,15 @@
     background-color: #2e7d32;
   }
 }
+.subscription-chart {
+  .chart-data-subcategory {
+    p {
+      padding: 5px;
+    }
+    .active-subcategory {
+      background-color: rgb(59, 130, 246);
+      color: #ffffff;
+      border-radius: 5px;
+    }
+  }
+}

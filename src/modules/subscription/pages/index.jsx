@@ -1,17 +1,7 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
-// import { accountOption } from "@/modules/insightMetrics/constants";
-import {
-  accountGroupChartData,
-  accountTypeChartData,
-  amountPerMOnth,
-  onBoardHealth,
-  options,
-  processedData,
-  riskRetentionShows,
-  series,
-} from "../constants";
+import { amountPerMOnth, onBoardHealth } from "../constants";
 import ReactApexChart from "react-apexcharts";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,7 +21,15 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import SubscriptionDetail from "../components/SubscriptionDetail";
 import moment from "moment";
 
-const CommonChart = ({ title, options, series, subCategory, className }) => {
+const CommonChart = ({
+  title,
+  options,
+  series,
+  subCategory,
+  className,
+  onSubCategoryClick,
+}) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
   return (
     <div className={`insight-metrics-chart ${className}`}>
       <div className="chart-data">
@@ -39,7 +37,16 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
           <h3>{title}</h3>
           <div className="chart-data-subcategory">
             {subCategory?.map((item, index) => (
-              <p key={index}>{item}</p>
+              <p
+                key={index}
+                onClick={() => {
+                  onSubCategoryClick && onSubCategoryClick(index);
+                  setSelectedIndex(index);
+                }}
+                className={`${index === selectedIndex && "active-subcategory"}`}
+              >
+                {item}
+              </p>
             ))}
           </div>
         </div>
@@ -53,12 +60,7 @@ const CommonChart = ({ title, options, series, subCategory, className }) => {
     </div>
   );
 };
-const seatPurchaseProductLine = {
-  byProductLine: 1,
-  byAccountName: 2,
-  byTeamName: 3,
-  byLastYear: 4,
-};
+
 const getRowId = (row) => row.id;
 
 const Subscription = () => {
@@ -104,23 +106,30 @@ const Subscription = () => {
     dispatch(getAllAccount());
   }, []);
 
-  useEffect(() => {
+  const handleFetchData = async () => {
+    let dateFilter;
+    if (filters?.startDate && filters?.endDate) {
+      dateFilter = {
+        from_date: filters?.startDate || null,
+        to_date: filters?.endDate || null,
+      };
+    }
     let payload = {
       csn: filter?.csn === "All CSN" ? "" : filter?.csn,
-      payload: {
-        from_date: filters?.startDate ? filters?.startDate : "",
-        to_date: filters?.endDate ? filters?.endDate : "",
-      },
+      payload: dateFilter,
     };
-    dispatch(getSubscriptionData(payload));
+    await dispatch(getSubscriptionData(payload));
+  };
+
+  useEffect(() => {
+    handleFetchData();
   }, [filter?.csn, filters?.endDate]);
 
   const handleChange = (newValue) => {
     const [start, end] = newValue;
-
     setFilters((prev) => ({
       ...prev,
-      startDate: start ? start.format("YYYY-MM-DD") : "",
+      startDate: start?.format("YYYY-MM-DD") || null,
       endDate: end ? end.format("YYYY-MM-DD") : "",
     }));
 
@@ -382,6 +391,590 @@ const Subscription = () => {
     }
   }, [filters?.account, filters?.branch, filters?.status, subscriptionData]);
 
+  // Number of seats chart
+  const [chartViewType, setChartViewType] = useState("byProductLine");
+  const [options, setOptions] = useState({
+    chart: {
+      events: {},
+      type: "bar",
+      height: 350,
+      width: "100%",
+    },
+    xaxis: {
+      categories: [], // Will be populated with top 50 product codes
+    },
+    yaxis: {
+      title: { text: "Total Seats" },
+    },
+    dataLabels: {
+      position: "top",
+    },
+  });
+
+  const [series, setSeries] = useState([
+    { name: "seats", data: [] }, // Will contain seat counts for top 50
+  ]);
+
+  useEffect(() => {
+    if (filteredData?.length > 0) {
+      let aggregationMap = new Map();
+      let groupKey;
+      let truncateLabels = false;
+      let rotateLabels = false;
+      let sortDescending = true;
+
+      // Determine grouping key based on chart view type
+      if (chartViewType === "byAccountName") {
+        groupKey = "account_name";
+        truncateLabels = true;
+        rotateLabels = true;
+      } else if (chartViewType === "byLastYear") {
+        groupKey = "lastPurchaseDate";
+        sortDescending = false; // Sort years ascending
+      } else {
+        truncateLabels = true;
+        rotateLabels = true;
+        groupKey = "productLineCode"; // Default to product line
+      }
+
+      filteredData.forEach((item) => {
+        let key;
+        if (chartViewType === "byLastYear") {
+          // Extract year from lastPurchaseDate
+          if (item[groupKey]) {
+            try {
+              const year = new Date(item[groupKey]).getFullYear();
+              if (!isNaN(year)) key = year.toString();
+            } catch (e) {
+              console.error("Invalid date format:", item[groupKey]);
+            }
+          }
+        } else {
+          key = item[groupKey];
+        }
+
+        if (!key) return; // Skip items without key
+
+        const current = aggregationMap.get(key) || 0;
+        aggregationMap.set(key, current + (item.seats || 0));
+      });
+
+      // Convert to array and sort
+      let sortedData = Array.from(aggregationMap.entries()).map(
+        ([key, total]) => ({ key, total })
+      );
+
+      if (chartViewType === "byLastYear") {
+        // Sort years numerically in ascending order
+        sortedData = sortedData.sort(
+          (a, b) => parseInt(a.key) - parseInt(b.key)
+        );
+      } else {
+        // Sort other views by total descending
+        sortedData = sortedData.sort((a, b) => b.total - a.total);
+      }
+
+      // Take top 50 (except for years which are limited)
+      const topData =
+        chartViewType === "byLastYear" ? sortedData : sortedData.slice(0, 50);
+
+      // Extract categories and data values
+      const categories = topData.map((item) => item.key);
+      const seriesData = topData.map((item) => item.total);
+
+      // Update chart state
+      setOptions((prev) => ({
+        ...prev,
+        xaxis: {
+          ...prev.xaxis,
+          categories,
+          labels: {
+            ...prev.xaxis.labels,
+            rotate: rotateLabels ? -45 : 0,
+            formatter: (value) => {
+              // Truncate long labels
+              if (truncateLabels && value.length > 20) {
+                return value.substring(0, 20) + "...";
+              }
+              return value;
+            },
+          },
+        },
+      }));
+
+      setSeries([{ name: "seats", data: seriesData }]);
+    } else {
+      // Handle no data case
+      setOptions((prev) => ({
+        ...prev,
+        xaxis: {
+          ...prev.xaxis,
+          categories: [],
+          labels: {
+            ...prev.xaxis.labels,
+            rotate: 0,
+          },
+        },
+        noData: {
+          text: "No data available",
+          align: "center",
+          verticalAlign: "middle",
+          offsetX: 0,
+          offsetY: 0,
+          style: {
+            color: "#888",
+            fontSize: "14px",
+            fontFamily: "Arial, sans-serif",
+          },
+        },
+      }));
+      setSeries([{ name: "seats", data: [] }]);
+    }
+  }, [filteredData, chartViewType]);
+
+  const handleChartViewChange = (viewType) => {
+    setChartViewType(viewType);
+  };
+
+  // Total Subscriptions as per Account Group
+  const [accountGroupType, setAccountGroupType] = useState("subscription");
+  const [accountGroupChart, setAccountGroupChart] = useState({
+    options: {
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: [],
+      legend: {
+        position: "bottom",
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+    series: [],
+  });
+
+  useEffect(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.account_group || "Unknown";
+
+        // Initialize group if not exists
+        if (!accountGroups[group]) {
+          accountGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        accountGroups[group].count += 1;
+        accountGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        accountGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(accountGroups);
+      let series;
+
+      switch (accountGroupType) {
+        case "dtp_price":
+          series = labels.map((group) => accountGroups[group].dtp);
+          break;
+        case "acv_price":
+          series = labels.map((group) => accountGroups[group].acv);
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => accountGroups[group].count);
+      }
+
+      setAccountGroupChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels,
+        },
+        series,
+      }));
+    } else {
+      // Reset to empty state
+      setAccountGroupChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels: [],
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+        },
+        series: [],
+      }));
+    }
+  }, [filteredData, accountGroupType]);
+
+  const getAccountGroupTitle = () => {
+    switch (accountGroupType) {
+      case "dtp_price":
+        return "Total DTP Price as per Account Group";
+      case "acv_price":
+        return "Total ACV Price as per Account Group";
+      case "subscription":
+      default:
+        return "Total Subscriptions as per Account Group";
+    }
+  };
+
+  const handleAccountGroupChange = (viewType) => {
+    setAccountGroupType(viewType);
+  };
+
+  // Retention Risk shows summary of the renewal risk for the subscription contract
+  const [retentionRiskType, setRetentionRiskType] = useState("subscription");
+  const [retentionRiskChart, setRetentionRiskChart] = useState({
+    options: {
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: [],
+      legend: {
+        position: "bottom",
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+    series: [],
+  });
+
+  useEffect(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const retentionRiskGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.retention_health_riskBand || "Unknown";
+
+        // Initialize group if not exists
+        if (!retentionRiskGroups[group]) {
+          retentionRiskGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        retentionRiskGroups[group].count += 1;
+        retentionRiskGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        retentionRiskGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(retentionRiskGroups);
+      let series;
+
+      switch (retentionRiskType) {
+        case "dtp_price":
+          series = labels.map((group) => retentionRiskGroups[group].dtp);
+          break;
+        case "acv_price":
+          series = labels.map((group) => retentionRiskGroups[group].acv);
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => retentionRiskGroups[group].count);
+      }
+
+      setRetentionRiskChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels,
+        },
+        series,
+      }));
+    } else {
+      // Reset to empty state
+      setRetentionRiskChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels: [],
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+        },
+        series: [],
+      }));
+    }
+  }, [filteredData, retentionRiskType]);
+
+  const getRetentionRiskTitle = () => {
+    switch (retentionRiskType) {
+      case "dtp_price":
+        return "Retention Risk shows summary of the renewal risk for the dtp price";
+      case "acv_price":
+        return "Retention Risk shows summary of the renewal risk for the acv price";
+      case "subscription":
+      default:
+        return "Retention Risk shows summary of the renewal risk for the subscription contract";
+    }
+  };
+
+  const handleRetentionRiskChange = (viewType) => {
+    setRetentionRiskType(viewType);
+  };
+
+  // Total Subscriptions as per Account Type
+  const [accountType_Type, setAccountType_Type] = useState("subscription");
+  const [accountTypeChart, setAccountTypeChart] = useState({
+    options: {
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: [],
+      legend: {
+        position: "bottom",
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+    series: [],
+  });
+
+  useEffect(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountTypeGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.account_type || "Unknown";
+
+        // Initialize group if not exists
+        if (!accountTypeGroups[group]) {
+          accountTypeGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        accountTypeGroups[group].count += 1;
+        accountTypeGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        accountTypeGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(accountTypeGroups);
+      let series;
+
+      switch (accountType_Type) {
+        case "dtp_price":
+          series = labels.map((group) => accountTypeGroups[group].dtp);
+          break;
+        case "acv_price":
+          series = labels.map((group) => accountTypeGroups[group].acv);
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => accountTypeGroups[group].count);
+      }
+
+      setAccountTypeChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels,
+        },
+        series,
+      }));
+    } else {
+      // Reset to empty state
+      setAccountTypeChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels: [],
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+        },
+        series: [],
+      }));
+    }
+  }, [filteredData, accountType_Type]);
+
+  const getAccountTypeTitle = () => {
+    switch (accountType_Type) {
+      case "dtp_price":
+        return "Total DTP Price as per Account Type";
+      case "acv_price":
+        return "Total ACV Price as per Account Type";
+      case "subscription":
+      default:
+        return "Total Subscriptions as per Account Type";
+    }
+  };
+
+  const handleAccountTypeChange = (viewType) => {
+    setAccountType_Type(viewType);
+  };
+
+  // On Board Health
+  const [onBoardHealthChart, setOnBoardHealthChart] = useState({
+    options: {
+      chart: {
+        events: {},
+        type: "bar",
+        height: 350,
+        width: "100%",
+      },
+      xaxis: {
+        categories: [],
+      },
+      yaxis: {
+        title: {
+          text: "",
+        },
+      },
+      dataLabels: {
+        position: "top",
+      },
+    },
+    series: [],
+  });
+
+  useEffect(() => {
+    if (filteredData?.length) {
+      // Define the desired category order
+      const orderedCategories = [
+        "Very High",
+        "High",
+        "Medium",
+        "Low",
+        "Very Low",
+        "Unknown",
+      ];
+
+      // Initialize counts for all categories
+      const riskCounts = orderedCategories.reduce((acc, category) => {
+        acc[category] = 0;
+        return acc;
+      }, {});
+
+      // Count subscriptions per risk band
+      filteredData.forEach((item) => {
+        const group = item?.retention_health_riskBand || "Unknown";
+        // Only count if it's one of our ordered categories
+        if (orderedCategories.includes(group)) {
+          riskCounts[group] = (riskCounts[group] || 0) + 1;
+        }
+      });
+
+      // Convert to arrays for the chart in the predefined order
+      const seriesData = orderedCategories.map(
+        (category) => riskCounts[category]
+      );
+      setOnBoardHealthChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels: orderedCategories,
+        },
+        series: [{ name: "Subscription", data: seriesData }], // Directly use the count array
+      }));
+    } else {
+      // Reset to empty state
+      setOnBoardHealthChart((prev) => ({
+        ...prev,
+        options: {
+          ...prev.options,
+          labels: [],
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+        },
+        series: [],
+      }));
+    }
+  }, [filteredData]);
+
   return (
     <>
       <div>
@@ -398,7 +991,20 @@ const Subscription = () => {
             >
               <span>Last Updated</span>
             </Tooltip>
-            <CommonButton className="common-green-btn">All</CommonButton>
+            <CommonButton
+              className="common-green-btn"
+              onClick={() => {
+                setFilters({
+                  account: [],
+                  branch: null,
+                  status: "All Status",
+                  startDate: null,
+                  endDate: null,
+                });
+              }}
+            >
+              All
+            </CommonButton>
 
             <CommonDateRangePicker
               value={dateRange}
@@ -478,62 +1084,104 @@ const Subscription = () => {
             </div>
           </div>
           <div className="subscription-chart">
-            <CommonChart
-              title="Trend of number of seats purchased by product line code"
-              options={options}
-              series={series}
-              subCategory={[
-                "By Product line",
-                "By Account names",
-                "By Team names",
-                "By Last Purchase Year",
-              ]}
-            />
-            <div className="account-industry-chart-2 mt-4">
+            {subscriptionDataLoading ? (
+              <SkeletonLoader isDashboard />
+            ) : (
               <CommonChart
-                title="Total Subscriptions as per Account Group"
-                options={accountGroupChartData.options}
-                series={accountGroupChartData.series}
-                className="chart-data-1"
+                title={
+                  chartViewType === "byProductLine"
+                    ? "Trend of number of seats purchased by product line code"
+                    : chartViewType === "byAccountName"
+                    ? "Trend of number of seats purchased by account name"
+                    : "Trend of number of seats purchased by last purchase year"
+                }
+                options={options}
+                series={series}
+                subCategory={[
+                  "By Product line",
+                  "By Account names",
+                  "By Team names",
+                  "By Last Purchase Year",
+                ]}
+                onSubCategoryClick={(index) => {
+                  if (index === 0) handleChartViewChange("byProductLine");
+                  if (index === 1) handleChartViewChange("byAccountName");
+                  if (index === 3) handleChartViewChange("byLastYear");
+                }}
               />
-              <CommonChart
-                title="Total Amount as per Months"
-                options={amountPerMOnth.options}
-                series={amountPerMOnth.series}
-                className="chart-data-2"
-              />
-            </div>
-            <div className="account-industry-chart-2 mt-4">
-              {subscriptionDataLoading ? (
-                <SkeletonLoader isDashboard />
-              ) : (
+            )}
+            {subscriptionDataLoading ? (
+              <SkeletonLoader isDashboard />
+            ) : (
+              <div className="account-industry-chart-2 mt-4">
+                <CommonChart
+                  title={getAccountGroupTitle()}
+                  options={accountGroupChart?.options}
+                  series={accountGroupChart?.series}
+                  className="chart-data-1"
+                  subCategory={["Subscription", "DTP", "ACV"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleAccountGroupChange("subscription");
+                    if (index === 1) handleAccountGroupChange("dtp_price");
+                    if (index === 2) handleAccountGroupChange("acv_price");
+                  }}
+                />
+                <CommonChart
+                  title="Total Amount as per Months"
+                  options={amountPerMOnth.options}
+                  series={amountPerMOnth.series}
+                  className="chart-data-2"
+                />
+              </div>
+            )}
+            {subscriptionDataLoading ? (
+              <SkeletonLoader isDashboard />
+            ) : (
+              <div className="account-industry-chart-2 mt-4">
                 <CommonChart
                   title="Expired subscriptions ratio of nurtrued and customer"
                   options={expiredContractSpeedMeterData?.options}
                   series={expiredContractSpeedMeterData?.series}
                   className="chart-data-1"
                 />
-              )}
-              <div className="chart-section">
-                <CommonChart
-                  title="Retention Risk shows summary of the renewal risk for the subscription contract"
-                  options={riskRetentionShows.options}
-                  series={riskRetentionShows.series}
-                  className="chart-data-2"
-                />
-                <CommonChart
-                  title="Total Subscriptions as per Account Type"
-                  options={accountTypeChartData.options}
-                  series={accountTypeChartData.series}
-                  className="chart-data-2"
-                />
+                <div className="chart-section">
+                  <CommonChart
+                    title={getRetentionRiskTitle()}
+                    options={retentionRiskChart?.options}
+                    series={retentionRiskChart?.series}
+                    className="chart-data-2"
+                    subCategory={["Subscription", "DTP", "ACV"]}
+                    onSubCategoryClick={(index) => {
+                      if (index === 0)
+                        handleRetentionRiskChange("subscription");
+                      if (index === 1) handleRetentionRiskChange("dtp_price");
+                      if (index === 2) handleRetentionRiskChange("acv_price");
+                    }}
+                  />
+                  <CommonChart
+                    title={getAccountTypeTitle()}
+                    options={accountTypeChart.options}
+                    series={accountTypeChart.series}
+                    className="chart-data-2"
+                    subCategory={["Subscription", "DTP", "ACV"]}
+                    onSubCategoryClick={(index) => {
+                      if (index === 0) handleAccountTypeChange("subscription");
+                      if (index === 1) handleAccountTypeChange("dtp_price");
+                      if (index === 2) handleAccountTypeChange("acv_price");
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-            <CommonChart
-              title="On boarding Health adoption report"
-              options={onBoardHealth.options}
-              series={onBoardHealth.series}
-            />
+            )}
+            {subscriptionDataLoading ? (
+              <SkeletonLoader isDashboard />
+            ) : (
+              <CommonChart
+                title="On boarding Health adoption report"
+                options={onBoardHealthChart.options}
+                series={onBoardHealthChart.series}
+              />
+            )}
           </div>
           {subscriptionDataLoading ? (
             <SkeletonLoader isDashboard />
