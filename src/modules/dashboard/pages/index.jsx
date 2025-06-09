@@ -191,8 +191,8 @@ const Dashboard = () => {
                     <span>{item?.bd_person_name}</span>
                   </Tooltip>
                 </div>
-                <p>{item?.bd_person_name}</p>
-                <p className="amount">₹{item?.order_loading_date}</p>
+                <p>{item?.order_loading_date}</p>
+                <p className="amount">₹{item?.sales_invoice_amount_ex_gst}</p>
               </div>
             ))}
           </div>
