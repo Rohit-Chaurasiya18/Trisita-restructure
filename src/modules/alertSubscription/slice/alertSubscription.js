@@ -65,7 +65,15 @@ const alertSubscriptionSlice = createSlice({
     });
     builder.addCase(getRORAlertData.fulfilled, (state, action) => {
       state.alertSubscriptionLoading = false;
-      state.alertSubscriptionList = action.payload.data;
+      state.alertSubscriptionList = action.payload.data?.map((item) => ({
+        ...item,
+        bd_person: item.bd_person_first_names
+          ? item?.bd_person_first_names.join(", ")
+          : "",
+        renewal_person: item.renewal_person_first_names
+          ? item?.renewal_person_first_names.join(", ")
+          : "",
+      }));
     });
     builder.addCase(getRORAlertData.rejected, (state) => {
       state.alertSubscriptionLoading = false;
