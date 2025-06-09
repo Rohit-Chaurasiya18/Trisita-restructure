@@ -2,6 +2,7 @@ import { combineReducers } from "@reduxjs/toolkit";
 import dashboardReducer from "@/modules/dashboard/slice";
 import loginReducer from "@/modules/login/slice/loginSlice";
 import profileReducer from "@/modules/profile/slice/profileSlice";
+import notificationsReducer from "@/modules/notification/slice/notificationsSlice";
 import layoutReducer from "@/layout/slice/layoutSlice";
 import insightMetricsReducer from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import insightMetricsReducerV2 from "@/modules/insightMetricsV2/slice/insightMetricsV2Slice";
@@ -16,6 +17,7 @@ const reducer = combineReducers({
   dashboard: dashboardReducer,
   login: loginReducer,
   profile: profileReducer,
+  notifications: notificationsReducer,
   layout: layoutReducer,
   insightMetrics: insightMetricsReducer,
   insightMetricsV2: insightMetricsReducerV2,

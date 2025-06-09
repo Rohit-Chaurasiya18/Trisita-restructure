@@ -21,6 +21,7 @@ import {
   ChangeLogSubscription,
   CompareSubscription,
   UniqueUserCount,
+  Notifications,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -166,6 +167,10 @@ const routesConfig = {
     {
       path: routesConstants?.CHANGE_PASSWORD,
       component: ChangePassword,
+    },
+    {
+      path: routesConstants?.NOTIFICATIONS,
+      component: Notifications,
     },
   ],
   public: [{ path: routesConstants?.LOGIN, component: Login }],

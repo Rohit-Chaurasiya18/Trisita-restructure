@@ -49,3 +49,6 @@ export const GET_CHANGED_LOG_SUBSCRIPTION_DETAIL =
 export const GET_COMPARE_SUBSCRIPTION_DATA = "/v1/api/compare_subscriptions/";
 export const GET_BACKUP_SUBSCRIPTION = "/v1/api/get_backup_subscription/";
 export const GET_SUBSCRIPTION = "/v1/api/get_subscription/";
+export const GET_ALL_NOTIFICATIONS = "/v1/api/notifications/";
+export const GET_USER_WISE_NOTIFICATION = "/v1/api/user_wise_notifications/";
+export const MARK_ALL_AS_READ_URL = "/v1/api/notifications/mark-as-read-all/";

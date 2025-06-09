@@ -1,28 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import routesConstants from "@/routes/routesConstants";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { useDispatch, useSelector } from "react-redux";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import Badge from "@mui/material/Badge";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import { getLogout } from "@/modules/login/slice/loginSlice";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import { setLayoutCSNFilter, setLayoutYearFilter } from "./slice/layoutSlice";
+import Logout from "@mui/icons-material/Logout";
+import useOutsideClick from "@/hooks/useOutsideClick";
 
 const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isNotificationOpen, setNotificationOpen] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { filter, userDetail } = useSelector((state) => ({
+  const profileRef = useRef(null);
+  const notificationRef = useRef(null);
+
+  const { filter, userDetail, notificationsData } = useSelector((state) => ({
     filter: state?.layout?.filter,
     userDetail: state?.login?.userDetail,
+    notificationsData: state?.notifications?.notificationsData,
   }));
 
   // Toggle profile dropdown
   const toggleProfileDropdown = () => {
     setProfileDropdownOpen(!isProfileDropdownOpen);
+    setNotificationOpen(false);
   };
 
   // Handle logout
@@ -40,7 +50,8 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
       dispatch(setLayoutYearFilter(event.target.value));
     }
   };
-
+  useOutsideClick(profileRef, () => setProfileDropdownOpen(false));
+  useOutsideClick(notificationRef, () => setNotificationOpen(false));
   return (
     <header className="header_block">
       <div className="header_content">
@@ -78,12 +89,68 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
             />
           </div>
           <div className="profile_dropdown">
-            <NotificationsNoneIcon className="me-2 notification-icon" />
-            <button className="profile_icon" onClick={toggleProfileDropdown}>
+            <Badge
+              badgeContent={
+                notificationsData?.filter((notif) => !notif?.is_read)?.length ||
+                0
+              }
+              color="error"
+              overlap="circular"
+            >
+              <NotificationsOutlinedIcon
+                className="me-2 notification-icon"
+                onClick={() => {
+                  setNotificationOpen(!isNotificationOpen);
+                  setProfileDropdownOpen(false);
+                }}
+              />
+            </Badge>
+            {isNotificationOpen && (
+              <div
+                className="dropdown_menu notification-menu"
+                ref={notificationRef}
+              >
+                <label>Notifications</label>
+                {notificationsData?.length > 0 ? (
+                  notificationsData?.slice(0, 5).map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`notification-item ${
+                        notification?.is_read ? "read" : "unread"
+                      }`}
+                    >
+                      <p className="notification-message">
+                        {notification?.notification_message.slice(0, 20)}...
+                      </p>
+                      <span className="notification-date">
+                        {new Date(notification?.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-notifications">No new notifications.</p>
+                )}
+                <div className="text-end">
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => {
+                      navigate(routesConstants?.NOTIFICATIONS);
+                      setNotificationOpen(false);
+                    }}
+                  >
+                    All Notifications <Logout />
+                  </span>
+                </div>
+              </div>
+            )}
+            <button
+              className="profile_icon ms-2"
+              onClick={toggleProfileDropdown}
+            >
               👤
             </button>
             {isProfileDropdownOpen && (
-              <div className="dropdown_menu">
+              <div className="dropdown_menu" ref={profileRef}>
                 <button
                   className="dropdown_item logout"
                   onClick={() => {

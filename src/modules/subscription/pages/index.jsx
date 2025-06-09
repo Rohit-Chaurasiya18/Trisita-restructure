@@ -1,7 +1,6 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
-import { amountPerMOnth, onBoardHealth } from "../constants";
 import ReactApexChart from "react-apexcharts";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +19,7 @@ import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonModal from "@/components/common/modal/CommonModal";
 import SubscriptionDetail from "../components/SubscriptionDetail";
 import moment from "moment";
+import dayjs from "dayjs";
 
 const CommonChart = ({
   title,
@@ -975,6 +975,61 @@ const Subscription = () => {
     }
   }, [filteredData]);
 
+  // Total Amount as per Months
+  const chartData = useMemo(() => {
+    const monthlyData = {};
+
+    // Prepare next 12 months
+    for (let i = 0; i < 12; i++) {
+      const monthKey = dayjs().add(i, "month").format("YYYY-MM");
+      monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
+    }
+
+    // Aggregate DTP and ACV by endDate month
+    (filteredData || []).forEach((sub) => {
+      const endMonth = dayjs(sub?.endDate).format("YYYY-MM");
+      if (monthlyData[endMonth]) {
+        monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
+        monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;
+      }
+    });
+
+    const categories = Object.keys(monthlyData);
+    const dtpData = categories.map((month) =>
+      parseFloat(monthlyData[month].dtp_total.toFixed(2))
+    );
+    const acvData = categories.map((month) =>
+      parseFloat(monthlyData[month].acv_total.toFixed(2))
+    );
+
+    return { categories, dtpData, acvData };
+  }, [filteredData]);
+
+  // 📊 ApexCharts config
+  const amountPerMonth = {
+    options: {
+      chart: { height: 350, type: "bar" },
+      xaxis: {
+        categories: chartData.categories,
+        title: { text: "Months" },
+      },
+      yaxis: {
+        title: { text: "Price" },
+      },
+      colors: ["#007BFF", "#FF5733"],
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          columnWidth: "50%",
+        },
+      },
+    },
+    series: [
+      { name: "DTP Price", data: chartData.dtpData },
+      { name: "ACV Price", data: chartData.acvData },
+    ],
+  };
+
   return (
     <>
       <div>
@@ -1128,8 +1183,8 @@ const Subscription = () => {
                 />
                 <CommonChart
                   title="Total Amount as per Months"
-                  options={amountPerMOnth.options}
-                  series={amountPerMOnth.series}
+                  options={amountPerMonth.options}
+                  series={amountPerMonth.series}
                   className="chart-data-2"
                 />
               </div>

@@ -43,6 +43,9 @@ export const ChangeLogSubscription = lazy(() =>
 export const CompareSubscription = lazy(() =>
   import("@/modules/subscription/pages/CompareSubscription")
 );
+export const Notifications = lazy(() =>
+  import("@/modules/notification/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));
