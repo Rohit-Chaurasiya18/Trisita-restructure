@@ -88,6 +88,7 @@ const Subscription = () => {
     subscriptionDataLoading: state?.subscription?.subscriptionDataLoading,
   }));
   const [filteredData, setFilteredData] = useState();
+  const [barColor, setBarColor] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
   const [filters, setFilters] = useState({
     account: [],
@@ -887,94 +888,6 @@ const Subscription = () => {
     setAccountType_Type(viewType);
   };
 
-  // On Board Health
-  const [onBoardHealthChart, setOnBoardHealthChart] = useState({
-    options: {
-      chart: {
-        events: {},
-        type: "bar",
-        height: 350,
-        width: "100%",
-      },
-      xaxis: {
-        categories: [],
-      },
-      yaxis: {
-        title: {
-          text: "",
-        },
-      },
-      dataLabels: {
-        position: "top",
-      },
-    },
-    series: [],
-  });
-
-  useEffect(() => {
-    if (filteredData?.length) {
-      // Define the desired category order
-      const orderedCategories = [
-        "Very High",
-        "High",
-        "Medium",
-        "Low",
-        "Very Low",
-        "Unknown",
-      ];
-
-      // Initialize counts for all categories
-      const riskCounts = orderedCategories.reduce((acc, category) => {
-        acc[category] = 0;
-        return acc;
-      }, {});
-
-      // Count subscriptions per risk band
-      filteredData.forEach((item) => {
-        const group = item?.retention_health_riskBand || "Unknown";
-        // Only count if it's one of our ordered categories
-        if (orderedCategories.includes(group)) {
-          riskCounts[group] = (riskCounts[group] || 0) + 1;
-        }
-      });
-
-      // Convert to arrays for the chart in the predefined order
-      const seriesData = orderedCategories.map(
-        (category) => riskCounts[category]
-      );
-      setOnBoardHealthChart((prev) => ({
-        ...prev,
-        options: {
-          ...prev.options,
-          labels: orderedCategories,
-        },
-        series: [{ name: "Subscription", data: seriesData }], // Directly use the count array
-      }));
-    } else {
-      // Reset to empty state
-      setOnBoardHealthChart((prev) => ({
-        ...prev,
-        options: {
-          ...prev.options,
-          labels: [],
-          noData: {
-            text: "No data available",
-            align: "center",
-            verticalAlign: "middle",
-            offsetX: 0,
-            offsetY: 0,
-            style: {
-              color: "#888",
-              fontSize: "14px",
-              fontFamily: "Arial, sans-serif",
-            },
-          },
-        },
-        series: [],
-      }));
-    }
-  }, [filteredData]);
-
   // Total Amount as per Months
   const chartData = useMemo(() => {
     const monthlyData = {};
@@ -1030,6 +943,124 @@ const Subscription = () => {
     ],
   };
 
+  // On Board Health
+  const orderedCategories = [
+    "Very High",
+    "High",
+    "Medium",
+    "Low",
+    "Very Low",
+    "Unknown",
+  ];
+
+  const handleOnBoardHealthBarClick = (data) => {
+    const allData = handleFilter(subscriptionData);
+    const isSameColor = barColor === data;
+
+    setBarColor(isSameColor ? "" : data);
+
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown"
+            ? item?.retention_health_riskBand === data
+            : !item?.retention_health_riskBand
+        );
+
+    setFilteredData(updatedData);
+  };
+
+  const onBoardHealthChart = useMemo(() => {
+    // Initialize risk count
+    const riskCounts = orderedCategories.reduce((acc, category) => {
+      acc[category] = 0;
+      return acc;
+    }, {});
+    let allData = handleFilter(subscriptionData);
+    if (allData?.length) {
+      allData.forEach((item) => {
+        const group = item?.retention_health_riskBand || "Unknown";
+        if (orderedCategories.includes(group)) {
+          riskCounts[group]++;
+        }
+      });
+
+      const seriesData = orderedCategories.map(
+        (category) => riskCounts[category]
+      );
+
+      return {
+        options: {
+          chart: {
+            type: "bar",
+            height: 350,
+            width: "100%",
+            events: {
+              click(event, chartContext, config) {
+                const clickedCategory =
+                  config?.config?.xaxis?.categories[config.dataPointIndex];
+                if (clickedCategory) {
+                  handleOnBoardHealthBarClick(clickedCategory);
+                }
+              },
+            },
+          },
+          xaxis: {
+            categories: orderedCategories,
+          },
+          yaxis: {
+            title: {
+              text: "",
+            },
+          },
+          dataLabels: {
+            position: "top",
+          },
+        },
+        series: [
+          {
+            name: "Subscription",
+            data: seriesData,
+          },
+        ],
+      };
+    } else {
+      return {
+        options: {
+          chart: {
+            type: "bar",
+            height: 350,
+            width: "100%",
+          },
+          xaxis: {
+            categories: [],
+          },
+          yaxis: {
+            title: {
+              text: "",
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+        },
+        series: [],
+      };
+    }
+  }, [filteredData]);
+
   return (
     <>
       <div>
@@ -1056,6 +1087,7 @@ const Subscription = () => {
                   startDate: null,
                   endDate: null,
                 });
+                setBarColor("");
               }}
             >
               All
