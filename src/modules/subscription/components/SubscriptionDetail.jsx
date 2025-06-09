@@ -188,7 +188,6 @@ const LineItems = () => {
       <DetailRow label="SKU Description" value={data?.id} />
       <DetailRow label="Quantity" value={data?.quantity} />
       <DetailRow label="Seats" value={data?.seats} />
-      <DetailRow label="Renewed Quantity" value={data?.id} />
       <DetailRow label="Deployment" value={data?.deployment} />
       <DetailRow label="Status" value={data?.subscriptionStatus} />
       <DetailRow label="Asset Status" value={data?.productStatus} />

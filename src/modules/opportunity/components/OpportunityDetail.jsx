@@ -183,10 +183,6 @@ const tabConfig = [
             path: ["line_items", 0, "sku_description"],
           },
           { label: "Seats", path: ["line_items", 0, "seats"] },
-          {
-            label: "Renewed Quantity",
-            path: ["line_items", 0, "renewed_quantity"],
-          },
           { label: "Deployment", path: ["line_items", 0, "deployment"] },
           { label: "Status", path: ["line_items", 0, "status"] },
           { label: "Asset Status", path: ["line_items", 0, "asset_status"] },
