@@ -116,7 +116,17 @@
   .subscription-header {
     .subscription-filter {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, 300px);
+      justify-content: start;
+    }
+  }
+}
+@media (max-width: 1246px) {
+  .subscription-header {
+    .subscription-filter {
+      display: grid;
+      grid-template-columns: repeat(2, 300px);
+      justify-content: start;
     }
   }
 }
