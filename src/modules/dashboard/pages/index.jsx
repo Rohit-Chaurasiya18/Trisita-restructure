@@ -16,6 +16,7 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { setPageLoader } from "@/modules/login/slice/loginSlice";
+import StoreMap from "../components/StoreMap";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -175,7 +176,8 @@ const Dashboard = () => {
           )}
           <div className="chart" key="geography">
             <span className="geography-span">Geography Based Traffic</span>
-            <GeographyChart isDashboard={true} />
+            {/* <GeographyChart isDashboard={true} /> */}
+            <StoreMap />
           </div>
         </div>
         {dashboardData?.order_loading_ho?.length > 0 && (

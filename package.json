@@ -27,6 +27,7 @@
     "@mui/x-date-pickers": "^8.1.0",
     "@mui/x-date-pickers-pro": "^8.4.0",
     "@nivo/geo": "^0.88.0",
+    "@react-google-maps/api": "^2.20.6",
     "@reduxjs/toolkit": "^2.0.1",
     "@tailwindcss/vite": "^4.0.12",
     "@tinymce/tinymce-react": "^4.3.2",
