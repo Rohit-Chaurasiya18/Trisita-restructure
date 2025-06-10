@@ -52,3 +52,11 @@ export const GET_SUBSCRIPTION = "/v1/api/get_subscription/";
 export const GET_ALL_NOTIFICATIONS = "/v1/api/notifications/";
 export const GET_USER_WISE_NOTIFICATION = "/v1/api/user_wise_notifications/";
 export const MARK_ALL_AS_READ_URL = "/v1/api/notifications/mark-as-read-all/";
+export const GET_PRODUCT_MASTER = "/v1/product/product_master/";
+export const GET_PRODUCT_MASTER_CATEGORY =
+  "/v1/product/product_master_category/";
+export const GET_PRODUCT_MASTER_GST_TYPE =
+  "/v1/product/product_master_gst_type/";
+export const GET_PRODUCT_MASTER_OEM = "/v1/product/product_master_oem/";
+export const GET_PRODUCT_MASTER_STATUS = "/v1/product/product_master_status/";
+export const GET_PRODUCT_MASTER_UOM = "/v1/product/product_master_uom/";

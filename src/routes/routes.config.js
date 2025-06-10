@@ -21,9 +21,12 @@ import {
   ChangeLogSubscription,
   CompareSubscription,
   UniqueUserCount,
+  ProductMaster,
+  AddUpdateProductMaster,
   Notifications,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
+import { components } from "react-select";
 
 const routesConfig = {
   common: [{ path: routesConstants._404, component: _404 }],
@@ -122,7 +125,11 @@ const routesConfig = {
     },
     {
       path: routesConstants.PRODUCT_MASTER,
-      component: Get_usage,
+      component: Outlet,
+      children: [
+        { index: true, component: ProductMaster },
+        { path: "add_product_master", component: AddUpdateProductMaster },
+      ],
     },
     {
       path: routesConstants.PRODUCT,

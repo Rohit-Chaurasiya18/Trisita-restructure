@@ -21,6 +21,8 @@ const routesConstants = {
   RA_ORDER: "/ra_order_subscription",
   EXPORTED_FILE: "/exported_file",
   PRODUCT_MASTER: "/product_master",
+  ADD_PRODUCT_MASTER: "/add_product_master",
+  UPDATE_PRODUCT_MASTER: "/update_product_master/",
   PRODUCT: "/product",
   RUN_CAMPAIGN: "/select_audience",
   CAMPAIGN_HISTORY: "/campaign_history",

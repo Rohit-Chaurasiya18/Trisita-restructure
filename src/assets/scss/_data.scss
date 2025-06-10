@@ -1,0 +1,26 @@
+// #################  Product Master ##################3
+.product-master-container {
+  .product-master-header {
+    display: flex;
+    justify-content: space-between;
+    .product-master-filter {
+      display: flex;
+      gap: 15px;
+      .MuiFormControl-root {
+        label {
+          top: -5px;
+        }
+        & .MuiInputBase-root {
+          height: 45px;
+        }
+      }
+      .add-product-master {
+        width: fit-content;
+        height: 45px;
+        padding: 10px;
+        background-color: rgb(141 190 134 / 1);
+        color: rgb(0 0 0 / 1);
+      }
+    }
+  }
+}
