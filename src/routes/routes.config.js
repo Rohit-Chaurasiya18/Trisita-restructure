@@ -22,8 +22,10 @@ import {
   CompareSubscription,
   UniqueUserCount,
   ProductMaster,
+  Product,
   AddUpdateProductMaster,
   Notifications,
+  AddUpdateProduct,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { components } from "react-select";
@@ -129,11 +131,19 @@ const routesConfig = {
       children: [
         { index: true, component: ProductMaster },
         { path: "add_product_master", component: AddUpdateProductMaster },
+        {
+          path: "update_product_master/:productMasterId",
+          component: AddUpdateProductMaster,
+        },
       ],
     },
     {
       path: routesConstants.PRODUCT,
-      component: Get_usage,
+      component: Outlet,
+      children: [
+        { index: true, component: Product },
+        { path: "add_product", component: AddUpdateProduct },
+      ],
     },
     {
       path: routesConstants.RUN_CAMPAIGN,

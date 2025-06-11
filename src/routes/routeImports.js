@@ -43,11 +43,17 @@ export const ChangeLogSubscription = lazy(() =>
 export const CompareSubscription = lazy(() =>
   import("@/modules/subscription/pages/CompareSubscription")
 );
+export const Product = lazy(() =>
+  import("@/modules/data/product/pages/Product")
+);
 export const ProductMaster = lazy(() =>
   import("@/modules/data/product/pages/ProductMaster")
 );
 export const AddUpdateProductMaster = lazy(() =>
   import("@/modules/data/product/pages/AddUpdateProductMaster")
+);
+export const AddUpdateProduct = lazy(() =>
+  import("@/modules/data/product/pages/AddUpdateProduct")
 );
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));

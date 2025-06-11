@@ -24,6 +24,7 @@ const routesConstants = {
   ADD_PRODUCT_MASTER: "/add_product_master",
   UPDATE_PRODUCT_MASTER: "/update_product_master/",
   PRODUCT: "/product",
+  ADD_PRODUCT: "/add_product",
   RUN_CAMPAIGN: "/select_audience",
   CAMPAIGN_HISTORY: "/campaign_history",
   CONTACT_INFORMATION: "/contact_information",

@@ -74,7 +74,18 @@ const ProductMaster = () => {
       width: 250,
       renderCell: (params) => (
         <Tooltip title={params?.value || ""}>
-          <span className="text-red-600 cursor-pointer">{params?.value}</span>
+          <span
+            className="text-red-600 cursor-pointer"
+            onClick={() =>
+              navigate(
+                routesConstants?.PRODUCT_MASTER +
+                  routesConstants?.UPDATE_PRODUCT_MASTER +
+                  params?.id
+              )
+            }
+          >
+            {params?.value}
+          </span>
         </Tooltip>
       ),
     },

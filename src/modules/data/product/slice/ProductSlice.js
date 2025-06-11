@@ -1,6 +1,7 @@
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  GET_PRODUCT,
   GET_PRODUCT_MASTER,
   GET_PRODUCT_MASTER_CATEGORY,
   GET_PRODUCT_MASTER_GST_TYPE,
@@ -102,6 +103,147 @@ export const getProductMasterUOM = createAsyncThunk(
   }
 );
 
+// Add Product Master Category
+export const addProductMasterCategory = createAsyncThunk(
+  `product/addProductMasterCategory`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        GET_PRODUCT_MASTER_CATEGORY,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Add Product Master UOM
+export const addProductMasterUOM = createAsyncThunk(
+  `product/addProductMasterUOM`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_PRODUCT_MASTER_UOM, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Add Product Master OEM
+export const addProductMasterOEM = createAsyncThunk(
+  `product/addProductMasterOEM`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_PRODUCT_MASTER_OEM, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Add Product Master Status
+export const addProductMasterStatus = createAsyncThunk(
+  `product/addProductMasterStatus`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        GET_PRODUCT_MASTER_STATUS,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Add Product Master Status
+export const addProductMasterGst = createAsyncThunk(
+  `product/addProductMasterGst`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        GET_PRODUCT_MASTER_GST_TYPE,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Add & Update Product Master
+export const addUpdateProductMaster = createAsyncThunk(
+  `product/addUpdateProductMaster`,
+  async (payload, thunkAPI) => {
+    try {
+      let method = "post";
+      let url = GET_PRODUCT_MASTER;
+      if (payload?.productMasterId) {
+        method = "put";
+        url = url + payload?.productMasterId;
+      }
+      const response = await axiosReact[method](url, payload?.payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Get Product Master By Id
+export const getProductMasterById = createAsyncThunk(
+  `product/getProductMasterById`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_PRODUCT_MASTER + payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Get Product Data
+export const getProductData = createAsyncThunk(
+  `product/getProductData`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_PRODUCT);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Add & Update Product
+export const addUpdateProduct = createAsyncThunk(
+  `product/addUpdateProduct`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_PRODUCT, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const ProductState = {
   productMasterData: [],
   productMasterDataLoading: false,
@@ -110,6 +252,10 @@ const ProductState = {
   productMasterOEM: [],
   productMasterStatus: [],
   productMasterUOM: [],
+  productMasterById: null,
+  productMasterByIdLoading: false,
+  productData: [],
+  productDataLoading: false,
 };
 
 const productSlice = createSlice({
@@ -184,6 +330,34 @@ const productSlice = createSlice({
     });
     builder.addCase(getProductMasterUOM.rejected, (state) => {
       state.productMasterUOM = [];
+    });
+
+    // getProductMasterById
+    builder.addCase(getProductMasterById.pending, (state) => {
+      state.productMasterById = null;
+      state.productMasterByIdLoading = true;
+    });
+    builder.addCase(getProductMasterById.fulfilled, (state, action) => {
+      state.productMasterById = action.payload.data?.product_master;
+      state.productMasterByIdLoading = false;
+    });
+    builder.addCase(getProductMasterById.rejected, (state) => {
+      state.productMasterById = null;
+      state.productMasterByIdLoading = false;
+    });
+
+    // getProductData
+    builder.addCase(getProductData.pending, (state) => {
+      state.productData = null;
+      state.productDataLoading = true;
+    });
+    builder.addCase(getProductData.fulfilled, (state, action) => {
+      state.productData = action.payload.data?.product;
+      state.productDataLoading = false;
+    });
+    builder.addCase(getProductData.rejected, (state) => {
+      state.productData = null;
+      state.productDataLoading = false;
     });
   },
 });
