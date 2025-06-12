@@ -13,6 +13,8 @@ import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import { setLayoutCSNFilter, setLayoutYearFilter } from "./slice/layoutSlice";
 import Logout from "@mui/icons-material/Logout";
 import useOutsideClick from "@/hooks/useOutsideClick";
+import { getAllNotifications } from "@/modules/notification/slice/notificationsSlice";
+import SkeletonLoader from "@/components/common/loaders/Skeleton";
 
 const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -23,10 +25,9 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
 
-  const { filter, userDetail, notificationsData } = useSelector((state) => ({
+  const { filter, userDetail } = useSelector((state) => ({
     filter: state?.layout?.filter,
     userDetail: state?.login?.userDetail,
-    notificationsData: state?.notifications?.notificationsData,
   }));
 
   // Toggle profile dropdown
@@ -52,6 +53,30 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   };
   useOutsideClick(profileRef, () => setProfileDropdownOpen(false));
   useOutsideClick(notificationRef, () => setNotificationOpen(false));
+
+  // NOtification
+  const [notificationsState, setNotificationsState] = useState({
+    count: 0,
+    notifications: [],
+    loading: false,
+  });
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      setNotificationsState((prev) => ({ ...prev, loading: true }));
+      const res = await dispatch(getAllNotifications({ isUser: false }));
+      const data = res?.payload?.data || {};
+
+      setNotificationsState({
+        count: data?.count || 0,
+        notifications: data?.notifications || [],
+        loading: false,
+      });
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <header className="header_block">
       <div className="header_content">
@@ -90,10 +115,7 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
           </div>
           <div className="profile_dropdown">
             <Badge
-              badgeContent={
-                notificationsData?.filter((notif) => !notif?.is_read)?.length ||
-                0
-              }
+              badgeContent={notificationsState?.count}
               color="error"
               overlap="circular"
             >
@@ -111,22 +133,26 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                 ref={notificationRef}
               >
                 <label>Notifications</label>
-                {notificationsData?.length > 0 ? (
-                  notificationsData?.slice(0, 5).map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`notification-item ${
-                        notification?.is_read ? "read" : "unread"
-                      }`}
-                    >
-                      <p className="notification-message">
-                        {notification?.notification_message.slice(0, 20)}...
-                      </p>
-                      <span className="notification-date">
-                        {new Date(notification?.created_at).toLocaleString()}
-                      </span>
-                    </div>
-                  ))
+                {notificationsState?.loading ? (
+                  <SkeletonLoader isDashboard />
+                ) : notificationsState?.notifications?.length > 0 ? (
+                  notificationsState?.notifications
+                    ?.slice(0, 5)
+                    .map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`notification-item ${
+                          notification?.is_read ? "read" : "unread"
+                        }`}
+                      >
+                        <p className="notification-message">
+                          {notification?.notification_message.slice(0, 20)}...
+                        </p>
+                        <span className="notification-date">
+                          {new Date(notification?.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                    ))
                 ) : (
                   <p className="no-notifications">No new notifications.</p>
                 )}

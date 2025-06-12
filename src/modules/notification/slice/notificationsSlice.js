@@ -59,7 +59,6 @@ export const updateMarkAllAsRead = createAsyncThunk(
 );
 
 const notificationsState = {
-  count: 0,
   notificationsData: [],
   notificationsDataLoading: false,
 };
@@ -75,7 +74,6 @@ const notificationsSlice = createSlice({
       state.notificationsData = [];
     });
     builder.addCase(getAllNotifications.fulfilled, (state, action) => {
-      state.count = action.payload.data?.count;
       state.notificationsDataLoading = false;
       state.notificationsData = action.payload.data?.notifications;
     });
