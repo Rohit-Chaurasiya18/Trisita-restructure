@@ -50,6 +50,10 @@
     font-size: 14px;
     padding-left: 16px;
     cursor: pointer;
+    @media (max-width: 664px) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   .chart-data {
     height: 100%;
@@ -70,10 +74,10 @@
 @media (max-width: 375px) {
   .subscription-header {
     .insight-metrics-chart {
-      width: 330px;
+      width: 100%;
     }
     .subscription-table {
-      width: 330px;
+      width: 100%;
     }
   }
 }
@@ -81,6 +85,29 @@
 @media (max-width: 670px) {
   .subscription-filter {
     grid-template-columns: repeat(1, 1fr) !important;
+    & .MuiStack-root {
+      display: grid;
+      p {
+        display: none;
+      }
+      & .MuiFormControl-root {
+        margin-bottom: 7px;
+        margin-left: 0px;
+        width: 300px;
+      }
+    }
+  }
+}
+@media (max-width: 340px) {
+  .subscription-filter {
+    & .MuiInputBase-root {
+      width: 250px !important;
+    }
+    & .MuiStack-root {
+      & .MuiFormControl-root {
+        width: 250px;
+      }
+    }
   }
 }
 

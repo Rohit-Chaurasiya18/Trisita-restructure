@@ -21,6 +21,24 @@
         background-color: rgb(141 190 134 / 1);
         color: rgb(0 0 0 / 1);
       }
+      @media (max-width: 350px) {
+        width: 100% !important;
+        & .MuiBox-root {
+          width: 100% !important;
+        }
+      }
+      @media (max-width: 650px) {
+        display: grid;
+        width: 50%;
+        button {
+          width: 100% !important;
+        }
+      }
+    }
+    @media (max-width: 970px) {
+      display: grid;
+      justify-content: normal;
+      grid-template-columns: 1fr;
     }
   }
 }
