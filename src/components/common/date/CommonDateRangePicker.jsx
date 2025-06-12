@@ -48,6 +48,9 @@ const CommonDateRangePicker = ({
           onAccept={handleAccept}
           slots={{ field: MultiInputDateRangeField }}
           slotProps={{
+            field: {
+              format: "DD/MM/YYYY", // Format for the field components
+            },
             textField: ({ position }) => ({
               label: position === "start" ? placeholderStart : placeholderEnd,
               InputProps: {
