@@ -13,6 +13,8 @@ import moment from "moment";
 import CommonModal from "@/components/common/modal/CommonModal";
 import OpportunityDetail from "../components/OpportunityDetail";
 import ExportToExcel from "@/components/common/buttons/ExportToExcel";
+import useDebounce from "@/hooks/useDebounce";
+import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 
 const CommonChart = ({ title, options, series }) => {
   return (
@@ -68,11 +70,12 @@ const Opportunity = () => {
     expiring_count: state?.opportunity?.expiring_count,
     last_updated: state?.opportunity?.last_updated,
   }));
+  const [dateRange, setDateRange] = useState([null, null]);
 
   const [filters, setFilters] = useState({
     branch: null,
-    from_date: null,
-    to_date: null,
+    from_date: "",
+    to_date: "",
     cardFilter: "",
   });
   // All User Product Seat
@@ -128,24 +131,37 @@ const Opportunity = () => {
     dispatch(getAllBranch());
   }, []);
 
-  useEffect(() => {
-    let payload = {
-      branch: filters?.branch?.value,
-      from_date: filters?.from_date,
-      to_date: filters?.to_date,
-      cardFilter: filters?.cardFilter,
-    };
-    dispatch(getExportedOpportunities(payload));
-  }, [
-    filters?.branch,
-    filters?.from_date,
-    filters?.to_date,
-    filters?.cardFilter,
-  ]);
+  const debounce = useDebounce(filters?.to_date, 1000);
 
-  const handleDateChange = (value, key) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  useEffect(() => {
+    const payload = {
+      branch: filters?.branch?.value,
+      cardFilter: filters?.cardFilter,
+      ...(debounce
+        ? {
+            from_date: filters?.from_date,
+            to_date: debounce,
+          }
+        : {
+            from_date: null,
+            to_date: null,
+          }),
+    };
+
+    dispatch(getExportedOpportunities(payload));
+  }, [filters?.branch, debounce, filters?.cardFilter]);
+
+  const handleDateChange = (newValue) => {
+    const [start, end] = newValue;
+    setFilters((prev) => ({
+      ...prev,
+      from_date: start?.format("YYYY-MM-DD") || null,
+      to_date: end ? end.format("YYYY-MM-DD") : "",
+    }));
+
+    setDateRange(newValue);
   };
+
   const handleChange = (name) => {
     setFilters((prev) => ({
       ...prev,
@@ -411,51 +427,52 @@ const Opportunity = () => {
           <span className="common-breadcrum-msg">
             Use of PWS Oppportunity Export API data to show details below
           </span>
-          <div className="account-filter">
-            <Tooltip
-              title={moment(last_updated).format("MMMM D, YYYY [at] h:mm:ss A")}
-              placement="top"
-            >
-              <span>Last Updated</span>
-            </Tooltip>
 
-            <CommonButton
-              className="common-green-btn"
-              onClick={() => {
-                setFilters({
-                  branch: null,
-                  from_date: null,
-                  to_date: null,
-                  cardFilter: "",
-                });
-              }}
-            >
-              All
-            </CommonButton>
+          <div className="subscription-header mb-4 opportunity-filter">
+            <div className="subscription-filter">
+              <Tooltip
+                title={moment(last_updated).format(
+                  "MMMM D, YYYY [at] h:mm:ss A"
+                )}
+                placement="top"
+              >
+                <span>Last Updated</span>
+              </Tooltip>
 
-            <DatePickerFilter
-              label="Start Date"
-              value={filters?.from_date}
-              onChange={(val) => handleDateChange(val, "from_date")}
-            />
-            <DatePickerFilter
-              label="End Date"
-              value={filters?.to_date}
-              onChange={(val) => handleDateChange(val, "to_date")}
-            />
+              <CommonButton
+                className="common-green-btn"
+                onClick={() => {
+                  setFilters({
+                    branch: null,
+                    from_date: null,
+                    to_date: null,
+                    cardFilter: "",
+                  });
+                }}
+              >
+                All
+              </CommonButton>
+              <CommonDateRangePicker
+                value={dateRange}
+                onChange={handleDateChange}
+                width="180px"
+                placeholderStart="Start date"
+                placeholderEnd="End date"
+              />
 
-            <CommonAutocomplete
-              label="Select a Branch"
-              onChange={(event, newValue) => {
-                setFilters((prev) => ({
-                  ...prev,
-                  branch: newValue,
-                }));
-              }}
-              options={branch_list}
-              loading={branchListLoading}
-              value={filters?.branch}
-            />
+              <CommonAutocomplete
+                onChange={(event, newValue) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    branch: newValue,
+                  }));
+                }}
+                options={branch_list}
+                label="Select a Branch"
+                loading={branchListLoading}
+                value={filters?.branch}
+              />
+            </div>
           </div>
         </div>
 

@@ -13,6 +13,8 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import CustomTabs from "../components/CustomTabs";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
+import useDebounce from "@/hooks/useDebounce";
 
 const AlertSubscription = () => {
   const dispatch = useDispatch();
@@ -33,12 +35,13 @@ const AlertSubscription = () => {
     branchListLoading: state?.insightMetrics?.branchListLoading,
     userDetail: state?.login?.userDetail,
   }));
-
+  
+  const [dateRange, setDateRange] = useState([null, null]);
   const [pageFilter, setPageFilter] = useState({
     rorFilter: "All",
     status: "All Status",
-    startDate: null,
-    endDate: null,
+    startDate: "",
+    endDate: "",
     branch: null,
   });
   const [modal, setModal] = useState({
@@ -47,43 +50,37 @@ const AlertSubscription = () => {
   const [subscriptionType, setSubscriptionType] = useState("Backup");
   const [selectedId, setSelectedId] = useState([]);
 
+  const debounce = useDebounce(pageFilter?.endDate, 1000);
+
   // Single useEffect to fetch data on any relevant filter change
   useEffect(() => {
-    const { rorFilter, startDate, endDate } = pageFilter;
+    const { rorFilter, startDate } = pageFilter;
     const csn = filter?.csn === "All CSN" ? "" : filter?.csn;
 
-    const payload = {
+    let payload = {
       id: csn,
       status: rorFilter,
     };
 
-    if (startDate && endDate) {
+    if (debounce) {
       payload.startDate = startDate;
-      payload.endDate = endDate;
+      payload.endDate = debounce;
+    } else {
+      payload.startDate = null;
+      payload.endDate = null;
     }
 
     dispatch(getRORAlertData(payload));
-  }, [
-    filter?.csn,
-    pageFilter.rorFilter,
-    pageFilter.startDate,
-    pageFilter.endDate,
-  ]);
+  }, [filter?.csn, pageFilter?.rorFilter, debounce]);
+
   useEffect(() => {
     dispatch(getAllBranch());
   }, []);
-  const handleChange = (e, key) => {
-    setPageFilter((prev) => ({ ...prev, [key]: e.target.value }));
-  };
-
-  const handleDateChange = (value, key) => {
-    setPageFilter((prev) => ({ ...prev, [key]: value }));
-  };
 
   const filteredData = useMemo(() => {
     if (!alertSubscriptionList) return [];
 
-    const { status, branch, startDate, endDate } = pageFilter;
+    const { status, branch } = pageFilter;
 
     let data = [...alertSubscriptionList];
 
@@ -95,21 +92,8 @@ const AlertSubscription = () => {
       data = data?.filter((item) => item.trisita_status === status);
     }
 
-    // Filter by Subs End Date range
-    if (startDate && endDate) {
-      // data = data?.filter((item) => {
-      // debugger;
-      //   const itemStartDate = new Date(item?.contract_start_date);
-      //   const itemEndDate = new Date(item?.contract_end_date);
-      //   const isAfterStart = startDate
-      //     ? itemStartDate >= new Date(startDate)
-      //     : true;
-      //   const isBeforeEnd = endDate ? itemEndDate <= new Date(endDate) : true;
-      //   return isAfterStart && isBeforeEnd;
-      // });
-    }
     return data;
-  }, [alertSubscriptionList, pageFilter]);
+  }, [alertSubscriptionList, pageFilter?.status, pageFilter?.branch]);
 
   const renderFallback = (value, fallback = "Undefined") =>
     value ? (
@@ -219,37 +203,66 @@ const AlertSubscription = () => {
       setSelectedId([]);
     }
   };
+
   const exportedData = useMemo(
     () => filteredData?.filter((item) => selectedId.includes(item?.id)),
     [selectedId]
   );
+
+  const handleDateChange = (newValue) => {
+    const [start, end] = newValue;
+    setPageFilter((prev) => ({
+      ...prev,
+      startDate: start?.format("YYYY-MM-DD") || null,
+      endDate: end ? end.format("YYYY-MM-DD") : "",
+    }));
+
+    setDateRange(newValue);
+  };
+
   return (
     <>
       <div className="alert-subscription">
         <div className="commom-header-title">
           ROR Change Alert / Lost to Competition
         </div>
-
-        <div className="filter">
-          <DatePickerFilter
-            label="Start Date"
-            value={pageFilter.startDate}
-            onChange={(val) => handleDateChange(val, "startDate")}
-          />
-          <DatePickerFilter
-            label="End Date"
-            value={pageFilter.endDate}
-            onChange={(val) => handleDateChange(val, "endDate")}
+      </div>
+      <div className="subscription-header">
+        <div className="subscription-filter">
+          <CommonDateRangePicker
+            value={dateRange}
+            onChange={handleDateChange}
+            width="180px"
+            placeholderStart="Start date"
+            placeholderEnd="End date"
           />
           <CommonSelect
-            onChange={(e) => handleChange(e, "rorFilter")}
-            value={pageFilter.rorFilter}
+            value={pageFilter?.rorFilter}
             options={[
               { value: "All", label: "All" },
               { value: "ROR", label: "ROR Change Alert" },
               { value: "LTC", label: "LTC (Lost to Competition)" },
             ]}
-            sx={{ width: "100px" }}
+            onChange={(e) => {
+              setPageFilter((prev) => ({
+                ...prev,
+                rorFilter: e?.target?.value,
+              }));
+            }}
+          />
+          <CommonSelect
+            value={pageFilter?.status}
+            options={[
+              { value: "All Status", label: "All Status" },
+              { value: "Active", label: "Active" },
+              { value: "Expired", label: "Expired" },
+            ]}
+            onChange={(e) => {
+              setFilters((prev) => ({
+                ...prev,
+                status: e?.target?.value,
+              }));
+            }}
           />
           <CommonAutocomplete
             onChange={(event, newValue) => {
@@ -262,16 +275,6 @@ const AlertSubscription = () => {
             label="Select a Branch"
             loading={branchListLoading}
             value={pageFilter?.branch}
-            getOptionLabel={(option) => option?.label}
-          />
-          <CommonSelect
-            onChange={(e) => handleChange(e, "status")}
-            value={pageFilter.status}
-            options={[
-              { value: "All Status", label: "All Status" },
-              { value: "Active", label: "Active" },
-              { value: "Expired", label: "Expired" },
-            ]}
           />
         </div>
       </div>

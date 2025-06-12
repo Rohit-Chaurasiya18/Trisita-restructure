@@ -14,6 +14,7 @@ import {
 } from "../slice/subscriptionSlice";
 import { Autocomplete, TextField, Typography } from "@mui/material";
 import CommonButton from "@/components/common/buttons/CommonButton";
+import useDebounce from "@/hooks/useDebounce";
 
 const SetAction = () => {
   return (
@@ -119,13 +120,20 @@ const NewSubscription = () => {
     setFilteredData(statusFiltered);
   }, [newSubscriptionData, filters.status]);
 
+  const debounce = useDebounce(filters?.endDate, 1000);
+
   // API fetch on filters
   useEffect(() => {
     let dateFilter;
-    if (filters?.startDate && filters?.endDate) {
+    if (debounce) {
       dateFilter = {
-        from_date: filters?.startDate || "",
-        to_date: filters?.endDate || "",
+        from_date: filters?.startDate,
+        to_date: debounce,
+      };
+    } else {
+      dateFilter = {
+        from_date: null,
+        to_date: null,
       };
     }
     const payload = {
@@ -133,7 +141,7 @@ const NewSubscription = () => {
       payload: dateFilter,
     };
     dispatch(getNewSubscriptionData(payload));
-  }, [filter?.csn, filters.endDate]);
+  }, [filter?.csn, debounce]);
 
   // Handle modal open
   const handleOpenModel = (id, isAssign = false) => {

@@ -13,7 +13,6 @@
         }
       }
     }
-   
 
     @media (max-width: 984px) {
       display: grid;
@@ -86,6 +85,26 @@
     }
     .chart-data {
       height: 100%;
+    }
+  }
+}
+
+.opportunity-filter {
+  @media (max-width: 1526px) {
+    .subscription-filter {
+      display: flex;
+      justify-content: end;
+    }
+  }
+  @media (max-width: 950px) {
+    .subscription-filter {
+      flex-wrap: wrap;
+      justify-content: normal;
+    }
+  }
+  @media (max-width: 600px) {
+    .subscription-filter {
+      display: grid;
     }
   }
 }

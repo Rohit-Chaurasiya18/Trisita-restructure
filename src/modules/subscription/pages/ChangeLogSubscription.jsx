@@ -12,6 +12,7 @@ import {
   getChangedLogSubscriptionData,
   getChangedLogSubscriptionDetail,
 } from "../slice/subscriptionSlice";
+import useDebounce from "@/hooks/useDebounce";
 
 const ChangedLogSubscription = () => {
   const dispatch = useDispatch();
@@ -63,13 +64,20 @@ const ChangedLogSubscription = () => {
     setFilteredData(statusFiltered);
   }, [changedLogSubscriptionData, filters.status]);
 
+  const debounce = useDebounce(filters?.endDate, 1000);
+
   // API fetch on filters
   useEffect(() => {
     let dateFilter;
-    if (filters?.startDate && filters?.endDate) {
+    if (debounce) {
       dateFilter = {
-        from_date: filters?.startDate || "",
-        to_date: filters?.endDate || "",
+        from_date: filters?.startDate,
+        to_date: debounce,
+      };
+    } else {
+      dateFilter = {
+        from_date: null,
+        to_date: null,
       };
     }
     const payload = {
@@ -77,7 +85,7 @@ const ChangedLogSubscription = () => {
       payload: dateFilter,
     };
     dispatch(getChangedLogSubscriptionData(payload));
-  }, [filter?.csn, filters.endDate]);
+  }, [filter?.csn, debounce]);
 
   // Handle modal open
   const handleOpenModel = (id) => {

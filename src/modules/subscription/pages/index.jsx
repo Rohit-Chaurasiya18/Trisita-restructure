@@ -20,6 +20,7 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import SubscriptionDetail from "../components/SubscriptionDetail";
 import moment from "moment";
 import dayjs from "dayjs";
+import useDebounce from "@/hooks/useDebounce";
 
 const CommonChart = ({
   title,
@@ -94,8 +95,8 @@ const Subscription = () => {
     account: [],
     branch: null,
     status: "All Status",
-    startDate: null,
-    endDate: null,
+    startDate: "",
+    endDate: "",
   });
   const [modal, setModal] = useState({
     show: false,
@@ -107,12 +108,19 @@ const Subscription = () => {
     dispatch(getAllAccount());
   }, []);
 
+  const debounce = useDebounce(filters?.endDate, 1000);
+
   const handleFetchData = async () => {
     let dateFilter;
-    if (filters?.startDate && filters?.endDate) {
+    if (debounce) {
       dateFilter = {
-        from_date: filters?.startDate || null,
-        to_date: filters?.endDate || null,
+        from_date: filters?.startDate,
+        to_date: debounce,
+      };
+    } else {
+      dateFilter = {
+        from_date: null,
+        to_date: null,
       };
     }
     let payload = {
@@ -124,7 +132,7 @@ const Subscription = () => {
 
   useEffect(() => {
     handleFetchData();
-  }, [filter?.csn, filters?.endDate]);
+  }, [filter?.csn, debounce]);
 
   const handleChange = (newValue) => {
     const [start, end] = newValue;
@@ -1061,6 +1069,8 @@ const Subscription = () => {
       };
     }
   }, [filteredData]);
+
+  console.log({ debounce });
 
   return (
     <>

@@ -23,19 +23,12 @@ const GetUsage = () => {
 
   const handleChange = (newValue) => {
     const [start, end] = newValue;
+    setFilters((prev) => ({
+      ...prev,
+      startDate: start?.format("YYYY-MM-DD") || null,
+      endDate: end ? end.format("YYYY-MM-DD") : "",
+    }));
 
-    if (start) {
-      setFilters((prev) => ({
-        ...prev,
-        startDate: start.format("YYYY-MM-DD"),
-      }));
-    }
-    if (end) {
-      setFilters((prev) => ({
-        ...prev,
-        endDate: end.format("YYYY-MM-DD"),
-      }));
-    }
     setDateRange(newValue);
   };
 
