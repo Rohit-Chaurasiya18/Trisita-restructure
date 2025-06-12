@@ -146,10 +146,6 @@ const Account = () => {
   const [selectedId, setSelectedId] = useState([]);
 
   useEffect(() => {
-    setFilteredData(exportedAccountData);
-  }, [exportedAccountData, isThirdPartyAccount]);
-
-  useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllUser());
   }, []);
@@ -166,8 +162,8 @@ const Account = () => {
     }
   }, [filter?.csn, isThirdPartyAccount]);
 
-  const handleFilters = () => {
-    let data = exportedAccountData;
+  const handleFilters = (data = exportedAccountData) => {
+    // let data = exportedAccountData;
     if (filters?.branch?.label) {
       data = data?.filter?.((item) => item?.branch === filters?.branch?.label);
     }
@@ -184,6 +180,11 @@ const Account = () => {
     }
     return data;
   };
+  useEffect(() => {
+    let data = handleFilters(exportedAccountData);
+    dispatch(setIndustryGroupCount({ data, isThirdPartyAccount }));
+    setFilteredData(data);
+  }, [exportedAccountData, isThirdPartyAccount]);
 
   useEffect(() => {
     if (

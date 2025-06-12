@@ -88,7 +88,7 @@ const GetUsage = () => {
               `/get_usage/usage/${filters?.account?.csn}/${filters?.startDate}/${filters?.endDate}`
             )
           }
-          // isDisabled={checkFilters()}
+          isDisabled={checkFilters()}
         >
           Get Usuage
         </CommonButton>

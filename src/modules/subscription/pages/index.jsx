@@ -355,10 +355,6 @@ const Subscription = () => {
     },
   ];
 
-  useEffect(() => {
-    setFilteredData(subscriptionData);
-  }, [subscriptionData]);
-
   const handleFilter = (Arr) => {
     let data = Arr;
     if (filters?.branch) {
@@ -378,6 +374,11 @@ const Subscription = () => {
     }
     return data;
   };
+
+  useEffect(() => {
+    let data = handleFilter(subscriptionData);
+    setFilteredData(data);
+  }, [subscriptionData]);
 
   useEffect(() => {
     if (

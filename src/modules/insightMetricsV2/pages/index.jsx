@@ -122,7 +122,8 @@ const InsightMetricsV2 = () => {
   }, []);
 
   useEffect(() => {
-    setFilteredData(insightMetricsCustomerV2);
+    let data = handleFilterData(insightMetricsCustomerV2);
+    setFilteredData(data);
   }, [insightMetricsCustomerV2]);
 
   useEffect(() => {

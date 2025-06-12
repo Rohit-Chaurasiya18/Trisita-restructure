@@ -25,9 +25,24 @@ const Quotations = () => {
     quotationData: state?.quotation?.quotationData,
     userDetail: state?.login?.userDetail,
   }));
+
+  const filterData = (data, text) => {
+    return data?.filter((row) => {
+      return Object.values(row).some(
+        (value) =>
+          value && value.toString().toLowerCase().includes(text.toLowerCase())
+      );
+    });
+  };
+
   useEffect(() => {
-    setFilteredData(quotationData);
+    let data = quotationData;
+    if (searchValue) {
+      data = filterData(data, searchValue?.trim());
+    }
+    setFilteredData(data);
   }, [quotationData]);
+
   const columns = [
     { field: "quotation_date", headerName: "Quotation Date", width: 150 },
     { field: "quotation_no", headerName: "Quotation No", width: 150 },
@@ -69,15 +84,6 @@ const Quotations = () => {
     },
     { field: "created_by", headerName: "Created By", width: 150 },
   ];
-
-  const filterData = (data, text) => {
-    return data?.filter((row) => {
-      return Object.values(row).some(
-        (value) =>
-          value && value.toString().toLowerCase().includes(text.toLowerCase())
-      );
-    });
-  };
 
   const handleSelectionChange = (selectedRows) => {
     const idArray = [...selectedRows?.ids];
