@@ -8,6 +8,7 @@ import { BarChart, GeographyChart, LineChart } from "../components";
 import { Tooltip } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  GetCitiesMap,
   GetDashboardChart,
   GetDashboardData,
   GetSeatDateChart,
@@ -46,6 +47,9 @@ const Dashboard = () => {
     );
     dispatch(
       GetSeatDateChart({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
+    );
+    dispatch(
+      GetCitiesMap({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
     );
   }, [filter?.csn]);
 

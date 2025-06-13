@@ -1,6 +1,7 @@
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  CITIES_MAP_URL,
   DASHBOARD_CHART,
   DASHBOARD_DATA,
   DASHBOARD_SEAT_DATE_CHART,
@@ -59,6 +60,23 @@ export const GetSeatDateChart = createAsyncThunk(
   }
 );
 
+export const GetCitiesMap = createAsyncThunk(
+  `dashboard/GetCitiesMap`,
+  async (payload, thunkAPI) => {
+    try {
+      let url = CITIES_MAP_URL;
+      if (payload) {
+        url = url + `/${payload?.id}`;
+      }
+      const response = await axiosReact.get(url, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const dashboardState = {
   loading: false,
   dashboardDataLoading: false,
@@ -67,6 +85,8 @@ const dashboardState = {
   dashboardChart: null,
   seatDateChartLoading: false,
   seatDateChart: null,
+  citiesMapLoading: false,
+  citiesMapChart: [],
 };
 
 const dashboardSlice = createSlice({
@@ -118,6 +138,26 @@ const dashboardSlice = createSlice({
     builder.addCase(GetSeatDateChart.rejected, (state) => {
       state.seatDateChart = null;
       state.seatDateChartLoading = false;
+    });
+
+    // Get Cities Map Data
+    builder.addCase(GetCitiesMap.pending, (state) => {
+      state.citiesMapChart = [];
+      state.citiesMapLoading = true;
+    });
+    builder.addCase(GetCitiesMap.fulfilled, (state, action) => {
+      state.citiesMapChart = action?.payload?.data?.topCities?.map((item) => ({
+        lat: item?.latitude,
+        lng: item?.longitude,
+        name: item?.city,
+        active: item?.counts?.Active,
+        inactive: item?.counts?.Expired,
+      }));
+      state.citiesMapLoading = false;
+    });
+    builder.addCase(GetCitiesMap.rejected, (state) => {
+      state.citiesMapChart = [];
+      state.citiesMapLoading = false;
     });
   },
 });
