@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { routeConstants } from "../routes/routeConstant";
 
 export default function Auth() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, contextHolder] =  message.useMessage();
   const location = useLocation()
   const navigate = useNavigate()
 
