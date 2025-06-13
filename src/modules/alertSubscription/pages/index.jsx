@@ -258,7 +258,7 @@ const AlertSubscription = () => {
               { value: "Expired", label: "Expired" },
             ]}
             onChange={(e) => {
-              setFilters((prev) => ({
+              setPageFilter((prev) => ({
                 ...prev,
                 status: e?.target?.value,
               }));
