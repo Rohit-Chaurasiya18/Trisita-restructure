@@ -131,7 +131,7 @@ const Opportunity = () => {
     dispatch(getAllBranch());
   }, []);
 
-  const debounce = useDebounce(filters?.to_date, 1000);
+  const debounce = useDebounce(filters?.to_date, 500);
 
   useEffect(() => {
     const payload = {
@@ -458,6 +458,7 @@ const Opportunity = () => {
                 width="180px"
                 placeholderStart="Start date"
                 placeholderEnd="End date"
+                disabled={opportunityLoading}
               />
 
               <CommonAutocomplete

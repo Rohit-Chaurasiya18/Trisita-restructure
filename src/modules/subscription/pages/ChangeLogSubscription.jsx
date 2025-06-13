@@ -64,7 +64,7 @@ const ChangedLogSubscription = () => {
     setFilteredData(statusFiltered);
   }, [changedLogSubscriptionData, filters.status]);
 
-  const debounce = useDebounce(filters?.endDate, 1000);
+  const debounce = useDebounce(filters?.endDate, 500);
 
   // API fetch on filters
   useEffect(() => {
@@ -218,6 +218,7 @@ const ChangedLogSubscription = () => {
               width="180px"
               placeholderStart="Start date"
               placeholderEnd="End date"
+              disabled={changedLogSubscriptionDataLoading}
             />
             <CommonSelect
               value={filters.status}

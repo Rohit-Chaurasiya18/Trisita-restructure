@@ -14,6 +14,7 @@ const CommonDateRangePicker = ({
   width = "300px",
   placeholderStart = "Start date",
   placeholderEnd = "End date",
+  disabled = false,
 }) => {
   const [internalValue, setInternalValue] = useState([null, null]);
   const isControlled =
@@ -43,6 +44,7 @@ const CommonDateRangePicker = ({
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={["MultiInputDateRangeField"]}>
         <DateRangePicker
+          disabled={disabled}
           value={value}
           onChange={setValue}
           onAccept={handleAccept}

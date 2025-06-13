@@ -120,7 +120,7 @@ const NewSubscription = () => {
     setFilteredData(statusFiltered);
   }, [newSubscriptionData, filters.status]);
 
-  const debounce = useDebounce(filters?.endDate, 1000);
+  const debounce = useDebounce(filters?.endDate, 500);
 
   // API fetch on filters
   useEffect(() => {
@@ -287,6 +287,7 @@ const NewSubscription = () => {
               width="180px"
               placeholderStart="Start date"
               placeholderEnd="End date"
+              disabled={newSubscriptionDataLoading}
             />
             <CommonSelect
               value={filters.status}

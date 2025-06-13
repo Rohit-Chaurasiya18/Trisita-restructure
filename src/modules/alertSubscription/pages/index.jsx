@@ -50,7 +50,7 @@ const AlertSubscription = () => {
   const [subscriptionType, setSubscriptionType] = useState("Backup");
   const [selectedId, setSelectedId] = useState([]);
 
-  const debounce = useDebounce(pageFilter?.endDate, 1000);
+  const debounce = useDebounce(pageFilter?.endDate, 500);
 
   // Single useEffect to fetch data on any relevant filter change
   useEffect(() => {
@@ -235,6 +235,7 @@ const AlertSubscription = () => {
             width="180px"
             placeholderStart="Start date"
             placeholderEnd="End date"
+            disabled={alertSubscriptionLoading}
           />
           <CommonSelect
             value={pageFilter?.rorFilter}

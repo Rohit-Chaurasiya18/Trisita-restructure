@@ -64,7 +64,7 @@ const DeletedSubscription = () => {
     setFilteredData(statusFiltered);
   }, [deletedSubscriptionData, filters.status]);
 
-  const debounce = useDebounce(filters?.endDate, 1000);
+  const debounce = useDebounce(filters?.endDate, 500);
 
   // API fetch on filters
   useEffect(() => {
@@ -218,6 +218,7 @@ const DeletedSubscription = () => {
               width="180px"
               placeholderStart="Start date"
               placeholderEnd="End date"
+              disabled={deletedSubscriptionDataLoading}
             />
             <CommonSelect
               value={filters.status}

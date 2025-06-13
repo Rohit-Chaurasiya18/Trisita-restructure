@@ -108,7 +108,7 @@ const Subscription = () => {
     dispatch(getAllAccount());
   }, []);
 
-  const debounce = useDebounce(filters?.endDate, 1000);
+  const debounce = useDebounce(filters?.endDate, 500);
 
   const handleFetchData = async () => {
     let dateFilter;
@@ -1110,6 +1110,7 @@ const Subscription = () => {
               width="180px"
               placeholderStart="Start date"
               placeholderEnd="End date"
+              disabled={subscriptionDataLoading}
             />
             <CommonAutocomplete
               onChange={(event, newValue) => {
