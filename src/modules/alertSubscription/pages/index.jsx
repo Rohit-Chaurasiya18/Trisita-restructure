@@ -35,7 +35,7 @@ const AlertSubscription = () => {
     branchListLoading: state?.insightMetrics?.branchListLoading,
     userDetail: state?.login?.userDetail,
   }));
-  
+
   const [dateRange, setDateRange] = useState([null, null]);
   const [pageFilter, setPageFilter] = useState({
     rorFilter: "All",
@@ -140,6 +140,12 @@ const AlertSubscription = () => {
       renderCell: ({ value }) => renderLimitedText(value),
     },
     { field: "account_csn", headerName: "Account CSN", width: 100 },
+    {
+      field: "third_party_name",
+      headerName: "Third Party Name",
+      width: 200,
+      renderCell: ({ value }) => renderFallback(value),
+    },
     {
       field: "bd_person",
       headerName: "BD Person Name",

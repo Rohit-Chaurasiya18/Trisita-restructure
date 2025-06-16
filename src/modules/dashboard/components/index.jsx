@@ -1,9 +1,6 @@
 import ReactApexChart from "react-apexcharts";
 import { ResponsiveChoropleth } from "@nivo/geo";
-import {
-  geoFeatures,
-  mockGeographyData,
-} from "../constants/index";
+import { geoFeatures, mockGeographyData } from "../constants/index";
 import { useEffect, useState } from "react";
 
 export const LineChart = ({ data }) => {
@@ -66,8 +63,9 @@ export const BarChart = ({ data }) => {
         });
       });
 
-      const cities = Array.from(allCities);
-
+      // const cities = Array.from(allCities);
+      const cities = ["Mumbai", "Kolkata", "Delhi", "Banglore", "null"];
+      // console.log(cities);
       // Create series data for each city
       const series = cities.map((city) => ({
         name: city,
