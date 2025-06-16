@@ -26,6 +26,8 @@ import {
   AddUpdateProductMaster,
   Notifications,
   AddUpdateProduct,
+  orderLoadingToHO,
+  AddEditOrderLoadingHO,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { components } from "react-select";
@@ -111,7 +113,11 @@ const routesConfig = {
     },
     {
       path: routesConstants.ORDER_LOADING_PO,
-      component: Get_usage,
+      component: Outlet,
+      children: [
+        { index: true, component: orderLoadingToHO },
+        { path: "add_order_loading_po", component: AddEditOrderLoadingHO },
+      ],
     },
     {
       path: routesConstants.ORDER_LOADING_DISTRIBUTOR,

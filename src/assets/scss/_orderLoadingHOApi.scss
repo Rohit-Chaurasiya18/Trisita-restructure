@@ -1,0 +1,28 @@
+.order-loading-ho-container {
+  .order-loading-ho-header {
+    display: flex;
+    justify-content: space-between;
+    .order-loading-ho-btn {
+      width: fit-content;
+      height: 45px;
+      padding: 10px;
+      background-color: rgb(141, 190, 134);
+      color: rgb(0, 0, 0);
+    }
+  }
+  .order-loading-ho-option {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 4rem;
+  }
+}
+.back-btn {
+  width: fit-content;
+  background-color: rgb(59 130 246 / 1);
+  color: #ffffff;
+  margin-top: 15px;
+  &:hover {
+    background-color: rgb(59 130 246 / 1);
+  }
+}

@@ -55,6 +55,16 @@ export const AddUpdateProductMaster = lazy(() =>
 export const AddUpdateProduct = lazy(() =>
   import("@/modules/data/product/pages/AddUpdateProduct")
 );
+
+export const orderLoadingToHO = lazy(() =>
+  import("@/modules/orderLoadingApi/pages/orderLoadingHO/pages/OrderLoadingHO")
+);
+
+export const AddEditOrderLoadingHO = lazy(() =>
+  import(
+    "@/modules/orderLoadingApi/pages/orderLoadingHO/pages/AddEditOrderLoadingHO"
+  )
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));
