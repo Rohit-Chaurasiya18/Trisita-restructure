@@ -1,4 +1,4 @@
-// #################  Product Master ##################3
+// #################  Product Master ##################
 .product-master-container {
   .product-master-header {
     display: flex;
@@ -40,5 +40,55 @@
       justify-content: normal;
       grid-template-columns: 1fr;
     }
+  }
+}
+
+// ################ Manage Template #################
+.manage-template-container {
+  .manage-template-header {
+    display: flex;
+    justify-content: space-between;
+    .add-html-template {
+      width: fit-content;
+      height: 45px;
+      padding: 10px;
+      background-color: rgb(141 190 134 / 1);
+      color: rgb(0 0 0 / 1);
+    }
+  }
+  .manage-template-detail {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #f2f0f0;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    .manage-template-content {
+      display: grid;
+    }
+    .template-save-btn {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+      justify-content: end;
+      button {
+        width: fit-content;
+        color: rgb(255 255 255 / 1);
+        background-color: rgb(59 130 246 / 1);
+      }
+    }
+  }
+}
+.add-template-form {
+  .form-group{
+    margin-bottom: 20px;
+  }
+  .add-template-btn {
+    width: fit-content;
+    color: rgb(255 255 255 / 1);
+    background-color: rgb(59 130 246 / 1);
+    margin: auto;
+    margin-top: 15px;
+    display: flex;
   }
 }

@@ -28,6 +28,7 @@ import {
   AddUpdateProduct,
   orderLoadingToHO,
   AddEditOrderLoadingHO,
+  ManageTemplate,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { components } from "react-select";
@@ -133,7 +134,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.MANAGE_TEMPLATE,
-      component: Get_usage,
+      component: ManageTemplate,
     },
     {
       path: routesConstants.UPLOAD,

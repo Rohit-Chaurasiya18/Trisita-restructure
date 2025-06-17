@@ -13,6 +13,7 @@ import opportunityReducer from "@/modules/opportunity/slice/opportunitySlice";
 import usugesReducer from "@/modules/getUsage/slice/UsuagesSlice";
 import subscriptionReducer from "@/modules/subscription/slice/subscriptionSlice";
 import productReducer from "@/modules/data/product/slice/ProductSlice";
+import manageTemplateReducer from "@/modules/data/manageTemplate/slice/ManageTemplateSlice";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -29,5 +30,6 @@ const reducer = combineReducers({
   usuages: usugesReducer,
   subscription: subscriptionReducer,
   product: productReducer,
+  manageTemplate: manageTemplateReducer,
 });
 export default reducer;
