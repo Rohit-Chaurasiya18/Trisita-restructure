@@ -329,8 +329,20 @@ const Subscription = () => {
     { field: "contract_term", headerName: "Contract Term", width: 130 },
     { field: "switchType", headerName: "Switch Type", width: 130 },
     { field: "switchYear", headerName: "Switch Year", width: 130 },
-    { field: "acv_price", headerName: "Total ACV Price", width: 130 },
-    { field: "dtp_price", headerName: "Total DTP Price", width: 130 },
+    {
+      field: "acv_price",
+      headerName: "Total ACV Price",
+      width: 130,
+      renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "dtp_price",
+      headerName: "Total DTP Price",
+      width: 130,
+      renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
     {
       field: "productLine",
       headerName: "Product Line",
@@ -1073,7 +1085,6 @@ const Subscription = () => {
     }
   }, [filteredData]);
 
-  console.log({ debounce });
 
   return (
     <>

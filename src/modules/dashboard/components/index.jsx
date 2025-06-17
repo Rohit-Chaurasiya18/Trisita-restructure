@@ -64,7 +64,7 @@ export const BarChart = ({ data }) => {
       });
 
       // const cities = Array.from(allCities);
-      const cities = ["Mumbai", "Kolkata", "Delhi", "Banglore", "null"];
+      const cities = ["Mumbai", "Kolkata", "Delhi", "Bangalore", "null"];
       // console.log(cities);
       // Create series data for each city
       const series = cities.map((city) => ({
