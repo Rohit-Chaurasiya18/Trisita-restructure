@@ -129,6 +129,21 @@ export const navLinks = [
     isLabel: true,
     item: [
       {
+        itemName: "Manage Team",
+        href: routesConstants?.MANAGE_TEAM,
+        iconUrl: <Diversity3Icon />,
+      },
+      {
+        itemName: "Manage Template",
+        href: routesConstants?.MANAGE_TEMPLATE,
+        iconUrl: <Diversity3Icon />,
+      },
+      {
+        itemName: "Upload",
+        href: routesConstants?.UPLOAD,
+        iconUrl: <ReceiptOutlinedIcon />,
+      },
+      {
         itemName: "Exported File",
         href: routesConstants?.EXPORTED_FILE,
         iconUrl: <Diversity3Icon />,

@@ -62,7 +62,7 @@ const Notification = () => {
   return (
     <>
       <div className="notification-header">
-        <div class="commom-header-title">All Notifications</div>
+        <div className="commom-header-title">All Notifications</div>
         <div className="notification-filter">
           <CommonAutocomplete
             onChange={(event, newValue) => {

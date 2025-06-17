@@ -128,6 +128,18 @@ const routesConfig = {
       component: Get_usage,
     },
     {
+      path: routesConstants.MANAGE_TEAM,
+      component: Get_usage,
+    },
+    {
+      path: routesConstants.MANAGE_TEMPLATE,
+      component: Get_usage,
+    },
+    {
+      path: routesConstants.UPLOAD,
+      component: Get_usage,
+    },
+    {
       path: routesConstants.EXPORTED_FILE,
       component: Get_usage,
     },
