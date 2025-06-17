@@ -10,7 +10,11 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import LockResetIcon from "@mui/icons-material/LockReset";
 import { getLogout } from "@/modules/login/slice/loginSlice";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
-import { setLayoutCSNFilter, setLayoutYearFilter } from "./slice/layoutSlice";
+import {
+  fetchNotifications,
+  setLayoutCSNFilter,
+  setLayoutYearFilter,
+} from "./slice/layoutSlice";
 import Logout from "@mui/icons-material/Logout";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import { getAllNotifications } from "@/modules/notification/slice/notificationsSlice";
@@ -54,27 +58,14 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   useOutsideClick(profileRef, () => setProfileDropdownOpen(false));
   useOutsideClick(notificationRef, () => setNotificationOpen(false));
 
-  // NOtification
-  const [notificationsState, setNotificationsState] = useState({
-    count: 0,
-    notifications: [],
-    loading: false,
-  });
+  const { count, notifications, loading } = useSelector((state) => ({
+    count: state?.layout?.notificationCount,
+    notifications: state?.layout?.notifications,
+    loading: state?.layout?.loading,
+  }));
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      setNotificationsState((prev) => ({ ...prev, loading: true }));
-      const res = await dispatch(getAllNotifications({ isUser: false }));
-      const data = res?.payload?.data || {};
-
-      setNotificationsState({
-        count: data?.count || 0,
-        notifications: data?.notifications || [],
-        loading: false,
-      });
-    };
-
-    fetchNotifications();
+    dispatch(fetchNotifications());
   }, []);
 
   return (
@@ -114,11 +105,7 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
             />
           </div>
           <div className="profile_dropdown">
-            <Badge
-              badgeContent={notificationsState?.count}
-              color="error"
-              overlap="circular"
-            >
+            <Badge badgeContent={count} color="error" overlap="circular">
               <NotificationsOutlinedIcon
                 className="me-2 notification-icon"
                 onClick={() => {
@@ -133,26 +120,24 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                 ref={notificationRef}
               >
                 <label>Notifications</label>
-                {notificationsState?.loading ? (
+                {loading ? (
                   <SkeletonLoader isDashboard />
-                ) : notificationsState?.notifications?.length > 0 ? (
-                  notificationsState?.notifications
-                    ?.slice(0, 5)
-                    .map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`notification-item ${
-                          notification?.is_read ? "read" : "unread"
-                        }`}
-                      >
-                        <p className="notification-message">
-                          {notification?.notification_message.slice(0, 20)}...
-                        </p>
-                        <span className="notification-date">
-                          {new Date(notification?.created_at).toLocaleString()}
-                        </span>
-                      </div>
-                    ))
+                ) : notifications?.length > 0 ? (
+                  notifications?.slice(0, 5).map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`notification-item ${
+                        notification?.is_read ? "read" : "unread"
+                      }`}
+                    >
+                      <p className="notification-message">
+                        {notification?.notification_message.slice(0, 20)}...
+                      </p>
+                      <span className="notification-date">
+                        {new Date(notification?.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                  ))
                 ) : (
                   <p className="no-notifications">No new notifications.</p>
                 )}

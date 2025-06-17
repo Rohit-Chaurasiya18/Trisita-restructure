@@ -9,6 +9,7 @@ import { getAllUser } from "@/modules/accounts/slice/accountSlice";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonButton from "@/components/common/buttons/CommonButton";
+import { fetchNotifications } from "@/layout/slice/layoutSlice";
 
 const Notification = () => {
   const dispatch = useDispatch();
@@ -43,11 +44,19 @@ const Notification = () => {
   );
 
   const handleMarkAsRead = (id) => {
-    dispatch(updateMarkAsRead({ id, data: notificationsData }));
+    dispatch(updateMarkAsRead({ id, data: notificationsData })).then((res) => {
+      if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+        dispatch(fetchNotifications());
+      }
+    });
   };
 
   const handleMarkAllAsRead = () => {
-    dispatch(updateMarkAllAsRead({ data: notificationsData }));
+    dispatch(updateMarkAllAsRead({ data: notificationsData })).then((res) => {
+      if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+        dispatch(fetchNotifications());
+      }
+    });
   };
 
   return (
