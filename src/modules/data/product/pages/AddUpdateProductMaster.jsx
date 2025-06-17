@@ -24,10 +24,12 @@ import { toast } from "react-toastify";
 
 const findData = (Arr, CurrentId) => {
   let obj = Arr?.find((item) => item?.id === +CurrentId);
-  return {
+  let result = {
     label: obj?.name,
     value: obj?.id,
+    taxApply: obj?.value || 0,
   };
+  return result;
 };
 
 const addButtonClick = {
@@ -134,8 +136,8 @@ const AddUpdateProductMaster = () => {
       ? findData(productMasterCategory, +productMasterById?.product_category)
       : null,
     productSKU: productMasterById?.product_sku ?? "",
-    acvPrice: +productMasterById?.acv_price || null,
-    unitPrice: +productMasterById?.dtp_price || null,
+    acvPrice: +productMasterById?.acv_price_decimal || null,
+    unitPrice: +productMasterById?.dtp_price_decimal || null,
     unitOfMeasure: productMasterById?.uom
       ? findData(productMasterUOM, +productMasterById?.uom)
       : null,
@@ -160,12 +162,12 @@ const AddUpdateProductMaster = () => {
       product_description: values?.productDescription?.trim(),
       product_category: values?.productCategory?.value,
       product_sku: values?.productSKU?.trim(),
-      acv_price: values?.acvPrice,
-      dtp_price: values?.unitPrice,
+      acv_price_decimal: values?.acvPrice,
+      dtp_price_decimal: Number(parseFloat(values?.unitPrice).toFixed(2)),
       oem: values?.oem?.value,
       uom: values?.unitOfMeasure?.value,
       gst_type: values?.gstType?.value,
-      gst_ammount: values?.gstAmount,
+      gst_ammount: Number(parseFloat(values?.gstAmount).toFixed(2)),
       startDate: values?.startDate,
       endDate: values?.endDate,
       status: values?.status?.value,
