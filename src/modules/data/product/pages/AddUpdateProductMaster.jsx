@@ -147,7 +147,7 @@ const AddUpdateProductMaster = () => {
     gstType: productMasterById?.gst_type
       ? findData(productMasterGst, +productMasterById?.gst_type)
       : null,
-    gstAmount: productMasterById?.gst_ammount ?? null,
+    gstAmount: productMasterById?.gst_ammount_decimal ?? null,
     startDate: productMasterById?.startDate ?? "",
     endDate: productMasterById?.endDate ?? "",
     status: productMasterById?.status
@@ -167,7 +167,7 @@ const AddUpdateProductMaster = () => {
       oem: values?.oem?.value,
       uom: values?.unitOfMeasure?.value,
       gst_type: values?.gstType?.value,
-      gst_ammount: Number(parseFloat(values?.gstAmount).toFixed(2)),
+      gst_ammount_decimal: Number(parseFloat(values?.gstAmount).toFixed(2)),
       startDate: values?.startDate,
       endDate: values?.endDate,
       status: values?.status?.value,
