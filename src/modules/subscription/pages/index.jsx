@@ -349,15 +349,8 @@ const Subscription = () => {
       width: 250,
       renderCell: (params) => {
         const { value: productLine } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {productLine?.length > maxChars
-              ? productLine
-              : productLine?.slice(0, maxChars)}
-          </div>
-        );
+        return <>{productLine}</>;
       },
     },
     {
@@ -1084,7 +1077,6 @@ const Subscription = () => {
       };
     }
   }, [filteredData]);
-
 
   return (
     <>
