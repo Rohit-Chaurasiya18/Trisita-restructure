@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAccountInformation } from "../slice/accountSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, Tooltip, Zoom } from "@mui/material";
 import { toast } from "react-toastify";
 
 // Reusable Autocomplete Field
@@ -69,15 +69,6 @@ const AssignUserBranch = ({ id, handleCallback }) => {
       renewalPerson: accountInformation?.renewal_person ?? [],
       client: accountInformation?.client ?? [],
     },
-    validationSchema: Yup.object({
-      bdPerson: Yup.array().min(1, "At least one BD person is required"),
-      branch: Yup.object().nullable().required("Branch is required"),
-      renewalPerson: Yup.array().min(
-        1,
-        "At least one renewal person is required"
-      ),
-      client: Yup.array().min(1, "At least one client is required"),
-    }),
     onSubmit: (values) => {
       // Submit your API call here
       const requestBody = {
@@ -96,6 +87,18 @@ const AssignUserBranch = ({ id, handleCallback }) => {
       });
     },
   });
+  const checkDisable = useMemo(() => {
+    if (
+      formik?.values?.bdPerson?.length > 0 ||
+      formik?.values?.client?.length > 0 ||
+      formik?.values?.renewalPerson?.length > 0 ||
+      formik?.values?.branch?.value
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  }, [formik?.values]);
   return (
     <form className="allocate-form" onSubmit={formik.handleSubmit}>
       <AutocompleteField
@@ -140,9 +143,23 @@ const AssignUserBranch = ({ id, handleCallback }) => {
       />
 
       <div className="form-group col-12 justify-content-center mt-4">
-        <button type="submit" className="btn btn-primary">
-          ALLOCATE
-        </button>
+        <Tooltip
+          title={checkDisable ? "Please select atleast one option" : ""}
+          placement="right"
+          arrow
+          TransitionComponent={Zoom}
+        >
+          <span style={{ display: "inline-block" }}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={checkDisable}
+              style={{ pointerEvents: checkDisable ? "none" : "auto" }} // avoids nested button blocking
+            >
+              ALLOCATE
+            </button>
+          </span>
+        </Tooltip>
       </div>
     </form>
   );
