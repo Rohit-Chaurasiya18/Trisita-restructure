@@ -901,9 +901,12 @@ const Subscription = () => {
   const chartData = useMemo(() => {
     const monthlyData = {};
 
-    // Prepare next 12 months
+    // Determine base month (start from selected startDate if available, else current month)
+    const baseMonth = filters?.startDate ? dayjs(filters.startDate) : dayjs(); // fallback to current month
+
+    // Prepare next 12 months starting from baseMonth
     for (let i = 0; i < 12; i++) {
-      const monthKey = dayjs().add(i, "month").format("YYYY-MM");
+      const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
       monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
     }
 
@@ -925,7 +928,7 @@ const Subscription = () => {
     );
 
     return { categories, dtpData, acvData };
-  }, [filteredData]);
+  }, [filteredData, filters?.startDate]);
 
   // 📊 ApexCharts config
   const amountPerMonth = {
