@@ -125,3 +125,21 @@
     display: flex;
   }
 }
+
+// ############### Manage Teams #############
+.manage-teams-container {
+  .manage-team-table {
+    margin-top: 25px;
+  }
+}
+.user-acces-level {
+  width: 50%;
+  margin: 0 auto;
+  padding: 5px;
+  display: flex;
+  justify-content: space-around;
+  background-color: #b7ebde;
+  border-radius: 4px;
+  align-items: center;
+  height: 45px;
+}

@@ -29,9 +29,9 @@ import {
   orderLoadingToHO,
   AddEditOrderLoadingHO,
   ManageTemplate,
+  ManageTeams,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
-import { components } from "react-select";
 
 const routesConfig = {
   common: [{ path: routesConstants._404, component: _404 }],
@@ -130,7 +130,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.MANAGE_TEAM,
-      component: Get_usage,
+      component: ManageTeams,
     },
     {
       path: routesConstants.MANAGE_TEMPLATE,

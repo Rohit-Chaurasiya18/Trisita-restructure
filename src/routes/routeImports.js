@@ -43,6 +43,9 @@ export const ChangeLogSubscription = lazy(() =>
 export const CompareSubscription = lazy(() =>
   import("@/modules/subscription/pages/CompareSubscription")
 );
+export const ManageTeams = lazy(() =>
+  import("@/modules/data/manageTeams/pages/index")
+);
 export const ManageTemplate = lazy(() =>
   import("@/modules/data/manageTemplate/pages/index")
 );
