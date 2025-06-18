@@ -18,7 +18,7 @@ const AddTemplate = ({ handleClose }) => {
   const validationSchema = Yup.object({
     templateName: Yup.string().required("Template name is required."),
     templateContent: Yup.string().required("Template name is required."),
-    reminderDays: Yup.number().typeError("Reminder days must be a number."),
+    reminderDays: Yup.number().typeError("Reminder days must be a number.").notRequired(),
   });
   const initialValues = {
     templateName: "",
@@ -29,12 +29,11 @@ const AddTemplate = ({ handleClose }) => {
     setIsSubmitting(true);
     let payload = {
       name: values?.templateName,
-      days: values?.reminderDays,
+      days: values?.reminderDays || null,
       content: values?.templateContent,
     };
     dispatch(addManageTemplate(payload)).then((res) => {
       if (res?.payload?.status === 200 || res?.payload?.status === 201) {
-        debugger;
         toast.success("Template added successfully!");
         dispatch(getManageTemplate());
         handleClose();
