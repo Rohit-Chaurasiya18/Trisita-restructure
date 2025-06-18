@@ -10,6 +10,8 @@ import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonModal from "@/components/common/modal/CommonModal";
 import { toast } from "react-toastify";
 import AddTemplate from "../components/AddTemplate";
+import CommonAccordion from "@/components/common/CommonAccordion";
+import { accordionData } from "../constants";
 
 const ManageTemplate = () => {
   const dispatch = useDispatch();
@@ -68,55 +70,67 @@ const ManageTemplate = () => {
           <SkeletonLoader />
         ) : (
           <div className="manage-template-detail">
-            <CustomSelect
-              label="Templates"
-              placeholder="Select a Template"
-              isClearable
-              options={templatesData}
-              value={selectedTemplate}
-              onChange={(selectedOption) => {
-                setSelectedTemplate(selectedOption);
-                setContent(selectedOption?.content);
-              }}
-            />
-            {selectedTemplate?.content && (
-              <div className="manage-template-content">
-                <label
-                  htmlFor="message"
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                >
-                  Template Content
-                </label>
-                <textarea
-                  name="message"
-                  style={{ height: "600px" }} // Set custom height for textarea
-                  className="w-full outline-none rounded-md"
-                  value={content}
-                  onChange={(e) => setContent(e?.target?.value)}
-                />
-              </div>
-            )}
-            <div className="template-save-btn">
-              <CommonButton
-                className="py-2 px-4 rounded-md mr-3"
-                isDisabled={content === ""}
-                onClick={handleSave}
-              >
-                Save
-              </CommonButton>
-              <CommonButton
-                className="py-2 px-4 rounded-md mr-3"
-                onClick={() => {
-                  setModal({
-                    isOpen: true,
-                    content: content,
-                    isAdd: false,
-                  });
+            <div className="manage-template-form">
+              <CustomSelect
+                label="Templates"
+                placeholder="Select a Template"
+                isClearable
+                options={templatesData}
+                value={selectedTemplate}
+                onChange={(selectedOption) => {
+                  setSelectedTemplate(selectedOption);
+                  setContent(selectedOption?.content);
                 }}
-                isDisabled={content === ""}
-              >
-                View
-              </CommonButton>
+              />
+              {selectedTemplate?.content && (
+                <div className="manage-template-content">
+                  <label
+                    htmlFor="message"
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                  >
+                    Template Content
+                  </label>
+                  <textarea
+                    name="message"
+                    style={{ height: "600px" }} // Set custom height for textarea
+                    className="w-full outline-none rounded-md"
+                    value={content}
+                    onChange={(e) => setContent(e?.target?.value)}
+                  />
+                </div>
+              )}
+              <div className="template-save-btn">
+                <CommonButton
+                  className="py-2 px-4 rounded-md mr-3"
+                  isDisabled={content === ""}
+                  onClick={handleSave}
+                >
+                  Save
+                </CommonButton>
+                <CommonButton
+                  className="py-2 px-4 rounded-md mr-3"
+                  onClick={() => {
+                    setModal({
+                      isOpen: true,
+                      content: content,
+                      isAdd: false,
+                    });
+                  }}
+                  isDisabled={content === ""}
+                >
+                  View
+                </CommonButton>
+              </div>
+            </div>
+            <div className="manage-template-accordion">
+              {accordionData.map((item) => (
+                <CommonAccordion
+                  key={item.id}
+                  title={item.title}
+                  content={item.content}
+                  mainDiv="manage-template-acc-table"
+                />
+              ))}
             </div>
           </div>
         )}

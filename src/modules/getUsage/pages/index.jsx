@@ -83,7 +83,7 @@ const GetUsage = () => {
           }
           isDisabled={checkFilters()}
         >
-          Get Usuage
+          Get Usage
         </CommonButton>
       </div>
     </>
