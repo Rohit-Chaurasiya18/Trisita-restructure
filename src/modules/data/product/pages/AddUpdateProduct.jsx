@@ -85,7 +85,6 @@ const AddUpdateProduct = () => {
   };
 
   const onSubmit = (values) => {
-    // debugger;
     setIsSubmitting(true);
     const requestData = {
       name: values?.productName?.trim(),

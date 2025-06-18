@@ -114,9 +114,7 @@ const AlertSubscription = () => {
 
   const handleOpenModel = (id, type) => {
     setModal((prev) => ({ ...prev, isOpen: true }));
-    dispatch(getAlertSubscription(id)).then((res) => {
-      console.log(res);
-    });
+    dispatch(getAlertSubscription(id)).then((res) => {});
   };
 
   const columns = [

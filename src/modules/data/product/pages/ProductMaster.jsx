@@ -154,7 +154,7 @@ const ProductMaster = () => {
       </div>
 
       {productMasterDataLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <div>
           <ExportToExcel

@@ -61,7 +61,7 @@ const StoreMap = () => {
   return (
     <>
       {citiesMapLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <GoogleMap
           mapContainerStyle={mapContainerStyle}

@@ -121,7 +121,7 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
               >
                 <label>Notifications</label>
                 {loading ? (
-                  <SkeletonLoader isDashboard />
+                  <SkeletonLoader />
                 ) : notifications?.length > 0 ? (
                   notifications?.slice(0, 5).map((notification) => (
                     <div

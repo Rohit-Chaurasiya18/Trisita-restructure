@@ -635,7 +635,7 @@ const Account = () => {
         </div>
         <div className="mt-4">
           {exportedAccountDataLoading ? (
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           ) : (
             industryGroupCount?.length > 0 && (
               <CommonCategoryGrid

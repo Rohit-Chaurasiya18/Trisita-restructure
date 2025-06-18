@@ -557,7 +557,7 @@ const InsightMetricsV2 = () => {
         </div>
         <div className="insight-chart-container">
           {insightMetricsCustomerV2Loading ? (
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           ) : (
             <CommonChart
               title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (without prorated)"
@@ -566,7 +566,7 @@ const InsightMetricsV2 = () => {
             />
           )}
           {insightMetricsCustomerV2Loading ? (
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           ) : (
             <CommonChart
               title="Retention Risk shows summary of the renewal risk for the subscription's contract"
@@ -576,7 +576,7 @@ const InsightMetricsV2 = () => {
           )}
         </div>
         {insightMetricsCustomerV2Loading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="table-container">
             <ExportToExcel

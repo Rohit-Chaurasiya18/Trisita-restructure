@@ -84,7 +84,7 @@ const Notification = () => {
         </div>
       </div>
       {notificationsDataLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <div className="notification-container">
           {notificationsData.length > 0 ? (

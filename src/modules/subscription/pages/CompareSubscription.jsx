@@ -328,7 +328,7 @@ const CompareSubscription = () => {
         </div>
 
         {compareSubscriptionDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="new-subscription-table">
             <ExportToExcel
@@ -355,7 +355,7 @@ const CompareSubscription = () => {
         )}
 
         {compareSubscriptionDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="new-subscription-table mt-4">
             <ExportToExcel

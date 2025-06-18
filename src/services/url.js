@@ -63,3 +63,4 @@ export const GET_PRODUCT_MASTER_STATUS = "/v1/product/product_master_status/";
 export const GET_PRODUCT_MASTER_UOM = "/v1/product/product_master_uom/";
 export const GET_PRODUCT = "/v1/product/product/";
 export const MANAGE_TEMPLATE_URL = "/v1/api/get_new_templates/";
+export const TRIGGER_TEMPLATE_URL = "/v1/api/subs_trigger_new/";

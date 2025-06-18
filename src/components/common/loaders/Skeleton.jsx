@@ -1,5 +1,5 @@
 const SkeletonLoader = ({
-  isDashboard = false,
+  isDashboard = true,
   height = "250px",
   width = "100%",
 }) => {

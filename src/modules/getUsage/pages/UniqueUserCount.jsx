@@ -187,7 +187,7 @@ const UniqueUserCount = () => {
 
       <div className="mt-4">
         {uniqueUsageUserCountLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <CommonChart
             title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (without prorated)"
@@ -197,7 +197,7 @@ const UniqueUserCount = () => {
         )}
 
         {uniqueUsageUserCountLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="unique-user-count-table">
             <CommonTable

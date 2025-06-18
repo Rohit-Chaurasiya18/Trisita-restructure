@@ -235,7 +235,7 @@ const ChangedLogSubscription = () => {
         </div>
 
         {changedLogSubscriptionDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="new-subscription-table">
             <ExportToExcel

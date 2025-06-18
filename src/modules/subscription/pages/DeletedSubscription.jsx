@@ -235,7 +235,7 @@ const DeletedSubscription = () => {
         </div>
 
         {deletedSubscriptionDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="new-subscription-table">
             <ExportToExcel

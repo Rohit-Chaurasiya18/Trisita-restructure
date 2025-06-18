@@ -100,7 +100,7 @@ const Profile = () => {
       <h3>Manage Profile</h3>
       <div className="update-profile">
         {isLoading ? (
-          <SkeletonLoader />
+          <SkeletonLoader isDashboard={false} />
         ) : (
           <>
             <h2 className="title">Update Profile</h2>

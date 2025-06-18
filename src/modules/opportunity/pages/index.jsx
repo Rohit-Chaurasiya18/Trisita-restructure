@@ -485,7 +485,7 @@ const Opportunity = () => {
 
         {opportunityLoading ? (
           <div className="mt-2">
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           </div>
         ) : (
           <div className="opportunity-chart-section">
@@ -510,7 +510,7 @@ const Opportunity = () => {
         )}
         {opportunityLoading ? (
           <div className="mt-2">
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           </div>
         ) : (
           <div className="opportunity-table">

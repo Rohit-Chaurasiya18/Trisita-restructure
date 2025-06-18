@@ -82,7 +82,7 @@ const Dashboard = () => {
         </div>
       </div>
       {dashboardDataLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <>
           <div className="dashboard-startCard">
@@ -164,7 +164,7 @@ const Dashboard = () => {
       <div className="dashboard-chart-section">
         <div className="dashboard-chart">
           {seatDateChartLoading ? (
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           ) : (
             <div className="chart" key="line">
               <LineChart data={seatDateChart} />
@@ -172,7 +172,7 @@ const Dashboard = () => {
           )}
 
           {dashboardChartLoading ? (
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           ) : (
             <div className="chart" key="bar">
               <BarChart data={dashboardChart?.Response} />

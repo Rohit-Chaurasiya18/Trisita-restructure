@@ -79,7 +79,7 @@ const Product = () => {
           </div>
         </div>
         {productDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div>
             <ExportToExcel

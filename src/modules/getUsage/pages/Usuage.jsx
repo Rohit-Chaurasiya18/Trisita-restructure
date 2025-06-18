@@ -272,7 +272,7 @@ const Usuage = () => {
       </div>
 
       {usuagesDataLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <CommonChart
           title="Data of direct seat metrics i.e. 1:1 association between product pool and agreement (without prorated)"
@@ -296,7 +296,7 @@ const Usuage = () => {
         />
 
         {isLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : featureNameCharts?.length ? (
           <CommonChart
             options={productLineChart.options}
@@ -308,7 +308,7 @@ const Usuage = () => {
       </div>
 
       {usuagesDataLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <div className="usages-table-container">
           <CommonTable

@@ -405,7 +405,7 @@ const AddAccount = () => {
   return (
     <>
       {isLoading ? (
-        <SkeletonLoader isDashboard />
+        <SkeletonLoader />
       ) : (
         <div>
           <h2>{id ? "Update" : "Add"} Account</h2>

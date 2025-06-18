@@ -11,6 +11,7 @@ import {
   GET_NEW_SUBSCRIPTION_DETAIL,
   GET_SUBSCRIPTION,
   GET_SUBSCRIPTION_DATA,
+  TRIGGER_TEMPLATE_URL,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -176,6 +177,40 @@ export const getBackupSubscriptionDetail = createAsyncThunk(
     }
   }
 );
+
+// Hanlde Trigger Template
+export const handleTriggerTemplate = createAsyncThunk(
+  `subscription/handleTriggerTemplate`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        TRIGGER_TEMPLATE_URL + payload?.id + "/",
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Hanlde Trigger Template
+export const getTriggeredTemplate = createAsyncThunk(
+  `subscription/getTriggeredTemplate`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        TRIGGER_TEMPLATE_URL + payload + "/"
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const intialState = {
   lastUpdate: null,
   speedometerRatio: null,
@@ -183,7 +218,6 @@ const intialState = {
   subscriptionDataLoading: false,
   subscriptionDetails: null,
   subscriptionDetailsLoading: false,
-
   newSubscriptionData: [],
   newSubscriptionDataLoading: false,
   newSubscriptionDetails: null,
@@ -200,6 +234,8 @@ const intialState = {
   compareSubscriptionDataLoading: false,
   compareSubscriptionDetails: null,
   compareSubscriptionDetailsLoading: false,
+  subscriptionTemplate: [],
+  subscriptionTemplateLoading: false,
 };
 
 const subscriptionSlice = createSlice({
@@ -219,20 +255,7 @@ const subscriptionSlice = createSlice({
       state.lastUpdate = action.payload.data?.last_updated;
       state.speedometerRatio =
         action.payload.data?.percentage_ratio_of_inactiveuser_and_expiredsubs;
-      state.subscriptionData = action.payload.data?.subscriptions?.map(
-        (item) => ({
-          ...item,
-          bd_person: item.bd_person_first_names
-            ? item.bd_person_first_names.join(", ")
-            : "",
-          renewal_person: item.renewal_person_first_names
-            ? item.renewal_person_first_names.join(", ")
-            : "",
-          third_party: item.third_party_names
-            ? item.third_party_names.join(", ")
-            : "",
-        })
-      );
+      state.subscriptionData = action.payload.data?.subscriptions;
     });
     builder.addCase(getSubscriptionData.rejected, (state) => {
       state.subscriptionDataLoading = false;
@@ -396,6 +419,20 @@ const subscriptionSlice = createSlice({
         state.compareSubscriptionDetailsLoading = false;
         state.compareSubscriptionDetails = null;
       }
+    });
+
+    // Get Subscription Template
+    builder.addCase(getTriggeredTemplate.pending, (state) => {
+      state.subscriptionTemplate = [];
+      state.subscriptionTemplateLoading = true;
+    });
+    builder.addCase(getTriggeredTemplate.fulfilled, (state, action) => {
+      state.subscriptionTemplate = action.payload.data?.trigger_choices_new?.map(item => item?.id);
+      state.subscriptionTemplateLoading = false;
+    });
+    builder.addCase(getTriggeredTemplate.rejected, (state) => {
+      state.subscriptionTemplate = [];
+      state.subscriptionTemplateLoading = false;
     });
   },
 });

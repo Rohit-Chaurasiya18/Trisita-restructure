@@ -304,7 +304,7 @@ const NewSubscription = () => {
         </div>
 
         {newSubscriptionDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="new-subscription-table">
             <ExportToExcel

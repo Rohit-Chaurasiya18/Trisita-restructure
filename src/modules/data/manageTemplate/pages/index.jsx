@@ -65,7 +65,7 @@ const ManageTemplate = () => {
           </CommonButton>
         </div>
         {templatesDataLoading ? (
-          <SkeletonLoader isDashboard />
+          <SkeletonLoader />
         ) : (
           <div className="manage-template-detail">
             <CustomSelect

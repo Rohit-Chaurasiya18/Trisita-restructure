@@ -21,6 +21,7 @@ import SubscriptionDetail from "../components/SubscriptionDetail";
 import moment from "moment";
 import dayjs from "dayjs";
 import useDebounce from "@/hooks/useDebounce";
+import SetTrigger from "../components/SetTrigger";
 
 const CommonChart = ({
   title,
@@ -101,6 +102,7 @@ const Subscription = () => {
   const [modal, setModal] = useState({
     show: false,
     id: null,
+    isTrigger: false,
   });
 
   useEffect(() => {
@@ -200,7 +202,7 @@ const Subscription = () => {
 
   // Handle modal open
   const handleOpenModel = (id) => {
-    setModal({ show: true, id });
+    setModal({ show: true, id, isTrigger: false });
     dispatch(getBackupSubscriptionDetail({ id, isSubscription: true }));
   };
 
@@ -359,7 +361,9 @@ const Subscription = () => {
       width: 150,
       renderCell: (params, index) => (
         <span
-          // onClick={() => handleOpenModel(params?.row?.id)}
+          onClick={() => {
+            setModal({ show: true, id: params?.row?.id, isTrigger: true });
+          }}
           className="assign-button text-black px-3 py-1 rounded border-0"
         >
           Assign Trigger
@@ -1190,7 +1194,7 @@ const Subscription = () => {
           </div>
           <div className="subscription-chart">
             {subscriptionDataLoading ? (
-              <SkeletonLoader isDashboard />
+              <SkeletonLoader />
             ) : (
               <CommonChart
                 title={
@@ -1216,7 +1220,7 @@ const Subscription = () => {
               />
             )}
             {subscriptionDataLoading ? (
-              <SkeletonLoader isDashboard />
+              <SkeletonLoader />
             ) : (
               <div className="account-industry-chart-2 mt-4">
                 <CommonChart
@@ -1240,7 +1244,7 @@ const Subscription = () => {
               </div>
             )}
             {subscriptionDataLoading ? (
-              <SkeletonLoader isDashboard />
+              <SkeletonLoader />
             ) : (
               <div className="account-industry-chart-2 mt-4">
                 <CommonChart
@@ -1279,7 +1283,7 @@ const Subscription = () => {
               </div>
             )}
             {subscriptionDataLoading ? (
-              <SkeletonLoader isDashboard />
+              <SkeletonLoader />
             ) : (
               <CommonChart
                 title="On boarding Health adoption report"
@@ -1289,7 +1293,7 @@ const Subscription = () => {
             )}
           </div>
           {subscriptionDataLoading ? (
-            <SkeletonLoader isDashboard />
+            <SkeletonLoader />
           ) : (
             <div className="subscription-table">
               <CommonTable
@@ -1306,11 +1310,26 @@ const Subscription = () => {
       </div>
       <CommonModal
         isOpen={modal.show}
-        handleClose={() => setModal({ show: false, id: null })}
+        handleClose={() =>
+          setModal({ show: false, id: null, isTrigger: false })
+        }
         scrollable
-        title={"Subscription Detail"}
+        title={modal?.isTrigger ? "Set Trigger" : "Subscription Detail"}
       >
-        <SubscriptionDetail />
+        {modal?.isTrigger ? (
+          <SetTrigger
+            modal={modal}
+            handleClose={() => {
+              setModal({
+                id: "",
+                isTrigger: false,
+                show: false,
+              });
+            }}
+          />
+        ) : (
+          <SubscriptionDetail />
+        )}
       </CommonModal>
     </>
   );

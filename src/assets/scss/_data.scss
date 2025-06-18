@@ -48,6 +48,15 @@
   .manage-template-header {
     display: flex;
     justify-content: space-between;
+    @media (max-width: 520px) {
+      display: grid;
+      gap: 10px;
+      justify-content: normal;
+      width: 100%;
+      .add-html-template {
+        width: 100% !important;
+      }
+    }
     .add-html-template {
       width: fit-content;
       height: 45px;
