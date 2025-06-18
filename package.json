@@ -53,6 +53,7 @@
     "react-svg": "^16.3.0",
     "react-toastify": "^11.0.5",
     "reactstrap": "^9.2.3",
+    "rsuite": "^5.82.0",
     "styled-components": "^6.1.17",
     "xlsx": "^0.18.5",
     "yup": "^1.6.1"

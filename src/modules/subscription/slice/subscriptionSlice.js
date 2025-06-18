@@ -234,6 +234,7 @@ const intialState = {
   compareSubscriptionDataLoading: false,
   compareSubscriptionDetails: null,
   compareSubscriptionDetailsLoading: false,
+  subscriptionTemplateCCEmails: [],
   subscriptionTemplate: [],
   subscriptionTemplateLoading: false,
 };
@@ -423,14 +424,18 @@ const subscriptionSlice = createSlice({
 
     // Get Subscription Template
     builder.addCase(getTriggeredTemplate.pending, (state) => {
+      state.subscriptionTemplateCCEmails = [];
       state.subscriptionTemplate = [];
       state.subscriptionTemplateLoading = true;
     });
     builder.addCase(getTriggeredTemplate.fulfilled, (state, action) => {
-      state.subscriptionTemplate = action.payload.data?.trigger_choices_new?.map(item => item?.id);
+      state.subscriptionTemplateCCEmails = action.payload.data?.cc_emails;
+      state.subscriptionTemplate =
+        action.payload.data?.trigger_choices_new?.map((item) => item?.id);
       state.subscriptionTemplateLoading = false;
     });
     builder.addCase(getTriggeredTemplate.rejected, (state) => {
+      state.subscriptionTemplateCCEmails = [];
       state.subscriptionTemplate = [];
       state.subscriptionTemplateLoading = false;
     });
