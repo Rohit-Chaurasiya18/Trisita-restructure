@@ -9,13 +9,7 @@ import {
   getAllAccount,
   getAllBranch,
 } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import {
-  Autocomplete,
-  colors,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import {
   getBackupSubscriptionDetail,
@@ -97,11 +91,6 @@ const Subscription = () => {
   }));
   const [filteredData, setFilteredData] = useState();
   const [barColor, setBarColor] = useState("");
-  const [numberOfSeatsBar, setNumberOfSeatsBar] = useState("");
-  const [accountGroupLegend, setAccountGroupLegend] = useState("");
-  const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
-  const [accountTypeLegend, setAccountTypeLegend] = useState("");
-
   const [dateRange, setDateRange] = useState([null, null]);
   const [filters, setFilters] = useState({
     account: [],
@@ -421,118 +410,31 @@ const Subscription = () => {
     }
   }, [filters?.account, filters?.branch, filters?.status, subscriptionData]);
 
-  // Chart click events
-  const handleNumberOfSeatsClick = (data) => {
-    let allData;
-    const isSameColor = numberOfSeatsBar === data;
-    if (isSameColor) {
-      allData = handleFilter(subscriptionData);
-    } else {
-      allData = filteredData;
-    }
-    setNumberOfSeatsBar(isSameColor ? "" : data);
-    let key;
-    if (chartViewType === "byProductLine") {
-      key = "productLineCode";
-    } else if (chartViewType === "byAccountName") {
-      key = "account_name";
-    } else if (chartViewType === "byLastYear") {
-      key = "lastPurchaseDate";
-    }
-    const updatedData = isSameColor
-      ? allData
-      : allData?.filter((item) =>
-          key === "lastPurchaseDate"
-            ? item[key]?.split("-")?.[0] === data
-            : item[key] === data
-        );
-    console.log(updatedData);
-    setFilteredData(updatedData);
-  };
-
-  const handleOnBoardHealthBarClick = (data) => {
-    let allData;
-    const isSameColor = barColor === data;
-    if (isSameColor) {
-      allData = handleFilter(subscriptionData);
-    } else {
-      allData = filteredData;
-    }
-
-    setBarColor(isSameColor ? "" : data);
-
-    const updatedData = isSameColor
-      ? allData
-      : allData?.filter((item) =>
-          data !== "Unknown"
-            ? item?.retention_health_riskBand === data
-            : !item?.retention_health_riskBand
-        );
-
-    setFilteredData(updatedData);
-  };
-
-  const handleAccountGroupLegendClick = (data) => {
-    let allData;
-    const isSameColor = accountGroupLegend === data;
-    if (isSameColor) {
-      allData = handleFilter(subscriptionData);
-    } else {
-      allData = filteredData;
-    }
-    setAccountGroupLegend(isSameColor ? "" : data);
-    const updatedData = isSameColor
-      ? allData
-      : allData?.filter((item) =>
-          data !== "Unknown"
-            ? item?.account_group === data
-            : !item?.account_group
-        );
-
-    setFilteredData(updatedData);
-  };
-
-  const handleRiskRetentionLegendClick = (data) => {
-    let allData;
-    const isSameColor = retentionRiskLegend === data;
-    if (isSameColor) {
-      allData = handleFilter(subscriptionData);
-    } else {
-      allData = filteredData;
-    }
-    setRetentionRiskLegend(isSameColor ? "" : data);
-    const updatedData = isSameColor
-      ? allData
-      : allData?.filter((item) =>
-          data !== "Unknown"
-            ? item?.retention_health_riskBand === data
-            : !item?.retention_health_riskBand
-        );
-
-    setFilteredData(updatedData);
-  };
-
-  const handleAccountTypeLegendClick = (data) => {
-    let allData;
-    const isSameColor = accountTypeLegend === data;
-    if (isSameColor) {
-      allData = handleFilter(subscriptionData);
-    } else {
-      allData = filteredData;
-    }
-    setAccountTypeLegend(isSameColor ? "" : data);
-    const updatedData = isSameColor
-      ? allData
-      : allData?.filter((item) =>
-          data !== "Unknown" ? item?.account_type === data : !item?.account_type
-        );
-
-    setFilteredData(updatedData);
-  };
   // Number of seats chart
   const [chartViewType, setChartViewType] = useState("byProductLine");
+  const [options, setOptions] = useState({
+    chart: {
+      events: {},
+      type: "bar",
+      height: 350,
+      width: "100%",
+    },
+    xaxis: {
+      categories: [], // Will be populated with top 50 product codes
+    },
+    yaxis: {
+      title: { text: "Total Seats" },
+    },
+    dataLabels: {
+      position: "top",
+    },
+  });
 
-  const numberOfSeats = useMemo(() => {
+  const [series, setSeries] = useState([
+    { name: "seats", data: [] }, // Will contain seat counts for top 50
+  ]);
+
+  useEffect(() => {
     if (filteredData?.length > 0) {
       let aggregationMap = new Map();
       let groupKey;
@@ -598,80 +500,54 @@ const Subscription = () => {
       // Extract categories and data values
       const categories = topData.map((item) => item.key);
       const seriesData = topData.map((item) => item.total);
-      return {
-        options: {
-          chart: {
-            events: {
-              click(event, chartContext, config) {
-                const clickedCategory =
-                  config?.config?.xaxis?.categories[config.dataPointIndex];
-                if (clickedCategory) {
-                  handleNumberOfSeatsClick(clickedCategory);
-                }
-              },
+
+      // Update chart state
+      setOptions((prev) => ({
+        ...prev,
+        xaxis: {
+          ...prev.xaxis,
+          categories,
+          labels: {
+            ...prev.xaxis.labels,
+            rotate: rotateLabels ? -45 : 0,
+            formatter: (value) => {
+              // Truncate long labels
+              if (truncateLabels && value.length > 20) {
+                return value.substring(0, 20) + "...";
+              }
+              return value;
             },
-            type: "bar",
-            height: 350,
-            width: "100%",
-          },
-          xaxis: {
-            categories, // Will be populated with top 50 product codes
-            labels: {
-              rotate: rotateLabels ? -45 : 0,
-              formatter: (value) => {
-                // Truncate long labels
-                if (truncateLabels && value.length > 20) {
-                  return value.substring(0, 20) + "...";
-                }
-                return value;
-              },
-            },
-          },
-          yaxis: {
-            title: { text: "Total Seats" },
-          },
-          dataLabels: {
-            position: "top",
           },
         },
-        series: [{ name: "seats", data: seriesData }],
-      };
+      }));
+
+      setSeries([{ name: "seats", data: seriesData }]);
     } else {
-      return {
-        options: {
-          chart: {
-            events: {},
-            type: "bar",
-            height: 350,
-            width: "100%",
-          },
-          xaxis: {
-            categories: [], // Will be populated with top 50 product codes
-            labels: {
-              rotate: 0,
-            },
-          },
-          noData: {
-            text: "No data available",
-            align: "center",
-            verticalAlign: "middle",
-            offsetX: 0,
-            offsetY: 0,
-            style: {
-              color: "#888",
-              fontSize: "14px",
-              fontFamily: "Arial, sans-serif",
-            },
-          },
-          yaxis: {
-            title: { text: "Total Seats" },
-          },
-          dataLabels: {
-            position: "top",
+      // Handle no data case
+      setOptions((prev) => ({
+        ...prev,
+        xaxis: {
+          ...prev.xaxis,
+          categories: [],
+          labels: {
+            ...prev.xaxis.labels,
+            rotate: 0,
           },
         },
-        series: [{ name: "seats", data: [] }],
-      };
+        noData: {
+          text: "No data available",
+          align: "center",
+          verticalAlign: "middle",
+          offsetX: 0,
+          offsetY: 0,
+          style: {
+            color: "#888",
+            fontSize: "14px",
+            fontFamily: "Arial, sans-serif",
+          },
+        },
+      }));
+      setSeries([{ name: "seats", data: [] }]);
     }
   }, [filteredData, chartViewType]);
 
@@ -681,8 +557,34 @@ const Subscription = () => {
 
   // Total Subscriptions as per Account Group
   const [accountGroupType, setAccountGroupType] = useState("subscription");
+  const [accountGroupChart, setAccountGroupChart] = useState({
+    options: {
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: [],
+      legend: {
+        position: "bottom",
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: "100%",
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+    series: [],
+  });
 
-  const accountGroupBarChart = useMemo(() => {
+  useEffect(() => {
     if (filteredData?.length) {
       // Aggregate data by account_group based on selected type
       const accountGroups = {};
@@ -721,65 +623,20 @@ const Subscription = () => {
           series = labels.map((group) => accountGroups[group].count);
       }
 
-      return {
+      setAccountGroupChart((prev) => ({
+        ...prev,
         options: {
-          chart: {
-            type: "pie",
-            height: 350,
-            events: {
-              legendClick: (chartContext, seriesIndex) => {
-                const clickedLegend = labels[seriesIndex];
-                if (clickedLegend) {
-                  handleAccountGroupLegendClick(clickedLegend);
-                }
-              },
-            },
-          },
-          labels: labels,
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-            formatter: (seriesName, opts) => {
-              const isHighlighted = seriesName === accountGroupLegend;
-              const count = opts.w.globals.series[opts.seriesIndex];
-              return `<span style="color: ${
-                isHighlighted ? "red" : "black"
-              };">${seriesName} - ${count}</span>`;
-            },
-          },
-          plotOptions: {
-            bar: {
-              distributed: true, // Distribute colors across bars
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: "100%",
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
+          ...prev.options,
+          labels,
         },
-        series: series,
-      };
+        series,
+      }));
     } else {
-      return {
+      // Reset to empty state
+      setAccountGroupChart((prev) => ({
+        ...prev,
         options: {
-          chart: {
-            type: "pie",
-            height: 350,
-          },
+          ...prev.options,
           labels: [],
           noData: {
             text: "No data available",
@@ -793,36 +650,9 @@ const Subscription = () => {
               fontFamily: "Arial, sans-serif",
             },
           },
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-          },
-          plotOptions: {
-            bar: {
-              distributed: true, // Distribute colors across bars
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: "100%",
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
         },
         series: [],
-      };
+      }));
     }
   }, [filteredData, accountGroupType]);
 
@@ -844,13 +674,41 @@ const Subscription = () => {
 
   // Retention Risk shows summary of the renewal risk for the subscription contract
   const [retentionRiskType, setRetentionRiskType] = useState("subscription");
+  const [retentionRiskChart, setRetentionRiskChart] = useState({
+    options: {
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: [],
+      legend: {
+        position: "bottom",
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+    series: [],
+  });
 
-  const retentionRiskBarChart = useMemo(() => {
+  useEffect(() => {
     if (filteredData?.length) {
       // Aggregate data by account_group based on selected type
       const retentionRiskGroups = {};
+
       filteredData.forEach((item) => {
         const group = item?.retention_health_riskBand || "Unknown";
+
         // Initialize group if not exists
         if (!retentionRiskGroups[group]) {
           retentionRiskGroups[group] = {
@@ -859,14 +717,17 @@ const Subscription = () => {
             acv: 0,
           };
         }
+
         // Aggregate values
         retentionRiskGroups[group].count += 1;
         retentionRiskGroups[group].dtp += parseFloat(item.dtp_price) || 0;
         retentionRiskGroups[group].acv += parseFloat(item.acv_price) || 0;
       });
+
       // Convert to arrays for the chart
       const labels = Object.keys(retentionRiskGroups);
       let series;
+
       switch (retentionRiskType) {
         case "dtp_price":
           series = labels.map((group) => retentionRiskGroups[group].dtp);
@@ -878,65 +739,21 @@ const Subscription = () => {
         default:
           series = labels.map((group) => retentionRiskGroups[group].count);
       }
-      return {
+
+      setRetentionRiskChart((prev) => ({
+        ...prev,
         options: {
-          chart: {
-            type: "pie",
-            height: 350,
-            events: {
-              legendClick: (chartContext, seriesIndex) => {
-                const clickedLegend = labels[seriesIndex];
-                if (clickedLegend) {
-                  handleRiskRetentionLegendClick(clickedLegend);
-                }
-              },
-            },
-          },
-          labels: labels,
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-            formatter: (seriesName, opts) => {
-              const isHighlighted = seriesName === retentionRiskLegend;
-              const count = opts.w.globals.series[opts.seriesIndex];
-              return `<span style="color: ${
-                isHighlighted ? "red" : "black"
-              };">${seriesName} - ${count}</span>`;
-            },
-          },
-          plotOptions: {
-            pie: {
-              distributed: true, // Distribute colors across bars
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
+          ...prev.options,
+          labels,
         },
-        series: series,
-      };
+        series,
+      }));
     } else {
-      return {
+      // Reset to empty state
+      setRetentionRiskChart((prev) => ({
+        ...prev,
         options: {
-          chart: {
-            type: "pie",
-            height: 350,
-          },
+          ...prev.options,
           labels: [],
           noData: {
             text: "No data available",
@@ -950,25 +767,9 @@ const Subscription = () => {
               fontFamily: "Arial, sans-serif",
             },
           },
-          legend: {
-            position: "bottom",
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
         },
         series: [],
-      };
+      }));
     }
   }, [filteredData, retentionRiskType]);
 
@@ -990,8 +791,34 @@ const Subscription = () => {
 
   // Total Subscriptions as per Account Type
   const [accountType_Type, setAccountType_Type] = useState("subscription");
+  const [accountTypeChart, setAccountTypeChart] = useState({
+    options: {
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: [],
+      legend: {
+        position: "bottom",
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+    series: [],
+  });
 
-  const accountTypePieChart = useMemo(() => {
+  useEffect(() => {
     if (filteredData?.length) {
       // Aggregate data by account_group based on selected type
       const accountTypeGroups = {};
@@ -1030,96 +857,36 @@ const Subscription = () => {
           series = labels.map((group) => accountTypeGroups[group].count);
       }
 
-      return {
+      setAccountTypeChart((prev) => ({
+        ...prev,
         options: {
-          chart: {
-            type: "pie",
-            height: 350,
-            events: {
-              legendClick: (chartContext, seriesIndex) => {
-                const clickedLegend = labels[seriesIndex];
-                if (clickedLegend) {
-                  handleAccountTypeLegendClick(clickedLegend);
-                }
-              },
-            },
-          },
-          labels: labels,
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-            formatter: (seriesName, opts) => {
-              const isHighlighted = seriesName === accountTypeLegend;
-              const count = opts.w.globals.series[opts.seriesIndex];
-              return `<span style="color: ${
-                isHighlighted ? "red" : "black"
-              };">${seriesName} - ${count}</span>`;
-            },
-          },
-          plotOptions: {
-            bar: {
-              distributed: true, // Distribute colors across bars
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
+          ...prev.options,
+          labels,
         },
-        series: series,
-      };
+        series,
+      }));
     } else {
-      return {
+      // Reset to empty state
+      setAccountTypeChart((prev) => ({
+        ...prev,
         options: {
-          chart: {
-            type: "pie",
-            height: 350,
-          },
+          ...prev.options,
           labels: [],
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-          },
-          plotOptions: {
-            bar: {
-              distributed: true, // Distribute colors across bars
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
             },
           },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
         },
         series: [],
-      };
+      }));
     }
   }, [filteredData, accountType_Type]);
 
@@ -1172,7 +939,7 @@ const Subscription = () => {
     return { categories, dtpData, acvData };
   }, [filteredData, filters?.startDate]);
 
-  // ApexCharts config
+  // 📊 ApexCharts config
   const amountPerMonth = {
     options: {
       chart: { height: 350, type: "bar" },
@@ -1207,6 +974,23 @@ const Subscription = () => {
     "Unknown",
   ];
 
+  const handleOnBoardHealthBarClick = (data) => {
+    const allData = handleFilter(subscriptionData);
+    const isSameColor = barColor === data;
+
+    setBarColor(isSameColor ? "" : data);
+
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown"
+            ? item?.retention_health_riskBand === data
+            : !item?.retention_health_riskBand
+        );
+
+    setFilteredData(updatedData);
+  };
+
   const onBoardHealthChart = useMemo(() => {
     // Initialize risk count
     const riskCounts = orderedCategories.reduce((acc, category) => {
@@ -1214,8 +998,8 @@ const Subscription = () => {
       return acc;
     }, {});
     let allData = handleFilter(subscriptionData);
-    if (filteredData?.length) {
-      filteredData.forEach((item) => {
+    if (allData?.length) {
+      allData.forEach((item) => {
         const group = item?.retention_health_riskBand || "Unknown";
         if (orderedCategories.includes(group)) {
           riskCounts[group]++;
@@ -1420,8 +1204,8 @@ const Subscription = () => {
                     ? "Trend of number of seats purchased by account name"
                     : "Trend of number of seats purchased by last purchase year"
                 }
-                options={numberOfSeats?.options}
-                series={numberOfSeats?.series}
+                options={options}
+                series={series}
                 subCategory={[
                   "By Product line",
                   "By Account names",
@@ -1441,8 +1225,8 @@ const Subscription = () => {
               <div className="account-industry-chart-2 mt-4">
                 <CommonChart
                   title={getAccountGroupTitle()}
-                  options={accountGroupBarChart?.options}
-                  series={accountGroupBarChart?.series}
+                  options={accountGroupChart?.options}
+                  series={accountGroupChart?.series}
                   className="chart-data-1"
                   subCategory={["Subscription", "DTP", "ACV"]}
                   onSubCategoryClick={(index) => {
@@ -1472,8 +1256,8 @@ const Subscription = () => {
                 <div className="chart-section">
                   <CommonChart
                     title={getRetentionRiskTitle()}
-                    options={retentionRiskBarChart?.options}
-                    series={retentionRiskBarChart?.series}
+                    options={retentionRiskChart?.options}
+                    series={retentionRiskChart?.series}
                     className="chart-data-2"
                     subCategory={["Subscription", "DTP", "ACV"]}
                     onSubCategoryClick={(index) => {
@@ -1485,8 +1269,8 @@ const Subscription = () => {
                   />
                   <CommonChart
                     title={getAccountTypeTitle()}
-                    options={accountTypePieChart?.options}
-                    series={accountTypePieChart?.series}
+                    options={accountTypeChart.options}
+                    series={accountTypeChart.series}
                     className="chart-data-2"
                     subCategory={["Subscription", "DTP", "ACV"]}
                     onSubCategoryClick={(index) => {
