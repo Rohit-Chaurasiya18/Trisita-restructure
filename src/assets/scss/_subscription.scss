@@ -50,6 +50,7 @@
     font-size: 14px;
     padding-left: 16px;
     cursor: pointer;
+    align-items: baseline;
     @media (max-width: 664px) {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
