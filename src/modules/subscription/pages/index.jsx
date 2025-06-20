@@ -447,7 +447,6 @@ const Subscription = () => {
             ? item[key]?.split("-")?.[0] === data
             : item[key] === data
         );
-    console.log(updatedData);
     setFilteredData(updatedData);
   };
 
@@ -1246,6 +1245,14 @@ const Subscription = () => {
       const seriesData = orderedCategories.map(
         (category) => riskCounts[category]
       );
+      const barColors = [
+        "#FF4560", // Very High (Red)
+        "#FF9800", // High (Orange)
+        "#FFC107", // Medium (Yellow)
+        "#4CAF50", // Low (Green)
+        "#2196F3", // Very Low (Blue)
+        "#9E9E9E", // Unknown (Gray)
+      ];
 
       return {
         options: {
@@ -1269,6 +1276,14 @@ const Subscription = () => {
           yaxis: {
             title: {
               text: "",
+            },
+          },
+          colors: barColors,
+          plotOptions: {
+            bar: {
+              borderRadius: 5,
+              columnWidth: "50%",
+              distributed: true,
             },
           },
           dataLabels: {
@@ -1499,7 +1514,6 @@ const Subscription = () => {
   const handleBdPersonChange = (viewType) => {
     setBdPersonType(viewType);
   };
-  console.log(subscriptionData);
   return (
     <>
       <div>

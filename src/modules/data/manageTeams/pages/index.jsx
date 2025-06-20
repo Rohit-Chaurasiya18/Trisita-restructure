@@ -28,7 +28,6 @@ const ManageTeams = () => {
       headerName: "Access Level",
       width: 300,
       renderCell: (params) => {
-        console.log(params);
         return (
           <label className="user-acces-level">
             {params?.row?.user_type === "Admin" ? (
