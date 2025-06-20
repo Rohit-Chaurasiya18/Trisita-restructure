@@ -101,6 +101,7 @@ const Subscription = () => {
   const [accountGroupLegend, setAccountGroupLegend] = useState("");
   const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
   const [accountTypeLegend, setAccountTypeLegend] = useState("");
+  const [bdPersonLegend, setBdPersonLegend] = useState("");
 
   const [dateRange, setDateRange] = useState([null, null]);
   const [filters, setFilters] = useState({
@@ -525,6 +526,26 @@ const Subscription = () => {
       ? allData
       : allData?.filter((item) =>
           data !== "Unknown" ? item?.account_type === data : !item?.account_type
+        );
+
+    setFilteredData(updatedData);
+  };
+
+  const handleBDPersonLegendClick = (data) => {
+    let allData;
+    const isSameColor = bdPersonLegend === data;
+    if (isSameColor) {
+      allData = handleFilter(subscriptionData);
+    } else {
+      allData = filteredData;
+    }
+    setBdPersonLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown"
+            ? item?.bd_person_first_names?.includes(data)
+            : item?.bd_person_first_names?.length === 0
         );
 
     setFilteredData(updatedData);
@@ -1298,6 +1319,187 @@ const Subscription = () => {
     }
   }, [filteredData]);
 
+  // Total Subscriptions as per BD Person
+  const [bdPersonType, setBdPersonType] = useState("subscription");
+
+  const bdPersonPieChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by BD person based on selected type
+      const bdPersonGroups = {};
+
+      filteredData.forEach((item) => {
+        const bdPersons =
+          item?.bd_person_first_names?.length > 0
+            ? item.bd_person_first_names
+            : ["Unknown"]; // Treat empty array as "Unknown"
+
+        bdPersons.forEach((person) => {
+          const normalizedPerson = person.trim().toLowerCase(); // Normalize names to avoid duplicates due to case sensitivity
+
+          // Initialize group if not exists
+          if (!bdPersonGroups[normalizedPerson]) {
+            bdPersonGroups[normalizedPerson] = {
+              name: person, // Keep original name for display
+              count: 0,
+              dtp: 0,
+              acv: 0,
+            };
+          }
+
+          // Aggregate values
+          bdPersonGroups[normalizedPerson].count += 1;
+          bdPersonGroups[normalizedPerson].dtp +=
+            parseFloat(item.dtp_price) || 0;
+          bdPersonGroups[normalizedPerson].acv +=
+            parseFloat(item.acv_price) || 0;
+        });
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.values(bdPersonGroups).map((group) => group.name);
+      let series;
+
+      switch (bdPersonType) {
+        case "dtp_price":
+          series = Object.values(bdPersonGroups).map((group) => group.dtp);
+          break;
+        case "acv_price":
+          series = Object.values(bdPersonGroups).map((group) => group.acv);
+          break;
+        case "subscription":
+        default:
+          series = Object.values(bdPersonGroups).map((group) => group.count);
+      }
+
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = labels[seriesIndex];
+                if (clickedLegend) {
+                  // Handle legend click if needed
+                  handleBDPersonLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: labels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const count = opts.w.globals.series[opts.seriesIndex];
+              const isHighlighted = seriesName === bdPersonLegend;
+              return `<span style="color: ${
+                isHighlighted ? "red" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across slices
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: "100%",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: series,
+      };
+    } else {
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+          },
+          labels: [],
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+          legend: {
+            position: "bottom",
+            formatter: (seriesName, opts) => {
+              const count = opts.w.globals.series[opts.seriesIndex];
+              const isHighlighted = seriesName === bdPersonLegend;
+              return `<span style="color: ${
+                isHighlighted ? "red" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across slices
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: "100%",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: [],
+      };
+    }
+  }, [filteredData, bdPersonType]);
+
+  const getBdPersonTitle = () => {
+    switch (bdPersonType) {
+      case "dtp_price":
+        return "Total DTP Price as per BD Person";
+      case "acv_price":
+        return "Total ACV Price as per BD Person";
+      case "subscription":
+      default:
+        return "Total Subscriptions as per BD Person";
+    }
+  };
+
+  const handleBdPersonChange = (viewType) => {
+    setBdPersonType(viewType);
+  };
+  console.log(subscriptionData);
   return (
     <>
       <div>
@@ -1501,11 +1703,26 @@ const Subscription = () => {
             {subscriptionDataLoading ? (
               <SkeletonLoader />
             ) : (
-              <CommonChart
-                title="On boarding Health adoption report"
-                options={onBoardHealthChart.options}
-                series={onBoardHealthChart.series}
-              />
+              <div className="account-industry-chart-2 mt-4">
+                <CommonChart
+                  title={getBdPersonTitle()}
+                  options={bdPersonPieChart?.options}
+                  series={bdPersonPieChart?.series}
+                  className="chart-data-1"
+                  subCategory={["Subscription", "DTP", "ACV"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleBdPersonChange("subscription");
+                    if (index === 1) handleBdPersonChange("dtp_price");
+                    if (index === 2) handleBdPersonChange("acv_price");
+                  }}
+                />
+                <CommonChart
+                  title="On boarding Health adoption report"
+                  options={onBoardHealthChart.options}
+                  series={onBoardHealthChart.series}
+                  className="chart-data-2"
+                />
+              </div>
             )}
           </div>
           {subscriptionDataLoading ? (

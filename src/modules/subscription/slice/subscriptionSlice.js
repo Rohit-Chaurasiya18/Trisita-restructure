@@ -256,7 +256,20 @@ const subscriptionSlice = createSlice({
       state.lastUpdate = action.payload.data?.last_updated;
       state.speedometerRatio =
         action.payload.data?.percentage_ratio_of_inactiveuser_and_expiredsubs;
-      state.subscriptionData = action.payload.data?.subscriptions;
+      state.subscriptionData = action.payload.data?.subscriptions?.map(
+        (item) => ({
+          ...item,
+          bd_person: item.bd_person_first_names
+            ? item.bd_person_first_names.join(", ")
+            : "",
+          renewal_person: item.renewal_person_first_names
+            ? item.renewal_person_first_names.join(", ")
+            : "",
+          third_party: item.third_party_names
+            ? item.third_party_names.join(", ")
+            : "",
+        })
+      );
     });
     builder.addCase(getSubscriptionData.rejected, (state) => {
       state.subscriptionDataLoading = false;
