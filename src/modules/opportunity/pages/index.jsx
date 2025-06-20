@@ -402,6 +402,16 @@ const Opportunity = () => {
       headerName: "Contract Msg Email",
       width: 220,
     },
+    {
+      field: "acv_price",
+      headerName: "Total ACV Price",
+      width: 220,
+    },
+    {
+      field: "dtp_price",
+      headerName: "Total DTP Price",
+      width: 220,
+    },
   ];
   const handleSelectionChange = (selectedRows) => {
     const idArray = [...selectedRows?.ids];
