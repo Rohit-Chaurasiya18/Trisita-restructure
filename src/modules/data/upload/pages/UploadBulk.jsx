@@ -149,21 +149,23 @@ const UploadBulk = () => {
           <div className="commom-header-title mb-0">Upload {pageTitle}</div>
           <span className="common-breadcrum-msg">we are in the same team</span>
         </div>
-        <div className="upload-bulk-filter">
-          <CommonDateRangePicker
-            value={dateRange}
-            onChange={handleDateChange}
-            width="180px"
-            placeholderStart="Start date"
-            placeholderEnd="End date"
-          />
-          <CommonButton
-            className="order-loading-ho-btn"
-            onClick={handleDownloadCSV}
-          >
-            Download CSV Format
-          </CommonButton>
-        </div>
+        {!isQuotation && (
+          <div className="upload-bulk-filter">
+            <CommonDateRangePicker
+              value={dateRange}
+              onChange={handleDateChange}
+              width="180px"
+              placeholderStart="Start date"
+              placeholderEnd="End date"
+            />
+            <CommonButton
+              className="order-loading-ho-btn"
+              onClick={handleDownloadCSV}
+            >
+              Download CSV Format
+            </CommonButton>
+          </div>
+        )}
       </div>
       {(isAccountTagging || isProductMaster) && (
         <div className="add-account-form">
