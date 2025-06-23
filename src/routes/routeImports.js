@@ -61,6 +61,11 @@ export const AddUpdateProductMaster = lazy(() =>
 export const AddUpdateProduct = lazy(() =>
   import("@/modules/data/product/pages/AddUpdateProduct")
 );
+export const Upload = lazy(() => import("@/modules/data/upload/pages/index"));
+
+export const UploadBulk = lazy(() =>
+  import("@/modules/data/upload/pages/UploadBulk")
+);
 
 export const orderLoadingToHO = lazy(() =>
   import("@/modules/orderLoadingApi/pages/orderLoadingHO/pages/OrderLoadingHO")

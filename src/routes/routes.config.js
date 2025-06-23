@@ -30,6 +30,8 @@ import {
   AddEditOrderLoadingHO,
   ManageTemplate,
   ManageTeams,
+  Upload,
+  UploadBulk,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -138,7 +140,17 @@ const routesConfig = {
     },
     {
       path: routesConstants.UPLOAD,
-      component: Get_usage,
+      component: Outlet,
+      children: [
+        {
+          index: true,
+          component: Upload,
+        },
+        {
+          path: "upload_bulk",
+          component: UploadBulk,
+        },
+      ],
     },
     {
       path: routesConstants.EXPORTED_FILE,

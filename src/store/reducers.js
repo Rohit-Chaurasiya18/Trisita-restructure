@@ -14,7 +14,7 @@ import usugesReducer from "@/modules/getUsage/slice/UsuagesSlice";
 import subscriptionReducer from "@/modules/subscription/slice/subscriptionSlice";
 import productReducer from "@/modules/data/product/slice/ProductSlice";
 import manageTemplateReducer from "@/modules/data/manageTemplate/slice/ManageTemplateSlice";
-
+import uploadReducer from "@/modules/data/upload/slice/UploadSlice";
 const reducer = combineReducers({
   dashboard: dashboardReducer,
   login: loginReducer,
@@ -31,5 +31,6 @@ const reducer = combineReducers({
   subscription: subscriptionReducer,
   product: productReducer,
   manageTemplate: manageTemplateReducer,
+  upload: uploadReducer,
 });
 export default reducer;

@@ -26,3 +26,37 @@
     background-color: rgb(59 130 246 / 1);
   }
 }
+.upload-bulk-filter {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+  @media (max-width: 430px) {
+    & .MuiStack-root {
+      width: 100%;
+      display: grid;
+      row-gap: 10px;
+      flex-wrap: wrap !important;
+      & .MuiFormControl-root {
+        margin-left: 0px !important;
+        width: 100%;
+      }
+      p {
+        display: none;
+      }
+    }
+    button {
+      width: 100% !important;
+    }
+  }
+  button {
+    height: 54px !important;
+  }
+}
+.upload-container {
+  @media (max-width: 768px) {
+    display: grid !important;
+  }
+}
