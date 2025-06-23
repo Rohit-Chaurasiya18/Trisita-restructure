@@ -725,22 +725,35 @@ const Subscription = () => {
         accountGroups[group].acv += parseFloat(item.acv_price) || 0;
       });
 
-      // Convert to arrays for the chart
-      const labels = Object.keys(accountGroups);
-      let series;
-
+      // Convert to array for sorting
+      const groupsArray = Object.entries(accountGroups).map(
+        ([group, values]) => ({
+          group,
+          ...values,
+        })
+      );
+      // Determine the key to sort by based on the selected view
+      let sortKey;
       switch (accountGroupType) {
         case "dtp_price":
-          series = labels.map((group) => accountGroups[group].dtp);
+          sortKey = "dtp";
           break;
         case "acv_price":
-          series = labels.map((group) => accountGroups[group].acv);
+          sortKey = "acv";
           break;
         case "subscription":
         default:
-          series = labels.map((group) => accountGroups[group].count);
+          sortKey = "count";
       }
 
+      // Sort in descending order by the selected key
+      groupsArray.sort((a, b) => b[sortKey] - a[sortKey]);
+
+      // Extract labels and series from the sorted array
+      const labels = groupsArray.map((item) => item.group);
+      const series = groupsArray.map((item) =>
+        parseFloat(item[sortKey].toFixed(2))
+      );
       return {
         options: {
           chart: {
@@ -887,17 +900,33 @@ const Subscription = () => {
       // Convert to arrays for the chart
       const labels = Object.keys(retentionRiskGroups);
       let series;
+
       switch (retentionRiskType) {
         case "dtp_price":
-          series = labels.map((group) => retentionRiskGroups[group].dtp);
+          series = labels.map((group) =>
+            parseFloat(retentionRiskGroups[group].dtp.toFixed(2))
+          );
           break;
         case "acv_price":
-          series = labels.map((group) => retentionRiskGroups[group].acv);
+          series = labels.map((group) =>
+            parseFloat(retentionRiskGroups[group].acv.toFixed(2))
+          );
           break;
         case "subscription":
         default:
           series = labels.map((group) => retentionRiskGroups[group].count);
       }
+
+      // Optional: sort labels and series based on value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
       return {
         options: {
           chart: {
@@ -905,14 +934,14 @@ const Subscription = () => {
             height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
-                const clickedLegend = labels[seriesIndex];
+                const clickedLegend = sortedLabels[seriesIndex];
                 if (clickedLegend) {
                   handleRiskRetentionLegendClick(clickedLegend);
                 }
               },
             },
           },
-          labels: labels,
+          labels: sortedLabels,
           legend: {
             position: "bottom",
             onItemClick: {
@@ -948,7 +977,7 @@ const Subscription = () => {
             },
           ],
         },
-        series: series,
+        series: sortedSeries,
       };
     } else {
       return {
@@ -1040,15 +1069,30 @@ const Subscription = () => {
 
       switch (accountType_Type) {
         case "dtp_price":
-          series = labels.map((group) => accountTypeGroups[group].dtp);
+          series = labels.map((group) =>
+            parseFloat(accountTypeGroups[group].dtp.toFixed(2))
+          );
           break;
         case "acv_price":
-          series = labels.map((group) => accountTypeGroups[group].acv);
+          series = labels.map((group) =>
+            parseFloat(accountTypeGroups[group].acv.toFixed(2))
+          );
           break;
         case "subscription":
         default:
           series = labels.map((group) => accountTypeGroups[group].count);
       }
+
+      // Optional: Sort data descending by value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
 
       return {
         options: {
@@ -1057,14 +1101,14 @@ const Subscription = () => {
             height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
-                const clickedLegend = labels[seriesIndex];
+                const clickedLegend = sortedLabels[seriesIndex];
                 if (clickedLegend) {
                   handleAccountTypeLegendClick(clickedLegend);
                 }
               },
             },
           },
-          labels: labels,
+          labels: sortedLabels,
           legend: {
             position: "bottom",
             onItemClick: {
@@ -1100,7 +1144,7 @@ const Subscription = () => {
             },
           ],
         },
-        series: series,
+        series: sortedSeries,
       };
     } else {
       return {
@@ -1371,21 +1415,33 @@ const Subscription = () => {
       });
 
       // Convert to arrays for the chart
-      const labels = Object.values(bdPersonGroups).map((group) => group.name);
-      let series;
+      const groupValues = Object.values(bdPersonGroups);
 
+      let series;
       switch (bdPersonType) {
         case "dtp_price":
-          series = Object.values(bdPersonGroups).map((group) => group.dtp);
+          series = groupValues.map((group) => parseFloat(group.dtp.toFixed(2)));
           break;
         case "acv_price":
-          series = Object.values(bdPersonGroups).map((group) => group.acv);
+          series = groupValues.map((group) => parseFloat(group.acv.toFixed(2)));
           break;
         case "subscription":
         default:
-          series = Object.values(bdPersonGroups).map((group) => group.count);
+          series = groupValues.map((group) => group.count);
       }
 
+      const labels = groupValues.map((group) => group.name);
+
+      // Sort labels and series by value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
       return {
         options: {
           chart: {
@@ -1393,7 +1449,7 @@ const Subscription = () => {
             height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
-                const clickedLegend = labels[seriesIndex];
+                const clickedLegend = sortedLabels[seriesIndex];
                 if (clickedLegend) {
                   // Handle legend click if needed
                   handleBDPersonLegendClick(clickedLegend);
@@ -1401,7 +1457,7 @@ const Subscription = () => {
               },
             },
           },
-          labels: labels,
+          labels: sortedLabels,
           legend: {
             position: "bottom",
             onItemClick: {
@@ -1437,7 +1493,7 @@ const Subscription = () => {
             },
           ],
         },
-        series: series,
+        series: sortedSeries,
       };
     } else {
       return {
