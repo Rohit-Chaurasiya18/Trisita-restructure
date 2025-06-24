@@ -18,6 +18,9 @@ import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { setPageLoader } from "@/modules/login/slice/loginSlice";
 import StoreMap from "../components/StoreMap";
+// import MapView from "../components/MapView";
+import { lazy, Suspense } from "react";
+const MapView = lazy(() => import("../components/MapView"));
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -181,7 +184,10 @@ const Dashboard = () => {
           <div className="chart" key="geography">
             <span className="geography-span">Geography Based Traffic</span>
             {/* <GeographyChart isDashboard={true} /> */}
-            <StoreMap />
+            {/* <StoreMap /> */}
+            <Suspense fallback={<div>Loading map...</div>}>
+              <MapView />
+            </Suspense>
           </div>
         </div>
         {dashboardData?.order_loading_ho?.length > 0 && (

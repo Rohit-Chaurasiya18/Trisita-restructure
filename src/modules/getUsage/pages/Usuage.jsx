@@ -56,34 +56,26 @@ const Usuage = () => {
   }, []);
 
   // Table columns
-  const columns = useMemo(
-    () => [
-      { field: "end_Customer_CSN", headerName: "CSN", flex: 1 },
-      { field: "account_name", headerName: "Account", flex: 1 },
-      { field: "usage_Type", headerName: "Usage Type", flex: 1 },
-      {
-        field: "usage_date",
-        headerName: "Usage Date",
-        flex: 1,
-        renderCell: (params) => formatDate(params.row["usage_date"]),
-      },
-      { field: "product_line_code", headerName: "Product Line Code", flex: 1 },
-      { field: "feature_id", headerName: "Feature Id", flex: 1 },
-      { field: "feature_name", headerName: "Feature Name", flex: 1 },
-      { field: "team_name", headerName: "Team Name", flex: 1 },
-      {
-        field: "primary_admin_email",
-        headerName: "Primary Admin Email",
-        flex: 1,
-      },
-    ],
-    [formatDate]
-  );
-
-  const getRowId = useMemo(() => {
-    let id = 1;
-    return () => id++;
-  }, []);
+  const columns = [
+    { field: "end_Customer_CSN", headerName: "CSN", width: 200 },
+    { field: "account_name", headerName: "Account", width: 200 },
+    { field: "usage_Type", headerName: "Usage Type", width: 200 },
+    {
+      field: "usage_date",
+      headerName: "Usage Date",
+      width: 200,
+    },
+    { field: "product_line_code", headerName: "Product Line Code", width: 200 },
+    { field: "feature_id", headerName: "Feature Id", width: 200 },
+    { field: "feature_name", headerName: "Feature Name", width: 200 },
+    { field: "team_name", headerName: "Team Name", width: 200 },
+    {
+      field: "primary_admin_email",
+      headerName: "Primary Admin Email",
+      width: 200,
+    },
+  ];
+  const getRowId = (row) => row?.id;
 
   // Effect: Set filtered data on data load
   useEffect(() => {
@@ -114,7 +106,6 @@ const Usuage = () => {
       ...new Set(login_counts?.map((item) => item["Product Line Code"])),
     ];
     const productLineData = {};
-
     uniqueCodes.forEach((code) => {
       const entries = login_counts?.filter(
         (item) => item["Product Line Code"] === code
@@ -125,15 +116,42 @@ const Usuage = () => {
       };
     });
 
-    const mergedData = (productLineData[uniqueCodes[0]]?.categories || []).map(
-      (date, i) => {
-        const entry = { Date: date };
-        uniqueCodes.forEach((code) => {
-          entry[code] = productLineData[code]?.data[i] || 0;
+    // const mergedData = (productLineData[uniqueCodes[0]]?.categories || []).map(
+    //   (date, i) => {
+    //     const entry = { Date: date };
+    //     uniqueCodes.forEach((code) => {
+    //       entry[code] = productLineData[code]?.data[i] || 0;
+    //     });
+    //     return entry;
+    //   }
+    // );
+    const mergedMap = new Map();
+
+    // Step 1: Loop through each product line
+    Object.entries(productLineData).forEach(
+      ([productLine, { categories, data }]) => {
+        categories.forEach((date, index) => {
+          if (!mergedMap.has(date)) {
+            mergedMap.set(date, { Date: date });
+          }
+          mergedMap.get(date)[productLine] = data[index];
         });
-        return entry;
       }
     );
+
+    // Step 2: Get all product lines (to fill 0s later)
+    const allProductLines = Object.keys(productLineData);
+
+    // Step 3: Fill missing product line values with 0
+    const mergedData = Array.from(mergedMap.values()).map((entry) => {
+      allProductLines.forEach((line) => {
+        if (!(line in entry)) {
+          entry[line] = 0;
+        }
+      });
+      return entry;
+    });
+    console.log({ uniqueCodes, productLineData });
 
     return {
       chartOptions: {

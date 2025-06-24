@@ -146,13 +146,7 @@ const dashboardSlice = createSlice({
       state.citiesMapLoading = true;
     });
     builder.addCase(GetCitiesMap.fulfilled, (state, action) => {
-      state.citiesMapChart = action?.payload?.data?.topCities?.map((item) => ({
-        lat: item?.latitude,
-        lng: item?.longitude,
-        name: item?.city,
-        active: item?.counts?.Active,
-        inactive: item?.counts?.Expired,
-      }));
+      state.citiesMapChart = action?.payload?.data?.topCities;
       state.citiesMapLoading = false;
     });
     builder.addCase(GetCitiesMap.rejected, (state) => {
