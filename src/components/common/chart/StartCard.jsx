@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const StatCard = ({
   icon: Icon,
@@ -7,9 +8,22 @@ const StatCard = ({
   percentage,
   progressColor = "green",
   isLink = false,
+  path = "",
+  handleNavigate,
 }) => {
+  const navigate = useNavigate();
   return (
-    <div className={`stat-card ${isLink && "cursor-pointer"}`}>
+    <div
+      className={`stat-card ${isLink && "cursor-pointer"}`}
+      onClick={() => {
+        if (path) {
+          navigate(path);
+        }
+        if (handleNavigate) {
+          handleNavigate();
+        }
+      }}
+    >
       <div className="stat-card-left">
         <div className="stat-text">
           <div className="icon-wrapper">

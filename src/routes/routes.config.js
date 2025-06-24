@@ -32,6 +32,10 @@ import {
   ManageTeams,
   Upload,
   UploadBulk,
+  PaymentsOverdue,
+  PaymentsOutstanding,
+  InvoicePending,
+  RenewalEmailSent,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -40,7 +44,14 @@ const routesConfig = {
   private: [
     {
       path: routesConstants.DASHBOARD,
-      component: Dashboard,
+      component: Outlet,
+      children: [
+        { index: true, component: Dashboard },
+        { path: "payments_overdue", component: PaymentsOverdue },
+        { path: "payments_outstanding", component: PaymentsOutstanding },
+        { path: "invoice_pending", component: InvoicePending },
+        { path: "renewal_email_sent", component: RenewalEmailSent },
+      ],
     },
     {
       path: routesConstants.INSIGHT_METRICS,

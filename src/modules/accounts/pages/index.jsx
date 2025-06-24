@@ -124,6 +124,7 @@ const Account = () => {
     industryGroupCount,
     accountInformation,
     userDetail,
+    dashboardStatus,
   } = useSelector((state) => ({
     branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
@@ -142,8 +143,18 @@ const Account = () => {
       : state?.account?.industryGroupCount,
     accountInformation: state?.account?.accountInformation,
     userDetail: state?.login?.userDetail,
+    dashboardStatus: state?.dashboard?.dashboardStatus,
   }));
   const [selectedId, setSelectedId] = useState([]);
+
+  useEffect(() => {
+    if (dashboardStatus) {
+      setFilters((prev) => ({
+        ...prev,
+        status: dashboardStatus,
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(getAllBranch());

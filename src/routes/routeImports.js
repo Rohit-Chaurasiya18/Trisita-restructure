@@ -1,5 +1,17 @@
 import { lazy } from "react";
-export const Dashboard = lazy(() => import("@/modules/dashboard/pages"));
+export const Dashboard = lazy(() => import("@/modules/dashboard/pages/index"));
+export const PaymentsOverdue = lazy(() =>
+  import("@/modules/dashboard/pages/PaymentOverdue")
+);
+export const PaymentsOutstanding = lazy(() =>
+  import("@/modules/dashboard/pages/PaymentOutstanding")
+);
+export const InvoicePending = lazy(() =>
+  import("@/modules/dashboard/pages/InvoicePending")
+);
+export const RenewalEmailSent = lazy(() =>
+  import("@/modules/dashboard/pages/RenewalEmailSent")
+);
 export const Insight_metrics = lazy(() =>
   import("@/modules/insightMetrics/pages/index")
 );

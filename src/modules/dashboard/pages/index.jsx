@@ -16,6 +16,7 @@ import {
   GetDashboardChart,
   GetDashboardData,
   GetSeatDateChart,
+  setDashboardLoading,
 } from "../slice";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
@@ -24,10 +25,13 @@ import { setPageLoader } from "@/modules/login/slice/loginSlice";
 import StoreMap from "../components/StoreMap";
 // import MapView from "../components/MapView";
 import { lazy, Suspense } from "react";
+import routesConstants from "@/routes/routesConstants";
+import { useNavigate } from "react-router-dom";
 const MapView = lazy(() => import("../components/MapView"));
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     filter,
     dashboardDataLoading,
@@ -99,6 +103,9 @@ const Dashboard = () => {
               title="Renewal Email Sent"
               percentage={14}
               isLink
+              path={
+                routesConstants?.DASHBOARD + routesConstants?.RENEWAL_EMAIL_SENT
+              }
             />
             <StatCard
               icon={ReceiptIcon}
@@ -116,6 +123,10 @@ const Dashboard = () => {
                 100
               ).toFixed(2)}`}
               isLink
+              handleNavigate={() => {
+                dispatch(setDashboardLoading("Active"));
+                navigate(routesConstants?.ACCOUNT);
+              }}
             />
             <StatCard
               icon={PersonOffIcon}
@@ -127,6 +138,10 @@ const Dashboard = () => {
                 100
               ).toFixed(2)}`}
               isLink
+              handleNavigate={() => {
+                dispatch(setDashboardLoading("Expired"));
+                navigate(routesConstants?.ACCOUNT);
+              }}
             />
           </div>
           <div className="dashboard-startCard">
@@ -136,12 +151,20 @@ const Dashboard = () => {
               title="Payment Overdue"
               percentage={14}
               isLink
+              path={
+                routesConstants?.DASHBOARD + routesConstants?.PAYMENTS_OVERDUE
+              }
             />
             <StatCard
               icon={PointOfSaleIcon}
               value={`₹${dashboardData?.payment_outstanding || 0}`}
               title="Payment Outstanding"
               percentage={21}
+              path={
+                routesConstants?.DASHBOARD +
+                routesConstants?.PAYMENTS_OUTSTANDING
+              }
+              isLink
             />
             <StatCard
               icon={CurrencyRupeeIcon}
@@ -152,7 +175,6 @@ const Dashboard = () => {
                   dashboardData?.total_accounts) *
                 100
               ).toFixed(2)}`}
-              isLink
             />
             <StatCard
               icon={PendingActionsIcon}
@@ -164,6 +186,9 @@ const Dashboard = () => {
                 100
               ).toFixed(2)}`}
               isLink
+              path={
+                routesConstants?.DASHBOARD + routesConstants?.INVOICE_PENDING
+              }
             />
           </div>
         </>

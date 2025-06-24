@@ -5,6 +5,10 @@ import {
   DASHBOARD_CHART,
   DASHBOARD_DATA,
   DASHBOARD_SEAT_DATE_CHART,
+  GET_INVOICE_PENDING_LIST,
+  GET_PAYMENTS_OUTSTANDING_LIST,
+  GET_PAYMENTS_OVERDUE_LIST,
+  GET_RENEWAL_EMAIL_LIST,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -77,6 +81,58 @@ export const GetCitiesMap = createAsyncThunk(
   }
 );
 
+export const GetRenewalEmailSentList = createAsyncThunk(
+  `dashboard/GetRenewalEmailList`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_RENEWAL_EMAIL_LIST);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const GetPaymentOverdueList = createAsyncThunk(
+  `dashboard/GetPaymentOverdueList`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_PAYMENTS_OVERDUE_LIST);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const GetPaymentOutstandingList = createAsyncThunk(
+  `dashboard/GetPaymentOutstandingList`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_PAYMENTS_OUTSTANDING_LIST);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const GetInvoicePendingList = createAsyncThunk(
+  `dashboard/GetInvoicePendingList`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_INVOICE_PENDING_LIST);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const dashboardState = {
   loading: false,
   dashboardDataLoading: false,
@@ -87,6 +143,15 @@ const dashboardState = {
   seatDateChart: null,
   citiesMapLoading: false,
   citiesMapChart: [],
+  dashboardStatus: "",
+  renewalEmailSentList: [],
+  renewalEmailSentListLoading: false,
+  paymentOverdueList: [],
+  paymentOverdueListLoading: false,
+  paymentOutstandingList: [],
+  paymentOutstandingListLoading: false,
+  invoicePendingList: [],
+  invoicePendingListLoading: false,
 };
 
 const dashboardSlice = createSlice({
@@ -95,6 +160,9 @@ const dashboardSlice = createSlice({
   reducers: {
     setLoading: (state, action) => {
       state.loading = action.payload;
+    },
+    setDashboardLoading: (state, action) => {
+      state.dashboardStatus = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -153,9 +221,65 @@ const dashboardSlice = createSlice({
       state.citiesMapChart = [];
       state.citiesMapLoading = false;
     });
+
+    // Get Renewal Email Sent List
+    builder.addCase(GetRenewalEmailSentList.pending, (state) => {
+      state.renewalEmailSentList = [];
+      state.renewalEmailSentListLoading = true;
+    });
+    builder.addCase(GetRenewalEmailSentList.fulfilled, (state, action) => {
+      state.renewalEmailSentList = action.payload.data?.Response;
+      state.renewalEmailSentListLoading = false;
+    });
+    builder.addCase(GetRenewalEmailSentList.rejected, (state) => {
+      state.renewalEmailSentList = [];
+      state.renewalEmailSentListLoading = false;
+    });
+
+    // Get Payment Overdue List
+    builder.addCase(GetPaymentOverdueList.pending, (state) => {
+      state.paymentOverdueList = [];
+      state.paymentOverdueListLoading = true;
+    });
+    builder.addCase(GetPaymentOverdueList.fulfilled, (state, action) => {
+      state.paymentOverdueList = action.payload.data?.overdue_orders;
+      state.paymentOverdueListLoading = false;
+    });
+    builder.addCase(GetPaymentOverdueList.rejected, (state) => {
+      state.paymentOverdueList = [];
+      state.paymentOverdueListLoading = false;
+    });
+
+    // Get Payment Outstanding List
+    builder.addCase(GetPaymentOutstandingList.pending, (state) => {
+      state.paymentOutstandingList = [];
+      state.paymentOutstandingListLoading = true;
+    });
+    builder.addCase(GetPaymentOutstandingList.fulfilled, (state, action) => {
+      state.paymentOutstandingList = action.payload.data?.order_list;
+      state.paymentOutstandingListLoading = false;
+    });
+    builder.addCase(GetPaymentOutstandingList.rejected, (state) => {
+      state.paymentOutstandingList = [];
+      state.paymentOutstandingListLoading = false;
+    });
+
+    // Get Invoice Pending List
+    builder.addCase(GetInvoicePendingList.pending, (state) => {
+      state.invoicePendingList = [];
+      state.invoicePendingListLoading = true;
+    });
+    builder.addCase(GetInvoicePendingList.fulfilled, (state, action) => {
+      state.invoicePendingList = action.payload.data?.total_invoice;
+      state.invoicePendingListLoading = false;
+    });
+    builder.addCase(GetInvoicePendingList.rejected, (state) => {
+      state.invoicePendingList = [];
+      state.invoicePendingListLoading = false;
+    });
   },
 });
 
-export const { setLoading } = dashboardSlice.actions;
+export const { setLoading, setDashboardLoading } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;
