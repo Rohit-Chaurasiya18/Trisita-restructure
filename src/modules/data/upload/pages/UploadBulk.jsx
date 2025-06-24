@@ -11,7 +11,11 @@ import CustomSelect from "@/components/common/dropdown/CustomSelect";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { downloadCsvFormat, uploadBulkData } from "../slice/UploadSlice";
+import {
+  downloadCSV,
+  downloadHistory,
+  uploadBulkData,
+} from "../slice/UploadSlice";
 import { toast } from "react-toastify";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 
@@ -107,12 +111,37 @@ const UploadBulk = () => {
     },
   });
 
-  const handleDownloadCSV = () => {
+  const handleDownloadHistory = () => {
     dispatch(
-      downloadCsvFormat({
+      downloadHistory({
         isAccountTagging,
         isProductMaster,
         filter: dateFilter,
+      })
+    ).then((res) => {
+      if (res?.payload?.status === 200) {
+        const url = window.URL.createObjectURL(new Blob([res?.payload?.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          isAccountTagging
+            ? "account_tagging_history.csv"
+            : "product_master_history.csv"
+        );
+        document.body.appendChild(link);
+        link.click();
+        toast.success("CSV format downloaded successfully!");
+      } else {
+      }
+    });
+  };
+
+  const handleDownloadCSV = () => {
+    dispatch(
+      downloadCSV({
+        isAccountTagging,
+        isProductMaster,
       })
     ).then((res) => {
       if (res?.payload?.status === 200) {
@@ -158,6 +187,12 @@ const UploadBulk = () => {
               placeholderStart="Start date"
               placeholderEnd="End date"
             />
+            <CommonButton
+              className="order-loading-ho-btn"
+              onClick={handleDownloadHistory}
+            >
+              Download History
+            </CommonButton>
             <CommonButton
               className="order-loading-ho-btn"
               onClick={handleDownloadCSV}

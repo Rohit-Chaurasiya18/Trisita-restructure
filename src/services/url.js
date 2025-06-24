@@ -67,6 +67,9 @@ export const TRIGGER_TEMPLATE_URL = "/v1/api/subs_trigger_new/";
 export const DOWNLOAD_PRODUCT_MASTER_CSV_FORMAT_URL =
   "/v1/product/download_product_master_csv_format/";
 export const DOWNLOAD_ACCOUNT_TAGGING_CSV_FORMAT_URL =
-  "/v1/api/download-recent-updated-accounts/";
+  "/v1/api/download-account-tagging-formate/";
+export const DOWNLOAD_PRODUCT_MASTER_CSV_HISTORY_URL = "/v1/product/download_updated_product_master/"
+export const DOWNLOAD_ACCOUNT_TAGGING_CSV_HISTORY_URL = "/v1/api/download-recent-updated-accounts/"
+
 export const UPLOAD_PRODUCT_MASTER = "/v1/product/upload_product_master/";
 export const UPLOAD_ACCOUNT_TAGGING_BULK = "/v1/api/bulk_upload_csv/";
