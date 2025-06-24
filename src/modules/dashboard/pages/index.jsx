@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import StatCard from "@/components/common/chart/StartCard";
 import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PaymentIcon from "@mui/icons-material/Payment";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import { BarChart, GeographyChart, LineChart } from "../components";
 import { Tooltip } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -97,7 +101,7 @@ const Dashboard = () => {
               isLink
             />
             <StatCard
-              icon={PointOfSaleIcon}
+              icon={ReceiptIcon}
               value={dashboardData?.total_sales_invoice_amount_exc_gst || 0}
               title="Sales Invoice Inc GST"
               percentage={21}
@@ -127,7 +131,7 @@ const Dashboard = () => {
           </div>
           <div className="dashboard-startCard">
             <StatCard
-              icon={EmailIcon}
+              icon={PaymentIcon}
               value={`₹${dashboardData?.payment_overdue || 0}`}
               title="Payment Overdue"
               percentage={14}
@@ -140,7 +144,7 @@ const Dashboard = () => {
               percentage={21}
             />
             <StatCard
-              icon={PersonAddIcon}
+              icon={CurrencyRupeeIcon}
               value={`₹${dashboardData?.payment_received || 0}`}
               title="Payment Received"
               percentage={`${(
@@ -151,7 +155,7 @@ const Dashboard = () => {
               isLink
             />
             <StatCard
-              icon={PersonOffIcon}
+              icon={PendingActionsIcon}
               value={dashboardData?.invoice_pending || 0}
               title="Invoice Pending"
               percentage={`${(
