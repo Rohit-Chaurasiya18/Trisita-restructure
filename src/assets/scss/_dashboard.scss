@@ -301,3 +301,16 @@
     display: grid !important;
   }
 }
+
+.renewal-email-sent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  @media (max-width: 845px) {
+    display: grid;
+    .subscription-filter {
+      display: grid;
+    }
+  }
+}

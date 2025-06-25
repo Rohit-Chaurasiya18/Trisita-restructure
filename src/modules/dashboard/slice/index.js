@@ -85,7 +85,12 @@ export const GetRenewalEmailSentList = createAsyncThunk(
   `dashboard/GetRenewalEmailList`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_RENEWAL_EMAIL_LIST);
+      const response = await axiosReact.get(
+        GET_RENEWAL_EMAIL_LIST +
+          `?start_date=${payload?.startDate || ""}&end_date=${
+            payload?.endDate || ""
+          }`
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -228,7 +233,24 @@ const dashboardSlice = createSlice({
       state.renewalEmailSentListLoading = true;
     });
     builder.addCase(GetRenewalEmailSentList.fulfilled, (state, action) => {
-      state.renewalEmailSentList = action.payload.data?.Response;
+      state.renewalEmailSentList = action.payload.data?.Response?.map(
+        (item) => ({
+          ...item,
+          bd_person: item?.bd_person_first_names
+            ? item?.bd_person_first_names.join(", ")
+            : "",
+          renewal_person: item?.renewal_person_first_names
+            ? item?.renewal_person_first_names.join(", ")
+            : "",
+          contract_manager_email: item?.contract_manager_email
+            ? item?.contract_manager_email.join(", ")
+            : "",
+          contract_manager_phone: item?.contract_manager_phone
+            ? item?.contract_manager_phone.join(", ")
+            : "",
+          cc_emails: item?.cc_emails ? item?.cc_emails.join(", ") : "",
+        })
+      );
       state.renewalEmailSentListLoading = false;
     });
     builder.addCase(GetRenewalEmailSentList.rejected, (state) => {
