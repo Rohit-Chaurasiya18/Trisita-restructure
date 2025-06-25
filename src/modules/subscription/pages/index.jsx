@@ -622,9 +622,17 @@ const Subscription = () => {
         options: {
           chart: {
             events: {
-              click(event, chartContext, config) {
+              // click(event, chartContext, config) {
+              //   debugger;
+              //   const clickedCategory =
+              //     config?.config?.xaxis?.categories[config.dataPointIndex];
+              //   if (clickedCategory) {
+              //     handleNumberOfSeatsClick(clickedCategory);
+              //   }
+              // },
+              xAxisLabelClick: function (event, chartContext, config) {
                 const clickedCategory =
-                  config?.config?.xaxis?.categories[config.dataPointIndex];
+                  config?.config?.xaxis?.categories[config.labelIndex];
                 if (clickedCategory) {
                   handleNumberOfSeatsClick(clickedCategory);
                 }
@@ -1680,7 +1688,7 @@ const Subscription = () => {
               />
             </div>
           </div>
-          <div className="subscription-chart">
+          <div className="subscription-chart number-of-seasts-chart">
             {subscriptionDataLoading ? (
               <SkeletonLoader />
             ) : (
