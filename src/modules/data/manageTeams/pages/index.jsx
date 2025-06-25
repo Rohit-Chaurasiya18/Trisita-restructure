@@ -17,7 +17,6 @@ const ManageTeams = () => {
   }, []);
 
   const columns = [
-    { field: "id", headerName: "Id" },
     { field: "email", headerName: "Email", width: 250 },
     { field: "first_name", headerName: "First Name" },
     { field: "last_name", headerName: "Last Name" },
