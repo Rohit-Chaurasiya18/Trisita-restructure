@@ -252,8 +252,8 @@ const Account = () => {
       width: 160,
       renderCell: (params) => (
         <div>
-          {params?.value && params?.value != " " ? (
-            params?.value.join(", ")
+          {params?.value ? (
+            params?.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
           )}
@@ -345,8 +345,8 @@ const Account = () => {
       width: 160,
       renderCell: (params) => (
         <div>
-          {params?.value && params?.value != " " ? (
-            params?.value.join(", ")
+          {params?.value ? (
+            params?.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
           )}

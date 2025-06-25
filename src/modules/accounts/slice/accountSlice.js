@@ -306,8 +306,14 @@ const accountSlice = createSlice({
         buyingReadinessScore: account?.buyingReadinessScore ?? null,
         branch: account?.branch_name ?? null,
         branch_object: account?.branch ?? null,
-        user_assign: account?.user_assign_first_names ?? null,
-        renewal_person: account?.renewal_person_first_names ?? null,
+        user_assign:
+          account?.user_assign_first_names?.length > 0
+            ? account?.user_assign_first_names?.join(", ")
+            : "",
+        renewal_person:
+          account?.renewal_person_first_names?.length > 0
+            ? account?.renewal_person_first_names?.join(", ")
+            : "",
       }));
 
       const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];

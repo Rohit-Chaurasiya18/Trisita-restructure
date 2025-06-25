@@ -4,9 +4,13 @@ import { Link, useLocation } from "react-router-dom";
 import { Tooltip, Zoom } from "@mui/material";
 import { Trisita_Logo } from "@/constants/images";
 import { GrClose } from "react-icons/gr";
+import routesConstants from "@/routes/routesConstants";
+import { useDispatch } from "react-redux";
+import { setDashboardLoading } from "@/modules/dashboard/slice";
 
 const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
   // Handle screen resize
   useEffect(() => {
     const handleResize = () => {
@@ -28,6 +32,9 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   }, [setIsOpen]);
 
   const handleItemClick = (navigate) => {
+    if (navigate === routesConstants?.ACCOUNT) {
+      dispatch(setDashboardLoading(""));
+    }
     if (window.innerWidth < 769) {
       setIsMobileView(true);
     }
