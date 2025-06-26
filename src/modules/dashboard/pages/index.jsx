@@ -194,7 +194,7 @@ const Dashboard = () => {
               <BarChart data={dashboardChart?.Response} />
             </div>
           )}
-          <div className="chart" key="geography">
+          <div className="chart geography-map" key="geography">
             <span className="geography-span">Geography Based Traffic</span>
             {/* <GeographyChart isDashboard={true} /> */}
             {/* <StoreMap /> */}

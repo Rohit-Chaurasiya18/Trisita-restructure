@@ -1,5 +1,4 @@
 const ViewTemplate = ({ data }) => {
-  console.log({ data });
   return (
     <>
       <div className="d-flex align-items-baseline gap-3">

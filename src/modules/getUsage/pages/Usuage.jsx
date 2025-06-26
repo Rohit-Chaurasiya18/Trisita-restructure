@@ -151,7 +151,6 @@ const Usuage = () => {
       });
       return entry;
     });
-    console.log({ uniqueCodes, productLineData });
 
     return {
       chartOptions: {
