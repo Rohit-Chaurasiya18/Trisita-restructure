@@ -101,7 +101,7 @@ const Dashboard = () => {
               icon={EmailIcon}
               value={dashboardData?.renewal_count || 0}
               title="Renewal Email Sent"
-              percentage={14}
+              percentage={dashboardData?.renewal_percentage || 0}
               isLink
               path={
                 routesConstants?.DASHBOARD + routesConstants?.RENEWAL_EMAIL_SENT
@@ -111,17 +111,13 @@ const Dashboard = () => {
               icon={ReceiptIcon}
               value={dashboardData?.total_sales_invoice_amount_exc_gst || 0}
               title="Sales Invoice Inc GST"
-              percentage={21}
+              percentage={dashboardData?.sales_invoice_percentage || 0}
             />
             <StatCard
               icon={PersonAddIcon}
               value={dashboardData?.active_account || 0}
               title="Active Accounts"
-              percentage={`${(
-                (dashboardData?.active_account /
-                  dashboardData?.total_accounts) *
-                100
-              ).toFixed(2)}`}
+              percentage={dashboardData?.active_account_percentage || 0}
               isLink
               handleNavigate={() => {
                 dispatch(setDashboardLoading("Active"));
@@ -132,11 +128,7 @@ const Dashboard = () => {
               icon={PersonOffIcon}
               value={dashboardData?.inactive_account || 0}
               title="Inactive Accounts"
-              percentage={`${(
-                (dashboardData?.inactive_account /
-                  dashboardData?.total_accounts) *
-                100
-              ).toFixed(2)}`}
+              percentage={dashboardData?.expired_account_percentage || 0}
               isLink
               handleNavigate={() => {
                 dispatch(setDashboardLoading("Expired"));
@@ -149,7 +141,7 @@ const Dashboard = () => {
               icon={PaymentIcon}
               value={`₹${dashboardData?.payment_overdue || 0}`}
               title="Payment Overdue"
-              percentage={14}
+              percentage={dashboardData?.overdue_percentage || 0}
               isLink
               path={
                 routesConstants?.DASHBOARD + routesConstants?.PAYMENTS_OVERDUE
@@ -159,7 +151,7 @@ const Dashboard = () => {
               icon={PointOfSaleIcon}
               value={`₹${dashboardData?.payment_outstanding || 0}`}
               title="Payment Outstanding"
-              percentage={21}
+              percentage={dashboardData?.payment_outstanding_percentage || 0}
               path={
                 routesConstants?.DASHBOARD +
                 routesConstants?.PAYMENTS_OUTSTANDING
@@ -170,21 +162,13 @@ const Dashboard = () => {
               icon={CurrencyRupeeIcon}
               value={`₹${dashboardData?.payment_received || 0}`}
               title="Payment Received"
-              percentage={`${(
-                (dashboardData?.active_account /
-                  dashboardData?.total_accounts) *
-                100
-              ).toFixed(2)}`}
+              percentage={dashboardData?.payment_received_percentage || 0}
             />
             <StatCard
               icon={PendingActionsIcon}
               value={dashboardData?.invoice_pending || 0}
               title="Invoice Pending"
-              percentage={`${(
-                (dashboardData?.invoice_pending /
-                  dashboardData?.order_loading_count) *
-                100
-              ).toFixed(2)}`}
+              percentage={dashboardData?.invoice_pending_percentage || 0}
               isLink
               path={
                 routesConstants?.DASHBOARD + routesConstants?.INVOICE_PENDING
