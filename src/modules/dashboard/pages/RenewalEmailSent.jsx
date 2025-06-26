@@ -8,6 +8,8 @@ import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicke
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import useDebounce from "@/hooks/useDebounce";
+import CommonModal from "@/components/common/modal/CommonModal";
+import ViewTemplate from "../components/ViewTemplate";
 
 const RenewalEmailSent = () => {
   const dispatch = useDispatch();
@@ -24,18 +26,23 @@ const RenewalEmailSent = () => {
     userDetail,
     branch_list,
     branchListLoading,
+    filter,
   } = useSelector((state) => ({
     renewalEmailSentList: state?.dashboard?.renewalEmailSentList,
     renewalEmailSentListLoading: state?.dashboard?.renewalEmailSentListLoading,
     userDetail: state?.login?.userDetail,
     branch_list: state?.insightMetrics?.branchList,
     branchListLoading: state?.insightMetrics?.branchListLoading,
+    filter: state?.layout?.filter,
   }));
   const [selectedId, setSelectedId] = useState([]);
-  const [filteredData, setFilteredData] = useState({});
+  const [filteredData, setFilteredData] = useState([]);
+  const [modal, setModal] = useState({
+    isOpen: false,
+    data: null,
+  });
 
   useEffect(() => {
-    // dispatch(GetRenewalEmailSentList());
     dispatch(getAllBranch());
   }, []);
   const debounce = useDebounce(filters?.endDate, 500);
@@ -43,7 +50,9 @@ const RenewalEmailSent = () => {
   useEffect(() => {
     const { startDate } = filters;
 
-    let payload = {};
+    let payload = {
+      id: filter?.csn === "All CSN" ? "" : filter?.csn,
+    };
     if (debounce) {
       payload.startDate = startDate;
       payload.endDate = debounce;
@@ -52,7 +61,7 @@ const RenewalEmailSent = () => {
       payload.endDate = null;
     }
     dispatch(GetRenewalEmailSentList(payload));
-  }, [debounce]);
+  }, [debounce, filter?.csn]);
 
   useEffect(() => {
     setFilteredData(renewalEmailSentList);
@@ -199,8 +208,10 @@ const RenewalEmailSent = () => {
       renderCell: (params, index) => (
         <span
           onClick={() => {
-            console.log(params);
-            debugger;
+            setModal({
+              isOpen: true,
+              data: params?.row,
+            });
           }}
           className="assign-button text-black px-3 py-1 rounded border-0"
         >
@@ -211,7 +222,6 @@ const RenewalEmailSent = () => {
   ];
 
   const handleSelectionChange = (selectedRows) => {
-    debugger;
     const idArray = [...selectedRows?.ids];
     if (idArray?.length > 0) {
       setSelectedId(idArray);
@@ -304,6 +314,20 @@ const RenewalEmailSent = () => {
               exportFileName={`renewal_email_sent_${userDetail?.first_name}_${userDetail?.last_name}`}
             />
           </div>
+          <CommonModal
+            isOpen={modal?.isOpen}
+            handleClose={() => {
+              setModal((prev) => ({
+                ...prev,
+                isOpen: false,
+                data: null,
+              }));
+            }}
+            scrollable
+            title={"View Template"}
+          >
+            <ViewTemplate data={modal?.data} />
+          </CommonModal>
         </>
       )}
     </>

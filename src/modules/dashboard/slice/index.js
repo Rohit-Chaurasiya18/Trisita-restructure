@@ -85,8 +85,12 @@ export const GetRenewalEmailSentList = createAsyncThunk(
   `dashboard/GetRenewalEmailList`,
   async (payload, thunkAPI) => {
     try {
+      let url = GET_RENEWAL_EMAIL_LIST;
+      if (payload?.id) {
+        url = url + `${payload?.id}/`;
+      }
       const response = await axiosReact.get(
-        GET_RENEWAL_EMAIL_LIST +
+        url +
           `?start_date=${payload?.startDate || ""}&end_date=${
             payload?.endDate || ""
           }`
