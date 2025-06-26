@@ -257,9 +257,7 @@ const PaymentOverdue = () => {
       renderCell: (params) => (
         <div className="text-center">
           <span
-            onClick={() =>
-              ShowTablesDetailsList(params?.row?.id, "Product Details")
-            }
+            onClick={() => ShowTablesDetailsList(params?.row?.id, 1)}
             className="assign-button text-black px-3 py-1 rounded border-0"
           >
             Show
@@ -417,9 +415,7 @@ const PaymentOverdue = () => {
       renderCell: (params) => (
         <div className="text-center">
           <span
-            onClick={() =>
-              ShowTablesDetailsList(params?.row?.id, "Purchase Invoice")
-            }
+            onClick={() => ShowTablesDetailsList(params?.row?.id, 2)}
             className="assign-button text-black px-3 py-1 rounded border-0"
           >
             Show
@@ -435,9 +431,7 @@ const PaymentOverdue = () => {
       renderCell: (params) => (
         <div className="text-center">
           <span
-            onClick={() =>
-              ShowTablesDetailsList(params?.row?.id, "Payment Details")
-            }
+            onClick={() => ShowTablesDetailsList(params?.row?.id, 3)}
             className="assign-button text-black px-3 py-1 rounded border-0"
           >
             Show
@@ -575,7 +569,13 @@ const PaymentOverdue = () => {
           setSelected((prev) => ({ ...prev, isOpen: false, type: null }));
         }}
         size={"xl"}
-        title={selected?.type}
+        title={
+          selected?.type === 1
+            ? "Product Details"
+            : selected?.type === 2
+            ? "Purchase Details"
+            : "Payments Details"
+        }
       >
         <OrderLoadingHoDetails selected={selected} />
       </CommonModal>

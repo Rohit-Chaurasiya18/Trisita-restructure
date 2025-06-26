@@ -115,20 +115,20 @@ const OrderLoadingHoDetails = ({ selected }) => {
     <>
       <CommonTable
         rows={
-          selected?.type === "Product Details"
+          selected?.type === 1
             ? orderLoadingHoDetail?.product_details
-            : selected?.type === "Purchase Invoice"
+            : selected?.type === 2
             ? orderLoadingHoDetail?.purchase_invoice
-            : selected?.type === "Payment Details"
+            : selected?.type === 3
             ? orderLoadingHoDetail?.payment
             : []
         }
         columns={
-          selected?.type === "Product Details"
+          selected?.type === 1
             ? product_master_Columns
-            : selected?.type === "Purchase Invoice"
+            : selected?.type === 2
             ? purchase_columns
-            : selected?.type === "Payment Details"
+            : selected?.type === 3
             ? payment_columns
             : []
         }
