@@ -74,9 +74,12 @@ export const DOWNLOAD_ACCOUNT_TAGGING_CSV_HISTORY_URL =
   "/v1/api/download-recent-updated-accounts/";
 export const UPLOAD_PRODUCT_MASTER = "/v1/product/upload_product_master/";
 export const UPLOAD_ACCOUNT_TAGGING_BULK = "/v1/api/bulk_upload_csv/";
-export const GET_RENEWAL_EMAIL_LIST = "/v1/api/renewal_email_list/";
+export const GET_RENEWAL_EMAIL_LIST = "/v1/api/get_renew_email_logs/";
 export const GET_PAYMENTS_OVERDUE_LIST =
   "/v1/product/get_payment_overdue_list/";
 export const GET_PAYMENTS_OUTSTANDING_LIST =
   "/v1/product/get_payment_outstanding_list/";
 export const GET_INVOICE_PENDING_LIST = "/v1/product/get_invoice_pending_list/";
+export const GET_ORDER_LOADING_HO = "/v1/product/order_loading_po/";
+export const UPDATE_LOCK_UNLOCK_OREDER_LOADING =
+  "/v1/product/order_loading_lock_unlock/";

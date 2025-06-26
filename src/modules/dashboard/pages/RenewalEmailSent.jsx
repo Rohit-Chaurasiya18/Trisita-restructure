@@ -45,6 +45,7 @@ const RenewalEmailSent = () => {
   useEffect(() => {
     dispatch(getAllBranch());
   }, []);
+  
   const debounce = useDebounce(filters?.endDate, 500);
 
   useEffect(() => {
@@ -74,7 +75,7 @@ const RenewalEmailSent = () => {
 
   const columns = [
     {
-      field: "subscription",
+      field: "subscription_ref",
       headerName: "Subscription",
       width: 200,
     },
@@ -164,21 +165,11 @@ const RenewalEmailSent = () => {
       ),
     },
     {
-      field: "trigger_name_days",
+      field: "trigger_days",
       headerName: "Trigger Name Days",
       width: 200,
       renderCell: (params) => {
-        const template = Array.isArray(params?.value) ? params.value : [];
-        return (
-          <div className="">
-            {template?.length > 0 &&
-              template?.map((item, index) => (
-                <span className="me-2">
-                  {item?.days} {index !== template.length - 1 && ","}
-                </span>
-              ))}
-          </div>
-        );
+        return <>{params?.value}</>;
       },
     },
     {
@@ -233,7 +224,7 @@ const RenewalEmailSent = () => {
   const exportedData = useMemo(
     () =>
       renewalEmailSentList?.filter((item) =>
-        selectedId.includes(item?.subscription_id)
+        selectedId.includes(item?.index_id)
       ),
     [selectedId]
   );
@@ -307,7 +298,7 @@ const RenewalEmailSent = () => {
             <CommonTable
               rows={filteredData}
               columns={columns}
-              getRowId={(row) => row?.subscription_id}
+              getRowId={(row) => row?.index_id}
               checkboxSelection
               handleRowSelection={handleSelectionChange}
               toolbar

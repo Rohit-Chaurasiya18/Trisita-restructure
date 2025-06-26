@@ -6,9 +6,11 @@ import {
   DASHBOARD_DATA,
   DASHBOARD_SEAT_DATE_CHART,
   GET_INVOICE_PENDING_LIST,
+  GET_ORDER_LOADING_HO,
   GET_PAYMENTS_OUTSTANDING_LIST,
   GET_PAYMENTS_OVERDUE_LIST,
   GET_RENEWAL_EMAIL_LIST,
+  UPDATE_LOCK_UNLOCK_OREDER_LOADING,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -142,6 +144,33 @@ export const GetInvoicePendingList = createAsyncThunk(
   }
 );
 
+export const getOrderLoadingPo = createAsyncThunk(
+  `dashboard/getOrderLoadingPo`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_ORDER_LOADING_HO + payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const updateLockUnlockStatus = createAsyncThunk(
+  `dashboard/updateLockUnlockStatus`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        UPDATE_LOCK_UNLOCK_OREDER_LOADING + payload?.id + "/" + payload?.status
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 const dashboardState = {
   loading: false,
   dashboardDataLoading: false,
@@ -161,6 +190,8 @@ const dashboardState = {
   paymentOutstandingListLoading: false,
   invoicePendingList: [],
   invoicePendingListLoading: false,
+  orderLoadingHoDetail: null,
+  orderLoadingHoDetailLoading: false,
 };
 
 const dashboardSlice = createSlice({
@@ -237,8 +268,8 @@ const dashboardSlice = createSlice({
       state.renewalEmailSentListLoading = true;
     });
     builder.addCase(GetRenewalEmailSentList.fulfilled, (state, action) => {
-      state.renewalEmailSentList = action.payload.data?.Response?.map(
-        (item) => ({
+      state.renewalEmailSentList = action.payload.data?.results?.map(
+        (item, index) => ({
           ...item,
           bd_person: item?.bd_person_first_names
             ? item?.bd_person_first_names.join(", ")
@@ -253,6 +284,7 @@ const dashboardSlice = createSlice({
             ? item?.contract_manager_phone.join(", ")
             : "",
           cc_emails: item?.cc_emails ? item?.cc_emails.join(", ") : "",
+          index_id: item?.id,
         })
       );
       state.renewalEmailSentListLoading = false;
@@ -302,6 +334,20 @@ const dashboardSlice = createSlice({
     builder.addCase(GetInvoicePendingList.rejected, (state) => {
       state.invoicePendingList = [];
       state.invoicePendingListLoading = false;
+    });
+
+    // Get Order Loading Ho Detail
+    builder.addCase(getOrderLoadingPo.pending, (state) => {
+      state.orderLoadingHoDetail = null;
+      state.orderLoadingHoDetailLoading = true;
+    });
+    builder.addCase(getOrderLoadingPo.fulfilled, (state, action) => {
+      state.orderLoadingHoDetail = action?.payload?.data?.order_loading_po;
+      state.orderLoadingHoDetailLoading = false;
+    });
+    builder.addCase(getOrderLoadingPo.rejected, (state) => {
+      state.orderLoadingHoDetail = null;
+      state.orderLoadingHoDetailLoading = false;
     });
   },
 });
