@@ -394,6 +394,9 @@
 }
 .action-button {
   cursor: pointer;
+  &:focus-visible {
+    outline: none;
+  }
 }
 .MuiDateRangeCalendar-root > div:first-child {
   /* your styles here */
@@ -642,4 +645,8 @@
   .no-notifications {
     font-size: 14px;
   }
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed !important;
 }

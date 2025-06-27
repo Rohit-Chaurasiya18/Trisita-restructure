@@ -15,23 +15,20 @@ import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
 import { toast } from "react-toastify";
+import SetOrderAction from "../components/SetOrderAction";
 
 const PaymentOverdue = () => {
   const dispatch = useDispatch();
   const {
     paymentOverdueList,
     paymentOverdueListLoading,
-    orderLoadingHoDetail,
-    orderLoadingHoDetailLoading,
     branch_list,
     branchListLoading,
   } = useSelector((state) => ({
     paymentOverdueList: state?.dashboard?.paymentOverdueList,
+    paymentOverdueListLoading: state?.dashboard?.paymentOverdueListLoading,
     branch_list: state?.insightMetrics?.branchList,
     branchListLoading: state?.insightMetrics?.branchListLoading,
-    paymentOverdueListLoading: state?.dashboard?.paymentOverdueListLoading,
-    orderLoadingHoDetail: state?.dashboard?.orderLoadingHoDetail,
-    orderLoadingHoDetailLoading: state?.dashboard?.orderLoadingHoDetailLoading,
   }));
 
   const [selected, setSelected] = useState({
@@ -82,7 +79,7 @@ const PaymentOverdue = () => {
         <Tooltip title={params.value || ""}>
           <button
             className={`text-red-600 ${
-              params.row.locked ? "cursor-not-allowed" : ""
+              params?.row?.locked ? "cursor-not-allowed" : ""
             } border-0`}
             // onClick={
             //   !params.row.locked
@@ -473,20 +470,18 @@ const PaymentOverdue = () => {
       headerName: "Action",
       width: 150,
       renderCell: (params, index) => (
-        // <div className="flex items-center w-full justify-center">
-        //   <button
-        //     // onClick={() => handleActionModel(params?.row.id)}
-        //     className={`action-button bg-[#8dbe86] text-black px-3 py-1 rounded ${
-        //       params?.row.locked && "cursor-not-allowed"
-        //     }`}
-        //   >
-        //     Action
-        //   </button>
-        // </div>
         <div className="text-center">
           <span
-            // onClick={() => handleActionModel(params?.row.id)}
-            className="assign-button text-black px-3 py-1 rounded border-0"
+            onClick={() => {
+              if (params?.row.locked) return;
+              setSelected({
+                isOpen: true,
+                type: 4,
+              });
+            }}
+            className={`assign-button text-black px-3 py-1 rounded border-0 ${
+              params?.row.locked && "cursor-not-allowed"
+            }`}
           >
             Action
           </span>
@@ -568,16 +563,24 @@ const PaymentOverdue = () => {
         handleClose={() => {
           setSelected((prev) => ({ ...prev, isOpen: false, type: null }));
         }}
-        size={"xl"}
+        size={selected?.type === 4 ? "l" : "xl"}
         title={
           selected?.type === 1
             ? "Product Details"
             : selected?.type === 2
             ? "Purchase Details"
-            : "Payments Details"
+            : selected?.type === 3
+            ? "Payments Details"
+            : selected?.type === 4
+            ? "Set Actions"
+            : ""
         }
       >
-        <OrderLoadingHoDetails selected={selected} />
+        {selected?.type === 4 ? (
+          <SetOrderAction />
+        ) : (
+          <OrderLoadingHoDetails selected={selected} />
+        )}
       </CommonModal>
     </>
   );
