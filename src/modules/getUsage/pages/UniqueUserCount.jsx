@@ -203,7 +203,7 @@ const UniqueUserCount = () => {
             <CommonTable
               rows={uniqueUsageUserCount}
               columns={columns}
-              getRowId={(_, idx) => idx + 1}
+              getRowId={(row) => row?.id}
               toolbar
               exportFileName="unique_user_usages"
             />

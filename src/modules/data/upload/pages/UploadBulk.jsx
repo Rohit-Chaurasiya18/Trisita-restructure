@@ -228,7 +228,7 @@ const UploadBulk = () => {
                   }
                 />
                 {formik.errors?.csvFile && formik.touched?.csvFile && (
-                  <div class="invalid-feedback ">{formik.errors?.csvFile}</div>
+                  <div className="invalid-feedback ">{formik.errors?.csvFile}</div>
                 )}
               </div>
             )}

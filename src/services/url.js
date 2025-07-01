@@ -83,3 +83,6 @@ export const GET_INVOICE_PENDING_LIST = "/v1/product/get_invoice_pending_list/";
 export const GET_ORDER_LOADING_HO = "/v1/product/order_loading_po/";
 export const UPDATE_LOCK_UNLOCK_OREDER_LOADING =
   "/v1/product/order_loading_lock_unlock/";
+export const GET_BD_PERSON_BY_BRANCH = "/v1/api/get_bd_person_by_branch/";
+export const GET_ACCOUNT_BY_BD_PERSON = "/v1/api/get_accounts_by_bd_person/";
+export const ACTIVE_PRODUCT_MASTER = "/v1/product/active_product_master/";

@@ -5,6 +5,9 @@ import CommonButton from "../buttons/CommonButton";
 const CommonModal = ({
   isOpen,
   handleClose,
+  isAdd = false,
+  addBtnText = "Add",
+  handleAdd,
   className,
   title,
   modalProps = {},
@@ -42,6 +45,17 @@ const CommonModal = ({
         </ModalHeader>
         <ModalBody className={modalClassname}>{children}</ModalBody>
         <ModalFooter>
+          {isAdd && (
+            <CommonButton
+              style={{
+                width: "fit-content",
+                background: "#1595dd",
+              }}
+              onClick={handleAdd}
+            >
+              {addBtnText}
+            </CommonButton>
+          )}
           <CommonButton
             style={{
               width: "fit-content",
