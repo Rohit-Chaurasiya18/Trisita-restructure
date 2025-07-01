@@ -60,3 +60,15 @@
     display: grid !important;
   }
 }
+
+.common-btn-orderLoadingHO {
+  width: fit-content;
+  height: 45px;
+  padding: 10px;
+  background-color: rgb(141, 190, 134);
+  color: rgb(0, 0, 0);
+  &:hover {
+    background-color: rgb(141, 190, 134);
+    color: rgb(0, 0, 0);
+  }
+}

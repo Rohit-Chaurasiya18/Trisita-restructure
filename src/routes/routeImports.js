@@ -83,6 +83,12 @@ export const orderLoadingToHO = lazy(() =>
   import("@/modules/orderLoadingApi/pages/orderLoadingHO/pages/OrderLoadingHO")
 );
 
+export const OrderLoadingHOListing = lazy(() =>
+  import(
+    "@/modules/orderLoadingApi/pages/orderLoadingHO/pages/OrderLoadingHOListing"
+  )
+);
+
 export const AddEditOrderLoadingHO = lazy(() =>
   import(
     "@/modules/orderLoadingApi/pages/orderLoadingHO/pages/AddEditOrderLoadingHO"

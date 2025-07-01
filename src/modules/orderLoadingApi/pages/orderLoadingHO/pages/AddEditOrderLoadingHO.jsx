@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import PreviewIcon from "@mui/icons-material/Preview";
+import routesConstants from "@/routes/routesConstants";
 
 const orderTypeOptions = [
   { value: "New", label: "New" },
@@ -38,14 +39,19 @@ const AddEditOrderLoadingHO = () => {
           <div className="commom-header-title mb-0">Order Loading PO</div>
           <span className="common-breadcrum-msg">we are in the same team</span>
         </div>
-        <CommonButton className="back-btn" onClick={() => {}}>
+        <CommonButton
+          className="back-btn"
+          onClick={() => {
+            navigate(routesConstants?.ORDER_LOADING_PO);
+          }}
+        >
           Back
         </CommonButton>
       </div>
       <div className="add-edit-orderLoadingForm">
         <div className="add-account-form">
           <h2 className="title">
-            Order Loading PO{" "}
+            Order Loading PO
             {state?.user?.value === "EndUser" ? "End User" : "Third Party"} Form
           </h2>
           <form className="">

@@ -15,7 +15,15 @@ const OrderLoadingHO = () => {
           <span className="common-breadcrum-msg">we are in the same team</span>
         </div>
         <div className="order-loading-ho-filter">
-          <CommonButton className="order-loading-ho-btn" onClick={() => {}}>
+          <CommonButton
+            className="order-loading-ho-btn"
+            onClick={() => {
+              navigate(
+                routesConstants?.ORDER_LOADING_PO +
+                  routesConstants?.ORDER_LOADING_PO_LIST
+              );
+            }}
+          >
             Order Loading PO History
           </CommonButton>
         </div>
