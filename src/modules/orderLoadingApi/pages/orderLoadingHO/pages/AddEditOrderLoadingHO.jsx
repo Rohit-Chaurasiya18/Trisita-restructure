@@ -64,6 +64,8 @@ const AddEditOrderLoadingHO = () => {
     bdPersonByBranch,
     accountByBdPersonLoading,
     accountByBdPerson,
+    thirdPartyAccountByBdPersonLoading,
+    thirdPartyAccountByBdPerson,
   } = useSelector((state) => ({
     allBranch: state?.insightMetrics?.branchList,
     branchListLoading: state?.insightMetrics?.branchListLoading,
@@ -71,6 +73,10 @@ const AddEditOrderLoadingHO = () => {
     bdPersonByBranch: state?.orderLoadingApi?.bdPersonByBranch,
     accountByBdPersonLoading: state?.orderLoadingApi?.accountByBdPersonLoading,
     accountByBdPerson: state?.orderLoadingApi?.accountByBdPerson,
+    thirdPartyAccountByBdPersonLoading:
+      state?.orderLoadingApi?.thirdPartyAccountByBdPersonLoading,
+    thirdPartyAccountByBdPerson:
+      state?.orderLoadingApi?.thirdPartyAccountByBdPerson,
   }));
 
   useEffect(() => {
@@ -364,6 +370,8 @@ const AddEditOrderLoadingHO = () => {
                 );
                 setFieldValue("bdPerson", selectedOption);
                 setFieldValue("account", "");
+                setFieldValue("thirdPartyAccount", "");
+
                 if (selectedOption?.length > 0) {
                   setFieldTouched("bdPerson", false);
                 } else {
@@ -494,7 +502,7 @@ const AddEditOrderLoadingHO = () => {
                       setFieldTouched("thirdPartyAccount", true);
                     }
                   }}
-                  options={accountByBdPerson}
+                  options={thirdPartyAccountByBdPerson}
                   error={
                     errors?.thirdPartyAccount && touched?.thirdPartyAccount
                   }
@@ -504,7 +512,7 @@ const AddEditOrderLoadingHO = () => {
                     branchListLoading ||
                     bdPersonByBranchLoading ||
                     values?.bdPerson?.length === 0 ||
-                    accountByBdPersonLoading
+                    thirdPartyAccountByBdPersonLoading
                   }
                 />
               </>
