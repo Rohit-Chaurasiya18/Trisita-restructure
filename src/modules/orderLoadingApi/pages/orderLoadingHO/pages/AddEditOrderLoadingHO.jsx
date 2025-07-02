@@ -3,7 +3,7 @@ import CommonDatePicker from "@/components/common/date/CommonDatePicker";
 import CustomSelect from "@/components/common/dropdown/CustomSelect";
 import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -11,6 +11,7 @@ import PreviewIcon from "@mui/icons-material/Preview";
 import routesConstants from "@/routes/routesConstants";
 import { useFormik } from "formik";
 import {
+  addOrderLoadingHO,
   getAccountByBdPerson,
   getBdPersonByBranch,
 } from "@/modules/orderLoadingApi/slice/OrderLoadingApiSlice";
@@ -18,6 +19,8 @@ import * as Yup from "yup";
 import CommonModal from "@/components/common/modal/CommonModal";
 import ProductDetailModal from "../component/ProductDetailModal";
 import AddProductDetail from "../component/AddProductDetail";
+import ConfirmationModal from "@/components/common/modal/ConfirmationModal";
+import { toast } from "react-toastify";
 
 const orderTypeOptions = [
   { value: "New", label: "New" },
@@ -28,43 +31,19 @@ const licenseActivationOptions = [
   { value: "Particular Date", label: "Particular Date" },
 ];
 
-const validationSchema = Yup.object().shape({
-  orderLoadingDate: Yup.string().required("Order Loading Date is required"),
-  orderType: Yup.object().required("Order Type is required"),
-  branch: Yup.object().required("Branch is required"),
-  bdPerson: Yup.array()
-    .min(1, "At least one BD Person is required")
-    .required("BD Person is required"),
-  account: Yup.object().required("Account is required"),
-  poNumber: Yup.string().required("PO Number is required"),
-  poDate: Yup.string().required("PO Date is required"),
-  poCopy: Yup.mixed().required("PO Copy is required"),
-  billingAddress: Yup.string().required("Billing Address is required"),
-  billingGSTNumber: Yup.string().required("Billing GST Number is required"),
-  shippingAddress: Yup.string().required("Shipping Address is required"),
-  shippingGSTNumber: Yup.string().required("Shipping GST Number is required"),
-  licenseManagerName: Yup.string().required("License Manager Name is required"),
-  licenseManagerPhone: Yup.string().required(
-    "License Manager Phone is required"
-  ),
-  licenseManagerEmail: Yup.string()
-    .email("Invalid email format")
-    .required("License Manager Email is required"),
-  licenseActivationDate: Yup.object().required(
-    "License Activation Date is required"
-  ),
-  manualCIFForm: Yup.mixed().required("Manual CIF Form is required"),
-  sellingPaymentTerms: Yup.string().required(
-    "Selling Payment Terms is required"
-  ),
-  remarks: Yup.string().required("Remarks are required"),
-});
 const AddEditOrderLoadingHO = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const poCopyRef = useRef(null);
+  const clientPartyPoCopyRef = useRef(null);
   const manualCIFRef = useRef(null);
   const productFormRef = useRef();
+  const { state } = useLocation();
+
+  const isThirdParty = useMemo(
+    () => state?.user?.value === "ThirdParty",
+    [state]
+  );
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -72,8 +51,12 @@ const AddEditOrderLoadingHO = () => {
   const [addProductDetailModal, setAddProductDetailModal] = useState({
     isShow: false,
   });
+  const [showConfirm, setShowConfirm] = useState({
+    isShow: false,
+    type: null,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { state } = useLocation();
   const {
     allBranch,
     branchListLoading,
@@ -94,8 +77,111 @@ const AddEditOrderLoadingHO = () => {
     dispatch(getAllBranch());
   }, []);
 
+  const validationSchema = Yup.object().shape({
+    orderLoadingDate: Yup.string().required("Order Loading Date is required"),
+    orderType: Yup.object().required("Order Type is required"),
+    branch: Yup.object().required("Branch is required"),
+    bdPerson: Yup.array()
+      .min(1, "At least one BD Person is required")
+      .required("BD Person is required"),
+    account: Yup.object().required("Account is required"),
+    thirdPartyAccount: isThirdParty
+      ? Yup.object().required("Third Party Account is required")
+      : Yup.object().notRequired(),
+    poNumber: Yup.string().required("PO Number is required"),
+    poDate: Yup.string().required("PO Date is required"),
+    poCopy: Yup.mixed().required("PO Copy is required"),
+    clientPartyPoCopy: isThirdParty
+      ? Yup.mixed().required("PO Copy is required")
+      : Yup.mixed().notRequired(),
+    billingAddress: Yup.string().required("Billing Address is required"),
+    billingGSTNumber: Yup.string().required("Billing GST Number is required"),
+    shippingAddress: Yup.string().required("Shipping Address is required"),
+    shippingGSTNumber: Yup.string().required("Shipping GST Number is required"),
+    licenseManagerName: Yup.string().required(
+      "License Manager Name is required"
+    ),
+    licenseManagerPhone: Yup.string().required(
+      "License Manager Phone is required"
+    ),
+    licenseManagerEmail: Yup.string()
+      .email("Invalid email format")
+      .required("License Manager Email is required"),
+    licenseActivationDate: Yup.object().required(
+      "License Activation Date is required"
+    ),
+    manualCIFForm: Yup.mixed().required("Manual CIF Form is required"),
+    sellingPaymentTerms: Yup.string().required(
+      "Selling Payment Terms is required"
+    ),
+    remarks: Yup.string().required("Remarks are required"),
+  });
   const onSubmit = (values) => {
-    console.log("Form Values: ", values);
+    const formData = new FormData();
+    formData.append("user_type", state?.user?.value);
+    formData.append("order_type", values?.orderType?.value);
+    formData.append("order_loading_date", values?.orderLoadingDate);
+    formData.append("branch", values?.branch?.value);
+    formData.append(
+      "bd_person",
+      JSON.stringify(values?.bdPerson?.map((item) => item?.value))
+    );
+    formData.append("account", values?.account?.value);
+    formData.append("po_number", values?.poNumber);
+    formData.append("po_date", values?.poDate);
+    formData.append("billing_address", values?.billingAddress);
+    formData.append("billing_gst_number", values?.billingGSTNumber);
+    formData.append("shipping_address", values?.shippingAddress);
+    formData.append("shipping_gst_number", values?.shippingGSTNumber);
+    formData.append(
+      "license_contract_manager_name",
+      values?.licenseManagerName
+    );
+    formData.append(
+      "license_contract_manager_phone",
+      values?.licenseManagerPhone
+    );
+    formData.append(
+      "license_contract_manager_email_id",
+      values?.licenseManagerEmail
+    );
+    formData.append(
+      "proposed_license_activation_date",
+      values?.licenseActivationDate?.value
+    );
+    formData.append("selling_payment_terms", values?.sellingPaymentTerms);
+    formData.append("remarks", values?.remarks);
+    formData.append("po_copy", values?.poCopy);
+    formData.append("manual_cif_form", values?.manualCIFForm);
+    formData.append(
+      "product_details",
+      JSON.stringify(
+        values?.productDetails?.map((item, idx) => ({ ...item, id: idx }))
+      )
+    );
+    if (isThirdParty) {
+      // client_po_copy
+      formData.append("client_po_copy", values?.clientPartyPoCopy);
+      formData.append("thirdPartyAccount", values?.thirdPartyAccount?.value);
+    }
+    setIsSubmitting(true);
+
+    dispatch(addOrderLoadingHO(formData)).then((res) => {
+      resetForm();
+      if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+        toast.success("Order loading added successfully!");
+        poCopyRef.current.value = "";
+        if (isThirdParty) {
+          clientPartyPoCopyRef.current.value = "";
+        }
+        manualCIFRef.current.value = "";
+      }
+      setIsSubmitting(false);
+      navigate(
+        routesConstants?.ORDER_LOADING_PO +
+          routesConstants?.ORDER_LOADING_PO_LIST
+      );
+    });
   };
 
   const initialValues = {
@@ -104,9 +190,11 @@ const AddEditOrderLoadingHO = () => {
     branch: null,
     bdPerson: null,
     account: null,
+    thirdPartyAccount: null,
     poNumber: "",
     poDate: null,
     poCopy: null,
+    clientPartyPoCopy: null,
     billingAddress: "",
     billingGSTNumber: "",
     shippingAddress: "",
@@ -137,6 +225,36 @@ const AddEditOrderLoadingHO = () => {
     validationSchema,
     onSubmit,
   });
+
+  const handleAddProductDetail = (data) => {
+    let Arr = [...values?.productDetails, data];
+    setFieldValue("productDetails", Arr);
+    setAddProductDetailModal({
+      isShow: false,
+    });
+  };
+
+  const handleDeleteRow = (id) => {
+    let filteredArr = values?.productDetails?.filter(
+      (item, idx) => id !== idx + 1
+    );
+    setFieldValue("productDetails", filteredArr);
+  };
+
+  const handleYes = () => {
+    if (showConfirm?.type === 2) {
+      navigate(routesConstants?.ORDER_LOADING_PO);
+    }
+    setShowConfirm(false);
+  };
+
+  const handleCancel = () => {
+    if (showConfirm?.type === 1) {
+      setFieldValue("account", null);
+    }
+    setShowConfirm(false);
+  };
+
   return (
     <div className="">
       <div className="">
@@ -147,7 +265,7 @@ const AddEditOrderLoadingHO = () => {
         <CommonButton
           className="back-btn"
           onClick={() => {
-            navigate(routesConstants?.ORDER_LOADING_PO);
+            setShowConfirm({ isShow: true, type: 2 });
           }}
         >
           Back
@@ -215,7 +333,12 @@ const AddEditOrderLoadingHO = () => {
                 }
                 setFieldValue("bdPerson", "");
                 setFieldValue("account", "");
-                dispatch(getBdPersonByBranch(selectedOption?.value));
+                dispatch(
+                  getBdPersonByBranch({
+                    value: selectedOption?.value,
+                    orderType: values?.orderType?.value,
+                  })
+                );
               }}
               options={allBranch}
               placeholder="Select a Branch"
@@ -233,7 +356,12 @@ const AddEditOrderLoadingHO = () => {
                 let payload = selectedOption
                   ?.map((item) => item?.value)
                   .join(",");
-                dispatch(getAccountByBdPerson(payload));
+                dispatch(
+                  getAccountByBdPerson({
+                    value: payload,
+                    orderType: values?.orderType?.value,
+                  })
+                );
                 setFieldValue("bdPerson", selectedOption);
                 setFieldValue("account", "");
                 if (selectedOption?.length > 0) {
@@ -259,6 +387,7 @@ const AddEditOrderLoadingHO = () => {
               placeholder="Select a Account"
               value={values?.account}
               onChange={(selectedOption) => {
+                setShowConfirm({ isShow: true, type: 1 });
                 setFieldValue("account", selectedOption);
                 if (selectedOption?.value) {
                   setFieldTouched("account", false);
@@ -304,7 +433,8 @@ const AddEditOrderLoadingHO = () => {
             />
             <div className="form-group">
               <label className="form-label label requiredText">
-                PO Copy<span className="text-danger"> *</span>
+                {isThirdParty && "Third Party"} PO Copy
+                <span className="text-danger"> *</span>
               </label>
               <input
                 ref={poCopyRef}
@@ -321,6 +451,64 @@ const AddEditOrderLoadingHO = () => {
                 <div className="invalid-feedback ">{errors?.poCopy}</div>
               )}
             </div>
+
+            {isThirdParty && (
+              <>
+                <div className="form-group">
+                  <label className="form-label label requiredText">
+                    Client Party PO Copy
+                    <span className="text-danger"> *</span>
+                  </label>
+                  <input
+                    ref={clientPartyPoCopyRef}
+                    type="file"
+                    className={`form-control ${
+                      errors?.clientPartyPoCopy && touched?.clientPartyPoCopy
+                        ? "is-invalid"
+                        : ""
+                    } input`}
+                    name="clientPartyPoCopy"
+                    id="clientPartyPoCopy"
+                    onBlur={handleBlur}
+                    onChange={(e) =>
+                      setFieldValue("clientPartyPoCopy", e.target.files[0])
+                    }
+                  />
+                  {errors?.clientPartyPoCopy && touched?.clientPartyPoCopy && (
+                    <div className="invalid-feedback ">
+                      {errors?.clientPartyPoCopy}
+                    </div>
+                  )}
+                </div>
+                <CustomSelect
+                  label="Third Party Account"
+                  required
+                  name="thirdPartyAccount"
+                  placeholder="Select a Account"
+                  value={values?.thirdPartyAccount}
+                  onChange={(selectedOption) => {
+                    setFieldValue("thirdPartyAccount", selectedOption);
+                    if (selectedOption?.value) {
+                      setFieldTouched("thirdPartyAccount", false);
+                    } else {
+                      setFieldTouched("thirdPartyAccount", true);
+                    }
+                  }}
+                  options={accountByBdPerson}
+                  error={
+                    errors?.thirdPartyAccount && touched?.thirdPartyAccount
+                  }
+                  errorText={errors?.thirdPartyAccount}
+                  isDisabled={
+                    !values?.branch?.value ||
+                    branchListLoading ||
+                    bdPersonByBranchLoading ||
+                    values?.bdPerson?.length === 0 ||
+                    accountByBdPersonLoading
+                  }
+                />
+              </>
+            )}
             <CommonInputTextField
               labelName="Billing Address"
               id="billingAddress"
@@ -541,9 +729,9 @@ const AddEditOrderLoadingHO = () => {
               }}
               type="button"
               className="add-account-btn"
-              // isDisabled={isSubmitting}
+              isDisabled={isSubmitting}
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </CommonButton>
           </form>
         </div>
@@ -565,7 +753,13 @@ const AddEditOrderLoadingHO = () => {
           });
         }}
       >
-        <ProductDetailModal data={values?.productDetails} />
+        <ProductDetailModal
+          data={values?.productDetails?.map((item, idx) => ({
+            ...item,
+            id: idx + 1,
+          }))}
+          handleDeleteRow={handleDeleteRow}
+        />
       </CommonModal>
       <CommonModal
         isOpen={addProductDetailModal?.isShow}
@@ -586,8 +780,26 @@ const AddEditOrderLoadingHO = () => {
         <AddProductDetail
           ref={productFormRef}
           data={{ billingGSTNumber: values?.billingGSTNumber }}
+          handleAddProductDetail={handleAddProductDetail}
         />
       </CommonModal>
+      <ConfirmationModal
+        open={showConfirm?.isShow}
+        title={
+          showConfirm?.type === 1
+            ? "Confirm Account Selection"
+            : "Confirm Navigation"
+        }
+        description={
+          showConfirm?.type === 1
+            ? "Do you confirm that Account CSN is selected correctly?"
+            : "Are you sure you want to go back? Any unsaved changes will be lost."
+        }
+        onConfirm={handleYes}
+        onCancel={handleCancel}
+        confirmText="Yes"
+        cancelText="No"
+      />
     </div>
   );
 };

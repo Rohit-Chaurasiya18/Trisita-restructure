@@ -252,7 +252,7 @@ const Account = () => {
       width: 160,
       renderCell: (params) => (
         <div>
-          {params?.value ? (
+          {params?.value?.trim() ? (
             params?.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>

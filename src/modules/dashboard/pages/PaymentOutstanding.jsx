@@ -41,7 +41,6 @@ const PaymentOutstanding = () => {
   });
   const [filteredData, setFilteredData] = useState([]);
 
-  console.log({ paymentOutstandingList, paymentOutstandingListLoading });
   useEffect(() => {
     dispatch(GetPaymentOutstandingList());
     dispatch(getAllBranch());

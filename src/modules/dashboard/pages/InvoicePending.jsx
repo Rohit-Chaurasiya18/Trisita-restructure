@@ -35,8 +35,6 @@ const InvoicePending = () => {
   });
   const [filteredData, setFilteredData] = useState([]);
 
-  console.log({ invoicePendingList, invoicePendingListLoading });
-
   useEffect(() => {
     dispatch(GetInvoicePendingList());
     dispatch(getAllBranch());

@@ -25,7 +25,7 @@ export const getBdPersonByBranch = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.get(
-        GET_BD_PERSON_BY_BRANCH + payload + "/" + "New"
+        GET_BD_PERSON_BY_BRANCH + payload?.value + "/" + payload?.orderType
       );
       return response;
     } catch (err) {
@@ -40,7 +40,7 @@ export const getAccountByBdPerson = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.get(
-        GET_ACCOUNT_BY_BD_PERSON + payload + "/" + "New"
+        GET_ACCOUNT_BY_BD_PERSON + payload?.value + "/" + payload?.orderType
       );
       return response;
     } catch (err) {
@@ -62,6 +62,21 @@ export const getActiveProductMaster = createAsyncThunk(
     }
   }
 );
+
+//
+export const addOrderLoadingHO = createAsyncThunk(
+  `orderLoadingApi/addOrderLoadingHO`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_ORDER_LOADING_HO, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const orderLoadingApiState = {
   orderLoadingHOLoading: false,
   orderLoadingHOList: [],

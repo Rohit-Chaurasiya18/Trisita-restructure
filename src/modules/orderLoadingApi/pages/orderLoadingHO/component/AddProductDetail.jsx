@@ -7,6 +7,10 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import AddIcon from "@mui/icons-material/Add";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import routesConstants from "@/routes/routesConstants";
+
 const AddProductDetail = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const {
@@ -42,21 +46,36 @@ const AddProductDetail = forwardRef((props, ref) => {
       .positive("Purchase Amount must be a positive number"),
   });
 
-  const onSubmit = (values, { resetForm }) => {
-    if (!stateCode) {
-      toast.error("Please select branch for the gst process!");
-    } else {
-      console.log("Form Submitted", values);
-      // Perform any action with the form values
-    }
-  };
-
   const initialValues = {
     productMaster: null,
     quantity: "",
     sellingAmount: "",
     purchaseAmount: "",
     totalACVAmount: 0,
+  };
+  const onSubmit = (values, { resetForm }) => {
+    if (!stateCode) {
+      toast.error("Please select branch for the gst process!");
+      return;
+    } else {
+      let formattedData = {
+        product_master: values?.productMaster?.value,
+        product_master_label: values?.productMaster?.label,
+        quantity: values?.quantity,
+        selling_amount: values?.sellingAmount,
+        purchase_amount: values?.purchaseAmount,
+        total_selling_amount_exc_gst:
+          +values?.sellingAmount * +values?.quantity,
+        total_purchase_amount_exc_gst:
+          +values?.purchaseAmount * +values?.quantity,
+        total_acv_amount_exc_gst:
+          +values?.totalACVAmount * +values?.sellingAmount,
+        sgst_amount: sgstAmount,
+        cgst_amount: cgstAmount,
+        igst_amount: igstAmount,
+      };
+      props?.handleAddProductDetail(formattedData);
+    }
   };
 
   const {
@@ -76,34 +95,41 @@ const AddProductDetail = forwardRef((props, ref) => {
     onSubmit,
   });
 
+  const { data } = props;
+
+  const { sgstAmount, cgstAmount, igstAmount } = useMemo(() => {
+    const billingStateCode = data?.billingGSTNumber?.substring(0, 2);
+    const sellingAmount = parseFloat(values?.sellingAmount) || 0;
+    const isSameState = +billingStateCode === +stateCode;
+    if (isSameState) {
+      const sgst = sellingAmount * 0.09;
+      const cgst = sellingAmount * 0.09;
+      return {
+        sgstAmount: parseFloat(sgst)?.toFixed(2),
+        cgstAmount: parseFloat(cgst)?.toFixed(2),
+        igstAmount: 0,
+      };
+    } else {
+      const igst = sellingAmount * 0.18;
+      return {
+        sgstAmount: 0,
+        cgstAmount: 0,
+        igstAmount: parseFloat(igst)?.toFixed(2),
+      };
+    }
+  }, [data, stateCode, values?.sellingAmount]);
+
   // Expose submit function to parent using ref
   useImperativeHandle(ref, () => ({
     submitForm: () => handleSubmit(),
   }));
-
-  const { billingGSTNumber } = props;
-
-  const { sgstAmount, cgstAmount, igstAmount } = useMemo(() => {
-    const billingStateCode = billingGSTNumber?.substring(0, 2);
-    const sellingAmount = parseFloat(values?.sellingAmount) || 0;
-    const isSameState = +billingStateCode === +stateCode;
-
-    if (isSameState) {
-      const sgst = sellingAmount * 0.09;
-      const cgst = sellingAmount * 0.09;
-      return { sgstAmount: sgst, cgstAmount: cgst, igstAmount: 0 };
-    } else {
-      const igst = sellingAmount * 0.18;
-      return { sgstAmount: 0, cgstAmount: 0, igstAmount: igst };
-    }
-  }, [billingGSTNumber, stateCode, values?.sellingAmount]);
 
   return (
     <>
       <form onSubmit={handleSubmit} className="order-loading-add-product-form">
         <div className="col-sm-12">
           <div className="col-sm-3">Product Master:</div>
-          <div className="col-sm-9">
+          <div className="col-sm-9 product-master-field">
             <CustomSelect
               name="productMaster"
               placeholder="Select a Product Master"
@@ -124,6 +150,19 @@ const AddProductDetail = forwardRef((props, ref) => {
               }}
               error={errors?.productMaster && touched?.productMaster}
               errorText={errors.productMaster}
+            />
+            <AddIcon
+              onClick={() => {
+                const newPath =
+                  routesConstants?.PRODUCT_MASTER +
+                  routesConstants?.ADD_PRODUCT_MASTER;
+                window.open(newPath, "_blank");
+              }}
+            />
+            <RefreshIcon
+              onClick={() => {
+                dispatch(getActiveProductMaster());
+              }}
             />
           </div>
         </div>
@@ -198,7 +237,7 @@ const AddProductDetail = forwardRef((props, ref) => {
         <div className="col-sm-12 mb-3">
           <div className="col-sm-3">Total Purchase Amount:</div>
           <div className="col-sm-9">
-            {+values?.sellingAmount * +values?.purchaseAmount}
+            {+values?.quantity * +values?.purchaseAmount}
           </div>
         </div>
         <div className="col-sm-12 mb-3">
@@ -217,10 +256,9 @@ const AddProductDetail = forwardRef((props, ref) => {
           <div className="col-sm-3">CGST Amount (per unit):</div>
           <div className="col-sm-9">{cgstAmount}</div>
         </div>
-
         <div className="col-sm-12 mb-3">
           <div className="col-sm-3">IGST Amount (per unit):</div>
-          <div className="col-sm-9">{parseFloat(igstAmount)}</div>
+          <div className="col-sm-9">{parseFloat(igstAmount)?.toFixed(2)}</div>
         </div>
       </form>
     </>

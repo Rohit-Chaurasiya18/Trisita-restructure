@@ -1,8 +1,13 @@
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { Tooltip } from "@mui/material";
 
-const ProductDetailModal = ({ data = [] }) => {
+const ProductDetailModal = ({ data = [], handleDeleteRow }) => {
   const columns = [
+    {
+      field: "id",
+      headerName: "SR No",
+      width: 100,
+    },
     {
       field: "product_master_label",
       headerName: "Product Master",
@@ -36,9 +41,9 @@ const ProductDetailModal = ({ data = [] }) => {
       sortable: false,
       renderCell: (params) => (
         <button
-          className="text-red-600"
+          className="text-red-600 border-0"
           onClick={() => {
-            // handleDeleteRow(params.row.id);
+            handleDeleteRow(params.row.id);
           }}
         >
           Delete
