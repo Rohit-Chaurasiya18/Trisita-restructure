@@ -980,7 +980,7 @@ const AddAccount = () => {
                 }}
                 type="button"
                 className="add-account-btn"
-                isDisabled={isSubmitting}
+                isDisabled={isSubmitting || exportedAccountDataLoading}
               >
                 {id
                   ? isSubmitting
