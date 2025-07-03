@@ -249,7 +249,7 @@ const AddAccount = () => {
       ).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
           toast.success("Third Party Account updated Successfully");
-          navigate(routesConstants?.ACCOUNT);
+          navigate(routesConstants?.THIRD_PARTY_ACCOUNT);
           resetForm();
         }
         setIsSubmitting(false);
