@@ -110,10 +110,21 @@ const Account = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
   const isThirdPartyAccount = useMemo(
     () => location.pathname.startsWith("/third_party_account"),
     [location?.pathname]
   );
+
+  useEffect(() => {
+    setFilters({
+      searchValue: "",
+      branch: null,
+      status: "All Status",
+      industryCategory: "",
+    });
+  }, [isThirdPartyAccount]);
+
   const {
     branchListLoading,
     branch_list,

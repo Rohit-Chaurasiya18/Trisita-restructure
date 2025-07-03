@@ -171,11 +171,13 @@ const AddAccount = () => {
   const [accountDetail, setAccountDetail] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { allBranch, filter, exportedAccountData } = useSelector((state) => ({
-    allBranch: state?.insightMetrics?.branchList,
-    filter: state?.layout?.filter,
-    exportedAccountData: state?.account?.exportedAccountData,
-  }));
+  const { allBranch, filter, exportedAccountData, exportedAccountDataLoading } =
+    useSelector((state) => ({
+      allBranch: state?.insightMetrics?.branchList,
+      filter: state?.layout?.filter,
+      exportedAccountData: state?.account?.exportedAccountData,
+      exportedAccountDataLoading: state?.account?.exportedAccountDataLoading,
+    }));
 
   const accountOptions = useMemo(
     () =>
@@ -969,6 +971,7 @@ const AddAccount = () => {
                     touched?.account_associated_with
                   }
                   errorText={errors?.account_associated_with}
+                  isDisabled={exportedAccountDataLoading}
                 />
               )}
               <CommonButton
