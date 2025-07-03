@@ -288,6 +288,26 @@ const Account = () => {
         </Tooltip>
       ),
     },
+    ...(isThirdPartyAccount
+      ? [
+          {
+            field: "associated_account",
+            headerName: "Associated Account",
+            width: 300,
+            renderCell: (params) => (
+              <Tooltip title={params?.value || ""}>
+                <div>
+                  {params?.value ? (
+                    params?.value
+                  ) : (
+                    <span style={{ color: "red" }}>Undefined</span>
+                  )}
+                </div>
+              </Tooltip>
+            ),
+          },
+        ]
+      : []),
     { field: "industryGroup", headerName: "Industry", width: 100 },
     {
       field: "industrySegment",
