@@ -971,7 +971,6 @@ const AddAccount = () => {
                     touched?.account_associated_with
                   }
                   errorText={errors?.account_associated_with}
-                  isDisabled={exportedAccountDataLoading}
                 />
               )}
               <CommonButton
