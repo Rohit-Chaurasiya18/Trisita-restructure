@@ -269,7 +269,7 @@ const RAOrder = () => {
             fileName={fileName}
             className="insight-export-btn"
           />
-          <h3 className="common-insight-title">Deleted Data</h3>
+          <h3 className="common-insight-title">RA Order Data</h3>
           <CommonTable
             rows={filteredData}
             columns={columns}
