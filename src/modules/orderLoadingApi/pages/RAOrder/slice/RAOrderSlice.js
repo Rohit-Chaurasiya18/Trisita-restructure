@@ -46,6 +46,9 @@ const RaOrderSlice = createSlice({
         renewal_person: item?.renewal_person_first_names
           ? item?.renewal_person_first_names?.join(", ")
           : "",
+        third_party_name: item?.third_party_name
+          ? item?.third_party_name?.join(", ")
+          : "",
       }));
       state.raOrderListLoading = false;
     });

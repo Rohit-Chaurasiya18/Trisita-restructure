@@ -132,6 +132,13 @@ const RAOrder = () => {
       width: 200,
       renderCell: ({ value }) => renderLimitedText(value),
     },
+    {
+      field: "third_party_name",
+      headerName: "Third Party Name",
+      width: 200,
+      renderCell: ({ value }) => value,
+    },
+    { field: "part_number", headerName: "Part Number", width: 200 },
     { field: "account_csn", headerName: "Account CSN", width: 100 },
     {
       field: "bd_person",
@@ -166,6 +173,24 @@ const RAOrder = () => {
     { field: "account_group", headerName: "Account Group", width: 100 },
     { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
     { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
+    {
+      field: "acv_price",
+      headerName: "Total ACV Price",
+      width: 130,
+      renderCell: (params) => (
+        <div>{Number(params?.value || 0).toFixed(2)}</div>
+      ),
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "dtp_price",
+      headerName: "Total DTP Price",
+      width: 130,
+      renderCell: (params) => (
+        <div>{Number(params?.value || 0).toFixed(2)}</div>
+      ),
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
     {
       field: "productLine",
       headerName: "Product Line",

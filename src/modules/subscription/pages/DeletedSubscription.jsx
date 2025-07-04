@@ -150,6 +150,7 @@ const DeletedSubscription = () => {
           );
         },
       },
+      { field: "part_number", headerName: "Part Number", width: 200 },
       { field: "account_csn", headerName: "Account CSN", width: 100 },
       {
         field: "bd_person",

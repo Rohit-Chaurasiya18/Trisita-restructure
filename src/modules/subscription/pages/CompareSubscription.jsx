@@ -90,6 +90,24 @@ const CompareSubscription = () => {
           return <> {account}</>;
         },
       },
+      {
+        field: "third_party",
+        headerName: "Third Party Name",
+        width: 200,
+        renderCell: (params) => {
+          const { value: third_party_name } = params;
+          const maxChars = 20;
+
+          return (
+            <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+              {third_party_name?.length > maxChars
+                ? third_party_name
+                : third_party_name?.slice(0, maxChars)}
+            </div>
+          );
+        },
+      },
+      { field: "part_number", headerName: "Part Number", width: 200 },
       { field: "account_csn", headerName: "Account CSN", width: 100 },
       {
         field: "bd_person",
@@ -164,6 +182,24 @@ const CompareSubscription = () => {
         width: 130,
       },
       {
+        field: "acv_price",
+        headerName: "Total ACV Price",
+        width: 130,
+        renderCell: (params) => (
+          <div>{Number(params?.value || 0).toFixed(2)}</div>
+        ),
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
+        field: "dtp_price",
+        headerName: "Total DTP Price",
+        width: 130,
+        renderCell: (params) => (
+          <div>{Number(params?.value || 0).toFixed(2)}</div>
+        ),
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
         field: "productLine",
         headerName: "Product Line",
         width: 250,
@@ -199,6 +235,24 @@ const CompareSubscription = () => {
         return <>{params?.value}</>;
       },
     },
+    {
+      field: "third_party",
+      headerName: "Third Party Name",
+      width: 200,
+      renderCell: (params) => {
+        const { value: third_party_name } = params;
+        const maxChars = 20;
+
+        return (
+          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+            {third_party_name?.length > maxChars
+              ? third_party_name
+              : third_party_name?.slice(0, maxChars)}
+          </div>
+        );
+      },
+    },
+    { field: "part_number", headerName: "Part Number", width: 200 },
     {
       field: "bd_person",
       headerName: "BD Person Name",
@@ -242,6 +296,24 @@ const CompareSubscription = () => {
     { field: "subs_start_date", headerName: "Subs Start Date", width: 130 },
     { field: "subs_end_date", headerName: "Subs End Date", width: 130 },
     { field: "seat", headerName: "Seats", width: 70 },
+    {
+      field: "acv_price",
+      headerName: "Total ACV Price",
+      width: 130,
+      renderCell: (params) => (
+        <div>{Number(params?.value || 0).toFixed(2)}</div>
+      ),
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "dtp_price",
+      headerName: "Total DTP Price",
+      width: 130,
+      renderCell: (params) => (
+        <div>{Number(params?.value || 0).toFixed(2)}</div>
+      ),
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
     {
       field: "product_line_code",
       headerName: "Product Line",
