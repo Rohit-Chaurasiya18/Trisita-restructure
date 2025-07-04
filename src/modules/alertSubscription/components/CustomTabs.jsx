@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import routesConstants from "@/routes/routesConstants";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 const tabsData = [
   { id: "1", label: "End Customer" },
@@ -128,9 +130,17 @@ const LineItemsTab = ({ data }) => (
 );
 
 const CustomTabs = () => {
-  const { alertSubscriptionData } = useSelector((state) => ({
-    alertSubscriptionData: state?.alertSubscription?.alertSubscriptionData,
-  }));
+  const location = useLocation();
+  const { alertSubscriptionData, deletedSubscriptionDetails } = useSelector(
+    (state) => ({
+      alertSubscriptionData: state?.alertSubscription?.alertSubscriptionData,
+      deletedSubscriptionDetails:
+        state?.subscription?.deletedSubscriptionDetails,
+    })
+  );
+  const isRAOrder = useMemo(
+    () => location.pathname === routesConstants?.RA_ORDER
+  );
   const [activeTab, setActiveTab] = useState("1");
   const tabRefs = useRef([]);
 
@@ -153,15 +163,45 @@ const CustomTabs = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "1":
-        return <EndCustomerTab data={alertSubscriptionData} />;
+        return (
+          <EndCustomerTab
+            data={
+              isRAOrder ? deletedSubscriptionDetails : alertSubscriptionData
+            }
+          />
+        );
       case "2":
-        return <ResellerTab data={alertSubscriptionData} />;
+        return (
+          <ResellerTab
+            data={
+              isRAOrder ? deletedSubscriptionDetails : alertSubscriptionData
+            }
+          />
+        );
       case "3":
-        return <DistributorTab data={alertSubscriptionData} />;
+        return (
+          <DistributorTab
+            data={
+              isRAOrder ? deletedSubscriptionDetails : alertSubscriptionData
+            }
+          />
+        );
       case "4":
-        return <ContractTab data={alertSubscriptionData} />;
+        return (
+          <ContractTab
+            data={
+              isRAOrder ? deletedSubscriptionDetails : alertSubscriptionData
+            }
+          />
+        );
       case "5":
-        return <LineItemsTab data={alertSubscriptionData} />;
+        return (
+          <LineItemsTab
+            data={
+              isRAOrder ? deletedSubscriptionDetails : alertSubscriptionData
+            }
+          />
+        );
       default:
         return null;
     }

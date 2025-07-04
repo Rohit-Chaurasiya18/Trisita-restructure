@@ -98,6 +98,11 @@ export const AddEditOrderLoadingHO = lazy(() =>
 export const OrderLoadingDistributor = lazy(() =>
   import("@/modules/orderLoadingApi/pages/orderLoadingDistributor/pages/index")
 );
+// RAOrder
+
+export const RAOrder = lazy(() =>
+  import("@/modules/orderLoadingApi/pages/RAOrder/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));

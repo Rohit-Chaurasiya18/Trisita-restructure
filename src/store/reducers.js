@@ -16,6 +16,7 @@ import productReducer from "@/modules/data/product/slice/ProductSlice";
 import manageTemplateReducer from "@/modules/data/manageTemplate/slice/ManageTemplateSlice";
 import uploadReducer from "@/modules/data/upload/slice/UploadSlice";
 import orderLoadingApiReducer from "@/modules/orderLoadingApi/slice/OrderLoadingApiSlice";
+import RaOrderReducer from "@/modules/orderLoadingApi/pages/RAOrder/slice/RAOrderSlice";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -35,5 +36,6 @@ const reducer = combineReducers({
   manageTemplate: manageTemplateReducer,
   upload: uploadReducer,
   orderLoadingApi: orderLoadingApiReducer,
+  RaOrder: RaOrderReducer,
 });
 export default reducer;

@@ -38,6 +38,7 @@ import {
   RenewalEmailSent,
   OrderLoadingHOListing,
   OrderLoadingDistributor,
+  RAOrder,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -146,7 +147,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.RA_ORDER,
-      component: Get_usage,
+      component: RAOrder,
     },
     {
       path: routesConstants.MANAGE_TEAM,
