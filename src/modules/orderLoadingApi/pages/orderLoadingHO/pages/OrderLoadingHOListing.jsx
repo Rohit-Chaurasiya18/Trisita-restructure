@@ -89,11 +89,16 @@ const OrderLoadingHOListing = () => {
             className={`text-red-600 ${
               params?.row?.locked ? "cursor-not-allowed" : ""
             } border-0`}
-            // onClick={
-            //   !params.row.locked
-            //     ? () => navigate(`/update_order_loading_po/${params.id}`)
-            //     : null
-            // }
+            onClick={
+              !params.row.locked
+                ? () =>
+                    navigate(
+                      routesConstants?.ORDER_LOADING_PO +
+                        routesConstants?.UPDATE_ORDER_LOADING_PO +
+                        `/${params?.id}`
+                    )
+                : null
+            }
             disabled={params?.row?.locked}
           >
             <span className="table-cell-truncate">{params.value}</span>
@@ -568,7 +573,7 @@ const OrderLoadingHOListing = () => {
           <CommonTable
             rows={filteredData}
             columns={columns}
-            getRowId={(row) => row?.order_number}
+            getRowId={(row) => row?.id}
             toolbar
           />
         </div>

@@ -23,6 +23,7 @@ const routesConstants = {
   ORDER_LOADING_PO: "/order_loading_po",
   ORDER_LOADING_PO_LIST: "/order_loading_po_list",
   ADD_ORDER_LOADING_PO: "/add_order_loading_po",
+  UPDATE_ORDER_LOADING_PO: "/update_order_loading_po",
   ORDER_LOADING_DISTRIBUTOR: "/order_loading_distributor",
   RA_ORDER: "/ra_order_subscription",
   MANAGE_TEAM: "/team",

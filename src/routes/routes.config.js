@@ -132,6 +132,10 @@ const routesConfig = {
       children: [
         { index: true, component: orderLoadingToHO },
         { path: "add_order_loading_po", component: AddEditOrderLoadingHO },
+        {
+          path: "update_order_loading_po/:orderLoadingHoId",
+          component: AddEditOrderLoadingHO,
+        },
         { path: "order_loading_po_list", component: OrderLoadingHOListing },
       ],
     },
