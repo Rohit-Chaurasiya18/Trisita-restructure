@@ -22,6 +22,9 @@ export const Alert_subscription = lazy(() =>
   import("@/modules/alertSubscription/pages/index")
 );
 export const Get_usage = lazy(() => import("@/modules/getUsage/pages/index"));
+export const License_optization = lazy(() =>
+  import("@/modules/licenseOptimization/pages/index")
+);
 export const Usuage = lazy(() => import("@/modules/getUsage/pages/Usuage"));
 export const UniqueUserCount = lazy(() =>
   import("@/modules/getUsage/pages/UniqueUserCount")
@@ -39,6 +42,9 @@ export const AddQuotation = lazy(() =>
 );
 export const Opportunity = lazy(() =>
   import("@/modules/opportunity/pages/index")
+);
+export const NewOpportunity = lazy(() =>
+  import("@/modules/newOpportunity/pages/index")
 );
 export const Subscription = lazy(() =>
   import("@/modules/subscription/pages/index")

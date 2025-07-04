@@ -39,6 +39,11 @@ export const navLinks = [
         href: routesConstants?.GET_USAGE,
         iconUrl: <ContactsOutlinedIcon />,
       },
+      {
+        itemName: "License Optimization",
+        href: routesConstants?.LICENSE_OPTIMIZATION,
+        iconUrl: <ContactsOutlinedIcon />,
+      },
     ],
   },
   {
@@ -63,6 +68,11 @@ export const navLinks = [
       {
         itemName: "Renewal Opportunity",
         href: routesConstants?.OPPORTUNITY,
+        iconUrl: <ContactsOutlinedIcon />,
+      },
+      {
+        itemName: "New Opportunity",
+        href: routesConstants?.NEW_OPPORTUNITY,
         iconUrl: <ContactsOutlinedIcon />,
       },
       {

@@ -39,6 +39,8 @@ import {
   OrderLoadingHOListing,
   OrderLoadingDistributor,
   RAOrder,
+  License_optization,
+  NewOpportunity,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -81,6 +83,10 @@ const routesConfig = {
       ],
     },
     {
+      path: routesConstants?.LICENSE_OPTIMIZATION,
+      component: License_optization,
+    },
+    {
       path: routesConstants.ACCOUNT,
       component: Account,
     },
@@ -99,6 +105,10 @@ const routesConfig = {
     {
       path: routesConstants.OPPORTUNITY,
       component: Opportunity,
+    },
+    {
+      path: routesConstants.NEW_OPPORTUNITY,
+      component: NewOpportunity,
     },
     {
       path: routesConstants.QUOTATION,
