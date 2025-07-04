@@ -12,7 +12,7 @@ const routesConstants = {
   ADD_ACCOUNT: "/add_account",
   UPDATE_ACCOUNT: "/update_account",
   THIRD_PARTY_ACCOUNT: "/third_party_account",
-  OPPORTUNITY: "/opportunity",
+  OPPORTUNITY: "/renewal_opportunity",
   QUOTATION: "/quotation",
   ADD_QUOTATION: "/add_quotation",
   SUBSCRIPTION: "/subscription",

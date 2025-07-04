@@ -292,6 +292,9 @@ const subscriptionSlice = createSlice({
         renewal_person: item?.renewal_person_first_names
           ? item?.renewal_person_first_names.join(", ")
           : "",
+        third_party: item?.third_party_name
+          ? item?.third_party_name.join(", ")
+          : "",
       }));
       state.newSubscriptionDataLoading = false;
     });
@@ -327,6 +330,9 @@ const subscriptionSlice = createSlice({
           : "",
         renewal_person: item?.renewal_person_first_names
           ? item?.renewal_person_first_names.join(", ")
+          : "",
+        third_party: item?.third_party_name
+          ? item?.third_party_name.join(", ")
           : "",
       }));
       state.deletedSubscriptionDataLoading = false;
@@ -365,6 +371,9 @@ const subscriptionSlice = createSlice({
             : "",
           renewal_person: item?.renewal_person_first_names
             ? item?.renewal_person_first_names.join(", ")
+            : "",
+          third_party: item?.third_party_name
+            ? item?.third_party_name.join(", ")
             : "",
         }));
         state.changedLogSubscriptionDataLoading = false;

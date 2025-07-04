@@ -133,6 +133,23 @@ const ChangedLogSubscription = () => {
           </div>
         ),
       },
+      {
+        field: "third_party",
+        headerName: "Third Party Name",
+        width: 200,
+        renderCell: (params) => {
+          const { value: third_party_name } = params;
+          const maxChars = 20;
+
+          return (
+            <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+              {third_party_name?.length > maxChars
+                ? third_party_name
+                : third_party_name?.slice(0, maxChars)}
+            </div>
+          );
+        },
+      },
       { field: "account_csn", headerName: "Account CSN", width: 100 },
       {
         field: "bd_person",
@@ -166,6 +183,16 @@ const ChangedLogSubscription = () => {
       { field: "seats", headerName: "Seats", width: 70 },
       { field: "startDate", headerName: "Subs Start Date", width: 130 },
       { field: "endDate", headerName: "Subs End Date", width: 130 },
+      {
+        field: "trisita_new_status",
+        headerName: "Trisita New Status",
+        width: 130,
+      },
+      {
+        field: "trisita_old_status",
+        headerName: "Trisita Old Status",
+        width: 130,
+      },
       { field: "trisita_status", headerName: "Trisita Status", width: 130 },
       { field: "subscriptionStatus", headerName: "Status", width: 100 },
       {
@@ -183,6 +210,20 @@ const ChangedLogSubscription = () => {
         field: "contract_end_date",
         headerName: "Contract End Date",
         width: 130,
+      },
+      {
+        field: "acv_price",
+        headerName: "Total ACV Price",
+        width: 130,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
+        field: "dtp_price",
+        headerName: "Total DTP Price",
+        width: 130,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
       },
       {
         field: "productLine",
