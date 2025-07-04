@@ -37,6 +37,7 @@ import {
   InvoicePending,
   RenewalEmailSent,
   OrderLoadingHOListing,
+  OrderLoadingDistributor,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -141,7 +142,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.ORDER_LOADING_DISTRIBUTOR,
-      component: Get_usage,
+      component: OrderLoadingDistributor,
     },
     {
       path: routesConstants.RA_ORDER,

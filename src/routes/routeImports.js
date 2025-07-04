@@ -94,6 +94,10 @@ export const AddEditOrderLoadingHO = lazy(() =>
     "@/modules/orderLoadingApi/pages/orderLoadingHO/pages/AddEditOrderLoadingHO"
   )
 );
+
+export const OrderLoadingDistributor = lazy(() =>
+  import("@/modules/orderLoadingApi/pages/orderLoadingDistributor/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));
