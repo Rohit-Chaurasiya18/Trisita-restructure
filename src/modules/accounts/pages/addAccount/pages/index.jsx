@@ -250,8 +250,16 @@ const AddAccount = () => {
         addEditAccount({ updatedAccountId: id, updatedPayload: requestData })
       ).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
-          toast.success("Third Party Account updated Successfully");
-          navigate(routesConstants?.THIRD_PARTY_ACCOUNT);
+          toast.success(
+            `${
+              values?.thirdParty ? "Third Party" : "Account"
+            }  updated Successfully`
+          );
+          if (values?.thirdParty) {
+            navigate(routesConstants?.THIRD_PARTY_ACCOUNT);
+          } else {
+            navigate(routesConstants?.ACCOUNT);
+          }
           resetForm();
         }
         setIsSubmitting(false);
@@ -259,8 +267,16 @@ const AddAccount = () => {
     } else {
       dispatch(addEditAccount(requestData)).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
-          toast.success("Third Party Account created Successfully");
-          navigate(routesConstants?.ACCOUNT);
+          toast.success(
+            `${
+              values?.thirdParty ? "Third Party" : "Account"
+            }  created Successfully`
+          );
+          if (values?.thirdParty) {
+            navigate(routesConstants?.THIRD_PARTY_ACCOUNT);
+          } else {
+            navigate(routesConstants?.ACCOUNT);
+          }
           resetForm();
         }
         setIsSubmitting(false);
