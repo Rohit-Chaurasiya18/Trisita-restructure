@@ -392,6 +392,7 @@ const accountSlice = createSlice({
           account?.user_assign_firstname?.length > 0
             ? account?.user_assign_firstname?.join(", ")
             : "",
+        user_assign_Arr: account?.user_assign_firstname,
         renewal_person:
           account?.renewal_person_firstname?.length > 0
             ? account?.renewal_person_firstname?.join(", ")
