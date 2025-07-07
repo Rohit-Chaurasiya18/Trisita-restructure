@@ -87,3 +87,4 @@ export const GET_BD_PERSON_BY_BRANCH = "/v1/api/get_bd_person_by_branch/";
 export const GET_ACCOUNT_BY_BD_PERSON = "/v1/api/get_accounts_by_bd_person/";
 export const ACTIVE_PRODUCT_MASTER = "/v1/product/active_product_master/";
 export const GET_RA_ORDER = "/v1/api/get_order_ra_data/";
+export const GET_CONTACT_INFORMATION = "/v1/api/get_contact_info/";

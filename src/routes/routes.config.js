@@ -41,6 +41,7 @@ import {
   RAOrder,
   License_optization,
   NewOpportunity,
+  ContactInformation,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -218,7 +219,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.CONTACT_INFORMATION,
-      component: Get_usage,
+      component: ContactInformation,
     },
     {
       path: routesConstants.RENEW_HISTORY,
