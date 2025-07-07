@@ -17,6 +17,7 @@ import {
   getEndCustomerAccount,
   getExportedAccount,
   getInsightMetricsCsn,
+  getSubscriptionByThirdParty,
   getThirdPartyExportedAccount,
   setIndustryGroupCount,
 } from "../slice/accountSlice";
@@ -28,6 +29,7 @@ import AssignUserBranch from "../components/AssignUserBranch";
 import moment from "moment";
 import routesConstants from "@/routes/routesConstants";
 import ExportToExcel from "@/components/common/buttons/ExportToExcel";
+import SubscriptionDetail from "../components/SubscriptionDetail";
 
 const CommonChart = ({
   title,
@@ -106,6 +108,7 @@ const Account = () => {
     isOpen: false,
     id: "",
     isAssign: false,
+    type: null,
   });
   const location = useLocation();
   const navigate = useNavigate();
@@ -229,7 +232,13 @@ const Account = () => {
   }, [filters?.branch, filters?.status, filters?.searchValue]);
 
   const handleOpenModel = (id) => {
-    setModal((prev) => ({ ...prev, isOpen: true, id: id, isAssign: false }));
+    setModal((prev) => ({
+      ...prev,
+      isOpen: true,
+      id: id,
+      isAssign: false,
+      type: null,
+    }));
     const defaultCsn = filter?.csn === "All CSN" ? "5102086717" : filter?.csn;
     let payload = {
       accountId: id,
@@ -398,19 +407,42 @@ const Account = () => {
         </div>
       ),
     },
+    ...(isThirdPartyAccount
+      ? [
+          {
+            field: "show_subscription",
+            headerName: "Show subscription",
+            width: 250,
+            renderCell: (params, index) => (
+              <span
+                onClick={() => {
+                  setModal({
+                    isOpen: true,
+                    type: 1,
+                  });
+                  dispatch(getSubscriptionByThirdParty(params?.row?.id));
+                }}
+                className="assign-button text-black px-3 py-1 rounded border-0"
+              >
+                Show subscription
+              </span>
+            ),
+          },
+        ]
+      : []),
     {
       field: "action",
       headerName: "Action",
       width: 150,
       renderCell: (params, index) => (
         <span
-          // onClick={() => handleAssignModel(params?.row.id)}
           onClick={() =>
             setModal((prev) => ({
               ...prev,
               id: params?.row?.id,
               isOpen: true,
               isAssign: true,
+              type: null,
             }))
           }
           className="assign-button text-black px-3 py-1 rounded border-0"
@@ -545,6 +577,7 @@ const Account = () => {
       isOpen: false,
       id: "",
       isAssign: false,
+      type: null,
     });
     dispatch(
       getExportedAccount({
@@ -716,17 +749,6 @@ const Account = () => {
         <div className="account-industry-chart mt-4">
           {!exportedAccountDataLoading ? (
             <CommonChart
-              // title="Trend of number of accounts by Industry"
-              // options={lineChartData.options}
-              // series={lineChartData.series}
-              // subCategory={[
-              //   "By Industry Group",
-              //   "By Segment",
-              //   "By Sub Segment",
-              // ]}
-              // subCategoryChange={subCategoryChange}
-              // setSelectedIndex={setSelectedIndex}
-              // selectedIndex={selectedIndex}
               title="Trend of number of accounts by Industry"
               options={{
                 chart: {
@@ -778,16 +800,22 @@ const Account = () => {
             isOpen: false,
             isAssign: false,
             id: "",
+            type: null,
           }));
         }}
+        size={modal?.type === 1 ? "xl" : "lg"}
         scrollable
         title={
-          modal?.isAssign
+          modal?.type === 1
+            ? "Subscription Details"
+            : modal?.isAssign
             ? `Allocate User and Branch -- ${accountInformation?.name ?? ""}`
             : "Account information detail"
         }
       >
-        {modal?.isAssign ? (
+        {modal?.type === 1 ? (
+          <SubscriptionDetail />
+        ) : modal?.isAssign ? (
           <AssignUserBranch id={modal?.id} handleCallback={handleCallback} />
         ) : (
           <CustomTabs />

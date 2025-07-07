@@ -90,3 +90,4 @@ export const GET_ACCOUNT_BY_BD_PERSON = "/v1/api/get_accounts_by_bd_person/";
 export const ACTIVE_PRODUCT_MASTER = "/v1/product/active_product_master/";
 export const GET_RA_ORDER = "/v1/api/get_order_ra_data/";
 export const GET_CONTACT_INFORMATION = "/v1/api/get_contact_info/";
+export const GET_SUBS_BY_THIRD_PARTY = "/v1/api/get_subs_by_thirdparty/";

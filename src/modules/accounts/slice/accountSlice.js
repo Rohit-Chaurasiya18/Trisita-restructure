@@ -10,6 +10,7 @@ import {
   GET_BD_RENEWAL_PERSON,
   GET_CONTRACTS,
   GET_EXPORTED_ACCOUNTS_DATA,
+  GET_SUBS_BY_THIRD_PARTY,
   GET_THIRD_PARTY_ACCOUNT,
   INSIGHT_METRICS_CSN,
 } from "@/services/url";
@@ -214,6 +215,22 @@ export const addEditAccount = createAsyncThunk(
   }
 );
 
+// Get Subscription By Third Party
+export const getSubscriptionByThirdParty = createAsyncThunk(
+  `account/getSubscriptionByThirdParty`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_SUBS_BY_THIRD_PARTY + `?id=${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const accountState = {
   allUserData: null,
   last_updated: "",
@@ -234,6 +251,8 @@ const accountState = {
   industryGroupCount: {},
   accountInformation: null,
   accountInformationLoading: false,
+  subscriptionByThirdParty: [],
+  subscriptionByThirdPartyLoading: false,
 };
 
 const accountSlice = createSlice({
@@ -530,6 +549,20 @@ const accountSlice = createSlice({
     builder.addCase(getAccountInformation.rejected, (state) => {
       state.accountInformation = null;
       state.accountInformationLoading = false;
+    });
+
+    // getSubscriptionByThirdParty
+    builder.addCase(getSubscriptionByThirdParty.pending, (state) => {
+      state.subscriptionByThirdParty = [];
+      state.subscriptionByThirdPartyLoading = true;
+    });
+    builder.addCase(getSubscriptionByThirdParty.fulfilled, (state, action) => {
+      state.subscriptionByThirdParty = action.payload.data;
+      state.subscriptionByThirdPartyLoading = false;
+    });
+    builder.addCase(getSubscriptionByThirdParty.rejected, (state) => {
+      state.subscriptionByThirdParty = [];
+      state.subscriptionByThirdPartyLoading = false;
     });
   },
 });
