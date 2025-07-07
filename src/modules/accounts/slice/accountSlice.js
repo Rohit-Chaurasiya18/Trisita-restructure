@@ -4,6 +4,7 @@ import {
   ADD_EDIT_ACCOUNT,
   END_CUSTOMER_ACCOUNT,
   GET_ACCOUNT,
+  GET_ACCOUNT_BY_BDPERSON,
   GET_ACCOUNT_INFORMATION,
   GET_ALL_USER,
   GET_BD_RENEWAL_PERSON,
@@ -162,6 +163,22 @@ export const getBdRenewalPerson = createAsyncThunk(
     try {
       const response = await axiosReact.get(
         GET_BD_RENEWAL_PERSON + `/${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+// Get Account By Bd Person
+export const getAccountByBdPerson = createAsyncThunk(
+  `account/getAccountByBdPerson`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_ACCOUNT_BY_BDPERSON + `?bd_ids=${payload}`
       );
       return response;
     } catch (err) {

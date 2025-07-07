@@ -5,6 +5,7 @@ import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import {
   addEditAccount,
+  getAccountByBdPerson,
   getBdRenewalPerson,
   getExportedAccount,
 } from "@/modules/accounts/slice/accountSlice";
@@ -171,6 +172,7 @@ const AddAccount = () => {
   const [accountDetail, setAccountDetail] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [accountOptions, setAccountOptions] = useState([]);
   const { allBranch, filter, exportedAccountData, exportedAccountDataLoading } =
     useSelector((state) => ({
       allBranch: state?.insightMetrics?.branchList,
@@ -403,12 +405,30 @@ const AddAccount = () => {
       setFieldValue("renewalPerson", "");
     });
   };
+
+  // const handleAccount = (selectedOptionId) => {
+  //   dispatch(getAccountByBdPerson(selectedOptionId)).then((res) => {
+  //     if (res?.payload?.data?.length > 0) {
+  //       let Arr = res?.payload?.data?.map((item) => ({
+  //         value: item?.id,
+  //         label: `${item?.name} (${item?.csn})`,
+  //       }));
+  //       setAccountOptions(Arr);
+  //     } else {
+  //       setAccountOptions([]);
+  //     }
+  //   });
+  // };
+
   useEffect(() => {
     if (id) {
       setIsLoading(true);
       dispatch(addEditAccount({ accountId: id })).then((res) => {
         if (res?.payload?.data?.account) {
           setAccountDetail(res?.payload?.data?.account);
+          // if (res?.payload?.data?.account?.user_assign) {
+          //   handleAccount(res?.payload?.data?.account?.user_assign);
+          // }
           if (res?.payload?.data?.account?.branch) {
             handleBdRenewalPerson(res?.payload?.data?.account?.branch);
           }
@@ -435,9 +455,9 @@ const AddAccount = () => {
                 required
                 name="partnerCSN"
                 value={values?.partnerCSN}
-                onChange={(selectedOption) =>
-                  handleSelectChange("partnerCSN", selectedOption)
-                }
+                onChange={(selectedOption) => {
+                  handleSelectChange("partnerCSN", selectedOption);
+                }}
                 options={allPartnerCsn}
                 placeholder="Select a Partner CSN"
                 error={errors?.partnerCSN && touched?.partnerCSN}
@@ -496,9 +516,13 @@ const AddAccount = () => {
                 required
                 name="bdPerson"
                 value={values?.bdPerson}
-                onChange={(selectedOption) =>
-                  handleSelectChange("bdPerson", selectedOption)
-                }
+                onChange={(selectedOption) => {
+                  handleSelectChange("bdPerson", selectedOption);
+                  // if (selectedOption?.length > 0) {
+                  // let payload = selectedOption?.map((item) => item?.value);
+                  // handleAccount(payload);
+                  // }
+                }}
                 isMulti
                 options={bdPersonList}
                 placeholder="Select a BD Person"
