@@ -11,7 +11,6 @@ import {
 } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import {
   Autocomplete,
-  colors,
   TextField,
   Tooltip,
   Typography,

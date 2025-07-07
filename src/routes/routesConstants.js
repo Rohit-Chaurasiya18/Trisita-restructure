@@ -2,7 +2,6 @@ const routesConstants = {
   DASHBOARD: "/dashboard",
   PAYMENTS_OVERDUE: "/payments_overdue",
   PAYMENTS_OUTSTANDING: "/payments_outstanding",
-  RENEWAL_EMAIL_SENT: "/renewal_email_sent",
   INVOICE_PENDING: "/invoice_pending",
   INSIGHT_METRICS: "/insight_metrics",
   INSIGHT_METRICS_V2: "/insight_metrics_v2",

@@ -55,7 +55,6 @@ const routesConfig = {
         { path: "payments_overdue", component: PaymentsOverdue },
         { path: "payments_outstanding", component: PaymentsOutstanding },
         { path: "invoice_pending", component: InvoicePending },
-        { path: "renewal_email_sent", component: RenewalEmailSent },
       ],
     },
     {
@@ -223,7 +222,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.RENEW_HISTORY,
-      component: Get_usage,
+      component: RenewalEmailSent,
     },
     {
       path: routesConstants.PROFILE_FORM,

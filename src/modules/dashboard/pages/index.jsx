@@ -103,9 +103,7 @@ const Dashboard = () => {
               title="Renewal Email Sent"
               percentage={dashboardData?.renewal_percentage || 0}
               isLink
-              path={
-                routesConstants?.DASHBOARD + routesConstants?.RENEWAL_EMAIL_SENT
-              }
+              path={routesConstants?.RENEW_HISTORY}
             />
             <StatCard
               icon={ReceiptIcon}
