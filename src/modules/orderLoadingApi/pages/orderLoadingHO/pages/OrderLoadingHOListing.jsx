@@ -83,6 +83,7 @@ const OrderLoadingHOListing = () => {
     {
       field: "order_number",
       headerName: "Order Number",
+      sortable: true,
       renderCell: (params) => (
         <Tooltip title={params.value || ""}>
           <button
@@ -106,6 +107,11 @@ const OrderLoadingHOListing = () => {
         </Tooltip>
       ),
       width: 280,
+      sortComparator: (v1, v2, param1, param2) => {
+        const id1 = param1?.id ?? 0;
+        const id2 = param2?.id ?? 0;
+        return id1 - id2;
+      },
     },
     { field: "order_type", headerName: "Order Type", width: 150 },
     { field: "user_type", headerName: "User Type", width: 150 },

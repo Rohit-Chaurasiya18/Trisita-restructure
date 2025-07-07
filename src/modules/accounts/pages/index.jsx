@@ -113,7 +113,7 @@ const Account = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const isThirdPartyAccount = useMemo(
     () => location.pathname.startsWith("/third_party_account"),
     [location?.pathname]
@@ -409,6 +409,24 @@ const Account = () => {
     },
     ...(isThirdPartyAccount
       ? [
+          {
+            field: "acv_total",
+            headerName: "Total ACV Price",
+            width: 130,
+            renderCell: (params) => (
+              <div>{Number(params?.value || 0).toFixed(2)}</div>
+            ),
+            sortComparator: (v1, v2) => Number(v1) - Number(v2),
+          },
+          {
+            field: "dtp_total",
+            headerName: "Total DTP Price",
+            width: 130,
+            renderCell: (params) => (
+              <div>{Number(params?.value || 0).toFixed(2)}</div>
+            ),
+            sortComparator: (v1, v2) => Number(v1) - Number(v2),
+          },
           {
             field: "show_subscription",
             headerName: "Show subscription",
