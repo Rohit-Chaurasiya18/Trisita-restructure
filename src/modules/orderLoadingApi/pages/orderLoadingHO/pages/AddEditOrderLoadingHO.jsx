@@ -524,10 +524,9 @@ const AddEditOrderLoadingHO = () => {
       [fieldName]: fileURL,
     }));
   };
-
   return (
     <>
-      {orderLoadingHoDetailLoading ? (
+      {orderLoadingHoDetailLoading || !formInitialized ? (
         <SkeletonLoader />
       ) : (
         <div className="">

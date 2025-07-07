@@ -414,7 +414,7 @@ const Account = () => {
             headerName: "Total ACV Price",
             width: 130,
             renderCell: (params) => (
-              <div>{Number(params?.value || 0).toFixed(2)}</div>
+              <div>{Number(params?.value).toFixed(2)}</div>
             ),
             sortComparator: (v1, v2) => Number(v1) - Number(v2),
           },
@@ -423,7 +423,7 @@ const Account = () => {
             headerName: "Total DTP Price",
             width: 130,
             renderCell: (params) => (
-              <div>{Number(params?.value || 0).toFixed(2)}</div>
+              <div>{Number(params?.value).toFixed(2)}</div>
             ),
             sortComparator: (v1, v2) => Number(v1) - Number(v2),
           },

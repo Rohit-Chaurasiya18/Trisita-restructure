@@ -420,6 +420,8 @@ const accountSlice = createSlice({
         address1: account?.address1 ?? null,
         city: account?.city ?? null,
         status: account?.status ?? null,
+        dtp_total: account?.dtp_total ?? 0,
+        acv_total: account?.acv_total ?? 0,
         contract_status: account?.contract_status ?? null,
         buyingReadinessScore: account?.buyingReadinessScore ?? null,
         branch: account?.branch_name ?? null,
