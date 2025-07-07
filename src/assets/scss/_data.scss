@@ -208,3 +208,29 @@
     }
   }
 }
+.renewal-person-info {
+  padding: 24px;
+  border: 1px solid gray;
+  border-radius: 8px;
+  width: 100%;
+  margin-top: 20px;
+  label {
+    margin-bottom: 10px;
+    font-size: 30px;
+    font-weight: bold;
+  }
+  .col-12 {
+    display: flex;
+    @media (max-width: 490px) {
+      display: grid;
+      margin-bottom: 15px;
+    }
+    .col-2 {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    .col-10 {
+      font-size: 18px;
+    }
+  }
+}

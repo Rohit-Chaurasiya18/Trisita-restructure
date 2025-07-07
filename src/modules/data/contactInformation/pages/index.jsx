@@ -77,39 +77,93 @@ const ContactInformation = () => {
         />
         <label>Please select an account to show contact info.</label>
       </div>
-      {selectedValue?.value && (
-        <div className="contact-information-container">
-          <div className="bd-person-info">
-            <label>BD Person Contact</label>
-          </div>
-          <div className="contact-manager-info">
-            <label>Contract Manager</label>
-            <div>
-              <div className="col-12">
-                <div className="col-2">Name</div>
-                <div className="col-10">
-                  {contract_manager?.endCustomer_contractManager?.first +
-                    contract_manager?.endCustomer_contractManager?.last ||
-                    "N/A"}
+      {selectedValue?.value && !ContactInformationLoading && (
+        <>
+          <div className="contact-information-container">
+            <div className="bd-person-info">
+              <label>BD Person Contact</label>
+              {account?.user_assign?.length > 0 ? (
+                account?.user_assign?.map((item) => (
+                  <div className="mb-4">
+                    <div className="col-12">
+                      <div className="col-2">Name</div>
+                      <div className="col-10">
+                        {item?.first_name + item?.last_name || "N/A"}
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="col-2">Email</div>
+                      <div className="col-10">{item?.email || "N/A"}</div>
+                    </div>
+                    <div className="col-12">
+                      <div className="col-2">Phone</div>
+                      <div className="col-10">{item?.phone || "N/A"}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center">
+                  <p>No data found!</p>
                 </div>
-              </div>
-              <div className="col-12">
-                <div className="col-2">Email</div>
-                <div className="col-10">
-                  {contract_manager?.endCustomer_contractManager?.email ||
-                    "N/A"}
+              )}
+            </div>
+
+            <div className="contact-manager-info">
+              <label>Contract Manager</label>
+              <div>
+                <div className="col-12">
+                  <div className="col-2">Name</div>
+                  <div className="col-10">
+                    {contract_manager?.endCustomer_contractManager?.first +
+                      contract_manager?.endCustomer_contractManager?.last ||
+                      "N/A"}
+                  </div>
                 </div>
-              </div>
-              <div className="col-12">
-                <div className="col-2">Phone</div>
-                <div className="col-10">
-                  {contract_manager?.endCustomer_contractManager?.phone ||
-                    "N/A"}
+                <div className="col-12">
+                  <div className="col-2">Email</div>
+                  <div className="col-10">
+                    {contract_manager?.endCustomer_contractManager?.email ||
+                      "N/A"}
+                  </div>
+                </div>
+                <div className="col-12">
+                  <div className="col-2">Phone</div>
+                  <div className="col-10">
+                    {contract_manager?.endCustomer_contractManager?.phone ||
+                      "N/A"}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+          <div className="renewal-person-info">
+            <label>Renewal Person Contact</label>
+            {account?.renewal_person?.length > 0 ? (
+              account?.renewal_person?.map((item) => (
+                <div className="mb-4">
+                  <div className="col-12">
+                    <div className="col-2">Name</div>
+                    <div className="col-10">
+                      {item?.first_name + item?.last_name || "N/A"}
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="col-2">Email</div>
+                    <div className="col-10">{item?.email || "N/A"}</div>
+                  </div>
+                  <div className="col-12">
+                    <div className="col-2">Phone</div>
+                    <div className="col-10">{item?.phone || "N/A"}</div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center">
+                <p>No data found!</p>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </>
   );
