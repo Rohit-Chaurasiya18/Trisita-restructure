@@ -184,7 +184,7 @@ const AddEditOrderLoadingHO = () => {
     formData.append(
       "product_details",
       JSON.stringify(
-        values?.productDetails?.map((item, idx) => ({ ...item, id: idx }))
+        values?.productDetails?.map((item, idx) => ({ ...item, id: "" }))
       )
     );
     if (isThirdParty) {
@@ -436,6 +436,14 @@ const AddEditOrderLoadingHO = () => {
       );
       setFieldValue("sellingPaymentTerms", data.selling_payment_terms || "");
       setFieldValue("remarks", data.remarks || "");
+      setFieldValue(
+        "productDetails",
+        data?.product_details?.map((item) => ({
+          ...item,
+          product_master_label: item?.product_master_name,
+          productId: item?.id,
+        }))
+      );
 
       setFormInitialized(true);
     }
@@ -921,20 +929,24 @@ const AddEditOrderLoadingHO = () => {
                   {/* <label className="form-label label requiredText"> */}
                   <label className="form-label label">Product Details</label>
                   <div style={{ cursor: "pointer" }}>
-                    <AddIcon
-                      onClick={() => {
-                        setModal({
-                          isOpen: true,
-                        });
-                      }}
-                    />
-                    <PreviewIcon
-                      onClick={() => {
-                        setModal({
-                          isOpen: true,
-                        });
-                      }}
-                    />
+                    {!orderLoadingHoId && (
+                      <AddIcon
+                        onClick={() => {
+                          setModal({
+                            isOpen: true,
+                          });
+                        }}
+                      />
+                    )}
+                    {orderLoadingHoId && (
+                      <PreviewIcon
+                        onClick={() => {
+                          setModal({
+                            isOpen: true,
+                          });
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
                 <CommonInputTextField
