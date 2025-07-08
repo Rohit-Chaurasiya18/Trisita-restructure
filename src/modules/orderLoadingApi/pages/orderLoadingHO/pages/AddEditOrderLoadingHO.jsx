@@ -526,7 +526,7 @@ const AddEditOrderLoadingHO = () => {
   };
   return (
     <>
-      {orderLoadingHoDetailLoading || !formInitialized ? (
+      {orderLoadingHoDetailLoading  ? (
         <SkeletonLoader />
       ) : (
         <div className="">

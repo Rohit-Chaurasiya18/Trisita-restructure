@@ -11,7 +11,7 @@ export const INSIGHT_METRICS_CUSTOMER =
   "/v1/api/get_insights_metrics_customer/";
 export const INSIGHT_METRICS_CUSTOMER_V2 =
   "/v1/api/get_insights_metrics_v2_customer/";
-export const ALERT_SUBSCRIPTION = "/v1/api/get_ror_lop_data/";
+export const ALERT_SUBSCRIPTION = "/v1/api/new_get_ror_lop_data/";
 export const GET_ALERT_SUBSCRIPTION = "/v1/api/get_alert_subscription/";
 export const GET_ALL_USER = "/v1/get_user/";
 export const GET_EXPORTED_ACCOUNTS_DATA = "/v1/api/get_export_accounts/";
@@ -39,10 +39,10 @@ export const GET_USUAGE_PRODUCT_FEATURE_CHART =
   "/v1/api/get_usage_product_feature_chart/";
 export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/usage_user_count/";
 export const GET_SUBSCRIPTION_DATA = "/v1/api/get_export_subscriptions/";
-export const GET_NEW_SUBSCRIPTION_DATA = "/v1/api/get_new_subscriptions/";
+export const GET_NEW_SUBSCRIPTION_DATA = "/v1/api/new_get_new_subscriptions/";
 export const GET_NEW_SUBSCRIPTION_DETAIL = "/v1/api/new_subscription/";
 export const GET_DELETED_SUBSCRIPTION_DATA =
-  "/v1/api/get_deleted_subscriptions/";
+  "/v1/api/new_get_deleted_subscriptions/";
 export const GET_DELETED_SUBSCRIPTION_DETAIL =
   "/v1/api/get_deleted_subscription/";
 export const GET_CHANGED_LOG_SUBSCRIPTION_DATA =
@@ -88,6 +88,6 @@ export const UPDATE_LOCK_UNLOCK_OREDER_LOADING =
 export const GET_BD_PERSON_BY_BRANCH = "/v1/api/get_bd_person_by_branch/";
 export const GET_ACCOUNT_BY_BD_PERSON = "/v1/api/get_accounts_by_bd_person/";
 export const ACTIVE_PRODUCT_MASTER = "/v1/product/active_product_master/";
-export const GET_RA_ORDER = "/v1/api/get_order_ra_data/";
+export const GET_RA_ORDER = "/v1/api/new_get_order_ra_data/";
 export const GET_CONTACT_INFORMATION = "/v1/api/get_contact_info/";
 export const GET_SUBS_BY_THIRD_PARTY = "/v1/api/get_subs_by_thirdparty/";

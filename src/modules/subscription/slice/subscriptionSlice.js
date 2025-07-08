@@ -218,10 +218,12 @@ const intialState = {
   subscriptionDataLoading: false,
   subscriptionDetails: null,
   subscriptionDetailsLoading: false,
+  newSubscriptionLastUpdated: null,
   newSubscriptionData: [],
   newSubscriptionDataLoading: false,
   newSubscriptionDetails: null,
   newSubscriptionDetailsLoading: false,
+  deletedSubscriptionLastUpdated: null,
   deletedSubscriptionData: [],
   deletedSubscriptionDataLoading: false,
   deletedSubscriptionDetails: null,
@@ -284,18 +286,21 @@ const subscriptionSlice = createSlice({
       state.newSubscriptionDataLoading = true;
     });
     builder.addCase(getNewSubscriptionData.fulfilled, (state, action) => {
-      state.newSubscriptionData = action.payload.data?.map((item) => ({
-        ...item,
-        bd_person: item?.bd_person_first_names
-          ? item?.bd_person_first_names.join(", ")
-          : "",
-        renewal_person: item?.renewal_person_first_names
-          ? item?.renewal_person_first_names.join(", ")
-          : "",
-        third_party: item?.third_party_name
-          ? item?.third_party_name.join(", ")
-          : "",
-      }));
+      state.newSubscriptionLastUpdated = action.payload.data?.last_updated;
+      state.newSubscriptionData = action.payload.data?.subscriptions?.map(
+        (item) => ({
+          ...item,
+          bd_person: item?.bd_person_first_names
+            ? item?.bd_person_first_names.join(", ")
+            : "",
+          renewal_person: item?.renewal_person_first_names
+            ? item?.renewal_person_first_names.join(", ")
+            : "",
+          third_party: item?.third_party_name
+            ? item?.third_party_name.join(", ")
+            : "",
+        })
+      );
       state.newSubscriptionDataLoading = false;
     });
     builder.addCase(getNewSubscriptionData.rejected, (state) => {
@@ -323,18 +328,21 @@ const subscriptionSlice = createSlice({
       state.deletedSubscriptionDataLoading = true;
     });
     builder.addCase(getDeletedSubscriptionData.fulfilled, (state, action) => {
-      state.deletedSubscriptionData = action.payload.data?.map((item) => ({
-        ...item,
-        bd_person: item?.bd_person_first_names
-          ? item?.bd_person_first_names.join(", ")
-          : "",
-        renewal_person: item?.renewal_person_first_names
-          ? item?.renewal_person_first_names.join(", ")
-          : "",
-        third_party: item?.third_party_name
-          ? item?.third_party_name.join(", ")
-          : "",
-      }));
+      state.deletedSubscriptionLastUpdated = action.payload.data?.last_updated;
+      state.deletedSubscriptionData = action.payload.data?.subscriptions?.map(
+        (item) => ({
+          ...item,
+          bd_person: item?.bd_person_first_names
+            ? item?.bd_person_first_names.join(", ")
+            : "",
+          renewal_person: item?.renewal_person_first_names
+            ? item?.renewal_person_first_names.join(", ")
+            : "",
+          third_party: item?.third_party_name
+            ? item?.third_party_name.join(", ")
+            : "",
+        })
+      );
       state.deletedSubscriptionDataLoading = false;
     });
     builder.addCase(getDeletedSubscriptionData.rejected, (state) => {

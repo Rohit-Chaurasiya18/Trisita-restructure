@@ -8,13 +8,20 @@ export const getRaOrderData = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       let url = GET_RA_ORDER;
-      if (payload?.id) {
-        url = url + `${payload?.id}`;
+      if (payload?.csn) {
+        url = url + `${payload?.csn}`;
       }
-      const response = await axiosReact.post(url, {
-        from_date: payload?.from_date,
-        to_date: payload?.to_date,
-      });
+      const response = await axiosReact.post(url, payload?.payload);
+
+      // let url = GET_RA_ORDER;
+      // if (payload?.id) {
+      //   url = url + `${payload?.id}`;
+      // }
+
+      // const response = await axiosReact.post(url, {
+      //   from_date: payload?.from_date,
+      //   to_date: payload?.to_date,
+      // });
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -24,6 +31,7 @@ export const getRaOrderData = createAsyncThunk(
 );
 
 const RaOrderState = {
+  raOrderListLastUpdated: null,
   raOrderListLoading: false,
   raOrderList: [],
 };
@@ -38,7 +46,8 @@ const RaOrderSlice = createSlice({
       state.raOrderListLoading = true;
     });
     builder.addCase(getRaOrderData.fulfilled, (state, action) => {
-      state.raOrderList = action.payload.data?.map((item) => ({
+      state.raOrderListLastUpdated = action.payload.data?.last_updated;
+      state.raOrderList = action.payload.data?.subscriptions?.map((item) => ({
         ...item,
         bd_person: item?.bd_person_first_names
           ? item?.bd_person_first_names?.join(", ")

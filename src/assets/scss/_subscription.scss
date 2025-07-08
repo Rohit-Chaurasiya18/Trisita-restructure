@@ -160,6 +160,11 @@
 }
 
 // New Subscription Page
+.new-subs-amountPerMonth {
+  .insight-metrics-chart{
+    width: 100% !important;
+  }
+}
 .new-subscription-header {
   display: flex;
   justify-content: space-between;
