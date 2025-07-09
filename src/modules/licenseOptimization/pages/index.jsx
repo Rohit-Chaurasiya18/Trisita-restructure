@@ -13,6 +13,7 @@ import {
   getLicenseOptimizationData,
 } from "../slice/LicenseOptimizationSlice";
 import { Autocomplete, TextField, Typography } from "@mui/material";
+import routesConstants from "@/routes/routesConstants";
 
 const LicenseOptization = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const LicenseOptization = () => {
     branch: null,
     productLineCode: [],
   });
+  const [isSubmit, setIsSubmit] = useState(false);
 
   const handleChange = (newValue) => {
     const [start, end] = newValue;
@@ -112,6 +114,7 @@ const LicenseOptization = () => {
       filters?.startDate &&
       filters?.endDate
     ) {
+      setIsSubmit(true);
       let payload = {
         branch_id: filters?.branch?.value,
         account_ids: filters?.account?.map((item) => item?.value),
@@ -119,7 +122,15 @@ const LicenseOptization = () => {
         start_date: filters?.startDate,
         end_date: filters?.endDate,
       };
-      dispatch(getLicenseOptimisation(payload));
+      dispatch(getLicenseOptimisation(payload)).then((res) => {
+        if (res?.payload?.status === 200) {
+          navigate(
+            routesConstants?.LICENSE_OPTIMIZATION +
+              routesConstants?.VIEW_LICENSE_OPTIMIZATION
+          );
+        }
+        setIsSubmit(false);
+      });
     }
   };
   return (
@@ -254,7 +265,7 @@ const LicenseOptization = () => {
               handleLicenseOptimisation();
             }
           }
-          isDisabled={checkFilters()}
+          isDisabled={checkFilters() || isSubmit}
         >
           License Optization
         </CommonButton>

@@ -8,6 +8,7 @@ const routesConstants = {
   ALERT_SUBSCRIPTION: "/alert_subscription",
   GET_USAGE: "/get_usage",
   LICENSE_OPTIMIZATION: "/license_optimization",
+  VIEW_LICENSE_OPTIMIZATION: "/view_license_optimization",
   ACCOUNT: "/account",
   ADD_ACCOUNT: "/add_account",
   UPDATE_ACCOUNT: "/update_account",

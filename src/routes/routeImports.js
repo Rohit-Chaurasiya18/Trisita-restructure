@@ -25,6 +25,10 @@ export const Get_usage = lazy(() => import("@/modules/getUsage/pages/index"));
 export const License_optization = lazy(() =>
   import("@/modules/licenseOptimization/pages/index")
 );
+// LicenseOptimisationView
+export const License_Optimisation_View = lazy(() =>
+  import("@/modules/licenseOptimization/pages/LicenseOptimisationView")
+);
 export const Usuage = lazy(() => import("@/modules/getUsage/pages/Usuage"));
 export const UniqueUserCount = lazy(() =>
   import("@/modules/getUsage/pages/UniqueUserCount")
