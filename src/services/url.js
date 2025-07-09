@@ -91,3 +91,8 @@ export const ACTIVE_PRODUCT_MASTER = "/v1/product/active_product_master/";
 export const GET_RA_ORDER = "/v1/api/new_get_order_ra_data/";
 export const GET_CONTACT_INFORMATION = "/v1/api/get_contact_info/";
 export const GET_SUBS_BY_THIRD_PARTY = "/v1/api/get_subs_by_thirdparty/";
+export const GET_BRANCH_ACCOUNT_PRODUCTLINE =
+  "/v1/api/get_branch_accounts_and_productlines/";
+export const GET_LICENSE_OPTIMISATION =
+  "/v1/api/get_account_optimization_list/";
+export const GET_NEW_OPPORTUNITY = "/v1/product/new_opportunity/";

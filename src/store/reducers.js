@@ -18,6 +18,7 @@ import uploadReducer from "@/modules/data/upload/slice/UploadSlice";
 import orderLoadingApiReducer from "@/modules/orderLoadingApi/slice/OrderLoadingApiSlice";
 import RaOrderReducer from "@/modules/orderLoadingApi/pages/RAOrder/slice/RAOrderSlice";
 import ContactInformationReducer from "@/modules/data/contactInformation/slice/ContactInfoSlice";
+import LicenseOptimizationReducer from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -39,5 +40,6 @@ const reducer = combineReducers({
   orderLoadingApi: orderLoadingApiReducer,
   RaOrder: RaOrderReducer,
   ContactInformation: ContactInformationReducer,
+  LicenseOptimization: LicenseOptimizationReducer,
 });
 export default reducer;

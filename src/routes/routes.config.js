@@ -42,6 +42,7 @@ import {
   License_optization,
   NewOpportunity,
   ContactInformation,
+  AddEditNewOpportunity,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -108,7 +109,11 @@ const routesConfig = {
     },
     {
       path: routesConstants.NEW_OPPORTUNITY,
-      component: NewOpportunity,
+      component: Outlet,
+      children: [
+        { index: true, component: NewOpportunity },
+        { path: "add_new_opportunity", component: AddEditNewOpportunity },
+      ],
     },
     {
       path: routesConstants.QUOTATION,

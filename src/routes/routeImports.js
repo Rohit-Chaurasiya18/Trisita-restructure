@@ -46,6 +46,9 @@ export const Opportunity = lazy(() =>
 export const NewOpportunity = lazy(() =>
   import("@/modules/newOpportunity/pages/index")
 );
+export const AddEditNewOpportunity = lazy(() =>
+  import("@/modules/newOpportunity/pages/AddEditNewOpportunity")
+);
 export const Subscription = lazy(() =>
   import("@/modules/subscription/pages/index")
 );
