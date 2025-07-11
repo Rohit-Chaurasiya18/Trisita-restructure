@@ -650,3 +650,15 @@
 .cursor-not-allowed {
   cursor: not-allowed !important;
 }
+
+.license-optimise {
+  flex-wrap: wrap !important;
+}
+
+.license-optimise {
+  & .MuiAutocomplete-root {
+    & .MuiFormControl-root {
+      height: 100% !important;
+    }
+  }
+}

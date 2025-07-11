@@ -24,7 +24,6 @@ export const getLicenseOptimizationData = createAsyncThunk(
   }
 );
 
-
 export const getLicenseOptimisation = createAsyncThunk(
   `LicenseOptimization/getLicenseOptimisation`,
   async (payload, thunkAPI) => {
@@ -48,12 +47,18 @@ const LicenseOptimizationSlice = createSlice({
   initialState: LicenseOptimizationState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getLicenseOptimizationData.pending, (state) => {});
-    builder.addCase(
-      getLicenseOptimizationData.fulfilled,
-      (state, action) => {}
-    );
-    builder.addCase(getLicenseOptimizationData.rejected, (state) => {});
+    builder.addCase(getLicenseOptimisation.pending, (state) => {
+      state.licenseOptimizationLoading = true;
+      state.licenseOptimizationData = null;
+    });
+    builder.addCase(getLicenseOptimisation.fulfilled, (state, action) => {
+      state.licenseOptimizationLoading = false;
+      state.licenseOptimizationData = action.payload.data?.data;
+    });
+    builder.addCase(getLicenseOptimisation.rejected, (state) => {
+      state.licenseOptimizationLoading = false;
+      state.licenseOptimizationData = null;
+    });
   },
 });
 

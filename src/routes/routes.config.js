@@ -90,7 +90,7 @@ const routesConfig = {
       children: [
         { index: true, component: License_optization },
         {
-          path: "view_license_optimization",
+          path: "view_license_optimization/:accountId/:branchId/:productId/:startDate/:endDate",
           component: License_Optimisation_View,
         },
       ],

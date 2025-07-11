@@ -26,6 +26,7 @@ const LicenseOptization = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [accountOptions, setAccountOptions] = useState([]);
   const [productLineCodeOptions, setProductLineCodeOptions] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState({
     startDate: null,
     endDate: null,
@@ -85,6 +86,7 @@ const LicenseOptization = () => {
         } else {
           setProductLineCodeOptions([]);
         }
+        setTotalCount(res?.payload?.data?.totalCount);
       });
     } else {
       setAccountOptions([]);
@@ -126,9 +128,15 @@ const LicenseOptization = () => {
         if (res?.payload?.status === 200) {
           navigate(
             routesConstants?.LICENSE_OPTIMIZATION +
-              routesConstants?.VIEW_LICENSE_OPTIMIZATION
+              routesConstants?.VIEW_LICENSE_OPTIMIZATION +
+              `/${filters?.account?.map((item) => item?.value)}` +
+              `/${filters?.branch?.value}` +
+              `/${filters?.productLineCode?.map((item) => item?.value)}` +
+              `/${filters?.startDate}` +
+              `/${filters?.endDate}`
           );
         }
+
         setIsSubmit(false);
       });
     }
@@ -137,7 +145,7 @@ const LicenseOptization = () => {
     <>
       <div className="commom-header-title mb-0">License Optization</div>
       <span className="common-breadcrum-msg">Welcome to you Team</span>
-      <div className="get-usuage-filter">
+      <div className="get-usuage-filter license-optimise">
         <CommonAutocomplete
           onChange={(event, newValue) => {
             setFilters((prev) => ({
@@ -195,6 +203,19 @@ const LicenseOptization = () => {
             />
           )}
         />
+
+        {totalCount > 0 && (
+          <TextField
+            disabled
+            id="outlined-disabled"
+            label="Total Count"
+            defaultValue={totalCount}
+            sx={{
+              width: "100px",
+              marginTop: "9px",
+            }}
+          />
+        )}
         <Autocomplete
           value={filters?.productLineCode}
           onChange={(event, newValues) => {
@@ -234,17 +255,7 @@ const LicenseOptization = () => {
             />
           )}
         />
-        {/* <CommonAutocomplete
-          onChange={(event, newValue) => {
-            setFilters((prev) => ({ ...prev, productLineCode: newValue }));
-          }}
-          options={productLineCodeOptions}
-          label="Select a Product line "
-          // loading={accountListLoading}
-          value={filters?.productLineCode}
 
-          // getOptionLabel={(option) => `${option?.label} (${option?.csn})`}
-        /> */}
         <CommonDateRangePicker
           value={dateRange}
           onChange={handleChange}
@@ -257,14 +268,9 @@ const LicenseOptization = () => {
           ${
             checkFilters() ? "get-usuage-btn-disabled" : "get-usuage-btn-active"
           }`}
-          onClick={() =>
-            // navigate(
-            //   `/get_usage/usage/${filters?.account?.csn}/${filters?.startDate}/${filters?.endDate}`
-            // )
-            {
-              handleLicenseOptimisation();
-            }
-          }
+          onClick={() => {
+            handleLicenseOptimisation();
+          }}
           isDisabled={checkFilters() || isSubmit}
         >
           License Optization
