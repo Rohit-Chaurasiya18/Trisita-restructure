@@ -145,9 +145,9 @@ const NewOpportunity = () => {
       <div className="new-opportunity-container">
         <div className="quotation-header mb-5">
           <div>
-            <h5 className="commom-header-title mb-0">New Opportunity</h5>
+            <h5 className="commom-header-title mb-0">New Quotation</h5>
             <span className="common-breadcrum-msg">
-              Manage your new opportunity
+              Manage your new quotation
             </span>
           </div>
           <div className="quotation-filter">
@@ -163,7 +163,7 @@ const NewOpportunity = () => {
                 );
               }}
             >
-              Add New Opportunity
+              Add New Quotation
             </CommonButton>
             <CommonAutocomplete
               onChange={(event, newValue) => {

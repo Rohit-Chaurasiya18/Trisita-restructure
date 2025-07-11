@@ -71,7 +71,7 @@ export const navLinks = [
         iconUrl: <ContactsOutlinedIcon />,
       },
       {
-        itemName: "New Opportunity",
+        itemName: "New Quotation",
         href: routesConstants?.NEW_OPPORTUNITY,
         iconUrl: <ContactsOutlinedIcon />,
       },

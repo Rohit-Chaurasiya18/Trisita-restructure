@@ -11,7 +11,10 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonModal from "@/components/common/modal/CommonModal";
 import { AddSalesStage } from "@/modules/quotations/pages/AddQuotation";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { getLicenseOptimizationData } from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
+import {
+  getAllBdPersonByBranchId,
+  getLicenseOptimizationData,
+} from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
 import { addNewOpportunity } from "@/modules/opportunity/slice/opportunitySlice";
 import { toast } from "react-toastify";
 import routesConstants from "@/routes/routesConstants";
@@ -34,6 +37,7 @@ const AddEditNewOpportunity = () => {
   const [modal, setModal] = useState({
     isOpen: false,
   });
+  const [bdOptions, setBdOptions] = useState([]);
   const [accountOption, setAccountOption] = useState([]);
 
   const { salesStage, salesStageLoading, branch_list, branchListLoading } =
@@ -53,6 +57,7 @@ const AddEditNewOpportunity = () => {
     quotationDate: "",
     name: "",
     branch: "",
+    bdPerson: [],
     account: "",
     generalTotal: "",
     salesStage: null,
@@ -89,7 +94,7 @@ const AddEditNewOpportunity = () => {
       setIsSubmitting(true);
       dispatch(addNewOpportunity(payload)).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
-          toast.success("New Opportunity created succesfully.");
+          toast.success("New Quotation created succesfully.");
           navigate(routesConstants?.NEW_OPPORTUNITY);
           resetForm();
         }
@@ -99,42 +104,40 @@ const AddEditNewOpportunity = () => {
   });
   const handleBranchChange = (branchId) => {
     if (branchId) {
-      let payload = {
-        branch: branchId,
-      };
-      dispatch(getLicenseOptimizationData(payload)).then((res) => {
-        if (res?.payload?.data?.accounts?.length > 0) {
-          let seen = new Set();
-          let data = res?.payload?.data?.accounts?.reduce((acc, item) => {
-            const labelKey = `${item?.name} (${item?.csn})`;
-            if (!seen.has(labelKey)) {
-              acc.push({
-                label: item?.name,
-                value: item?.id,
-                csn: item?.csn,
-              });
-              seen.add(labelKey);
-            }
-            return acc;
-          }, []);
-          setAccountOption(data);
+      dispatch(getAllBdPersonByBranchId(branchId)).then((res) => {
+        if (res?.payload?.data?.bd_persons?.length > 0) {
+          let data = res?.payload?.data?.bd_persons?.map((i) => ({
+            value: i?.id,
+            label: i?.name,
+          }));
+          setBdOptions(data);
+          if (values?.bdPerson?.length > 0) {
+            let drr = values?.bdPerson?.filter((i) =>
+              data?.map((itm) => itm?.value)?.includes(i)
+            );
+            setFieldValue("bdPerson", drr);
+          } else {
+            setFieldValue("bdPerson", []);
+          }
         } else {
-          setAccountOption([]);
+          setBdOptions([]);
+          setFieldValue("bdPerson", []);
         }
       });
     } else {
       setAccountOption([]);
     }
   };
+  console.log(values?.bdPerson);
   return (
     <>
       <div>
         <div>
-          <h5 className="commom-header-title mb-0">Manage New Opportunity</h5>
-          <span className="common-breadcrum-msg">Add new opportunity</span>
+          <h5 className="commom-header-title mb-0">Manage New Quotation</h5>
+          <span className="common-breadcrum-msg">Add new quotation</span>
         </div>
         <div className="add-account-form">
-          <h2 className="title">New Opportunity Form</h2>
+          <h2 className="title">New Quotation Form</h2>
           <form>
             <CommonDatePicker
               label="Quotation Date"
@@ -178,6 +181,25 @@ const AddEditNewOpportunity = () => {
               error={errors?.branch && touched?.branch}
               errorText={errors?.branch}
               isDisabled={branchListLoading}
+            />
+            <CustomSelect
+              label="BD Person"
+              required
+              name="bdPerson"
+              isMulti
+              value={bdOptions?.filter((item) =>
+                values?.bdPerson?.includes(item?.value)
+              )}
+              onChange={(selectedOption) => {
+                setFieldValue(
+                  "bdPerson",
+                  selectedOption?.map((item) => item?.value)
+                );
+              }}
+              options={bdOptions}
+              placeholder="Select a BD Person"
+              error={errors?.bdPerson && touched?.bdPerson}
+              errorText={errors?.bdPerson}
             />
             <CustomSelect
               label="Account"

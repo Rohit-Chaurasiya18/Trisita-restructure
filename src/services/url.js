@@ -96,3 +96,4 @@ export const GET_BRANCH_ACCOUNT_PRODUCTLINE =
 export const GET_LICENSE_OPTIMISATION =
   "/v1/api/get_account_optimization_list/";
 export const GET_NEW_OPPORTUNITY = "/v1/product/new_opportunity/";
+export const GET_ALL_BD_PERSON_BY_BRANCH = "/v1/api/get_branch_wise_bd_person/";
