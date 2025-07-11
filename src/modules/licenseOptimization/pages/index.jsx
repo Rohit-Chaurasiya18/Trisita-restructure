@@ -216,7 +216,7 @@ const LicenseOptization = () => {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Select an Account"
+              label="Select an Product Line"
               variant="outlined"
               InputProps={{
                 ...params.InputProps,

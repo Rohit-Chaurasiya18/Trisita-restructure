@@ -987,16 +987,16 @@ const NewSubscription = () => {
 
     // Determine base month (start from selected startDate if available, else current month)
     const baseMonth = filters?.startDate ? dayjs(filters.startDate) : dayjs(); // fallback to current month
-
-    // Start 2 months before current month
-    for (let i = -2; i < 10; i++) {
-      const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
+    
+    // Previous 12 months
+    for (let i = 11; i >= 0; i--) {
+      const monthKey = baseMonth.subtract(i, "month").format("YYYY-MM");
       monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
     }
 
     // Aggregate DTP and ACV by endDate month
     (filteredData || []).forEach((sub) => {
-      const endMonth = dayjs(sub?.endDate).format("YYYY-MM");
+      const endMonth = dayjs(sub?.created_date).format("YYYY-MM");
       if (monthlyData[endMonth]) {
         monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
         monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;

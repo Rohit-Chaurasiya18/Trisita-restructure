@@ -194,8 +194,6 @@ const ChangedLogSubscription = () => {
         headerName: "Trisita Old Status",
         width: 130,
       },
-      { field: "trisita_status", headerName: "Trisita Status", width: 130 },
-      { field: "subscriptionStatus", headerName: "Status", width: 100 },
       {
         field: "lastPurchaseDate",
         headerName: "Last Purchase Date",

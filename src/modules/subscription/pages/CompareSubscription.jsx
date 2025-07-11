@@ -163,6 +163,17 @@ const CompareSubscription = () => {
       { field: "seats", headerName: "Seats", width: 70 },
       { field: "startDate", headerName: "Subs Start Date", width: 130 },
       { field: "endDate", headerName: "Subs End Date ", width: 130 },
+
+      {
+        field: "trisita_new_status",
+        headerName: "Trisita New Status",
+        width: 130,
+      },
+      {
+        field: "trisita_old_status",
+        headerName: "Trisita Old Status",
+        width: 100,
+      },
       { field: "trisita_status", headerName: "Trisita Status", width: 130 },
       { field: "subscriptionStatus", headerName: "Status", width: 100 },
       {

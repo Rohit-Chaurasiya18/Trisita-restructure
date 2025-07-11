@@ -909,7 +909,7 @@ const RAOrder = () => {
 
     // Aggregate DTP and ACV by endDate month
     (filteredData || []).forEach((sub) => {
-      const endMonth = dayjs(sub?.endDate).format("YYYY-MM");
+      const endMonth = dayjs(sub?.deleted_date).format("YYYY-MM");
       if (monthlyData[endMonth]) {
         monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
         monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;
