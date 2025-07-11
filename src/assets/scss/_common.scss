@@ -662,3 +662,19 @@
     }
   }
 }
+.license-optimise-widgets {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 15px;
+  @media (max-width: 1024px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    .stat-card {
+      width: 100%;
+    }
+  }
+  @media (max-width: 450px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

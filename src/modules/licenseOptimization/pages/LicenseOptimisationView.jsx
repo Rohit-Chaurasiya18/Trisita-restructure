@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { Tooltip } from "@mui/material";
+
 import { getLicenseOptimisation } from "../slice/LicenseOptimizationSlice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
-import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
 
 const LicenseOptimisationView = () => {
@@ -18,13 +19,11 @@ const LicenseOptimisationView = () => {
         state?.LicenseOptimization?.licenseOptimizationLoading,
     })
   );
-  const [modal, setModal] = useState({
-    show: false,
-    features: [],
-  });
+
+  const [modal, setModal] = useState({ show: false, features: [] });
 
   useEffect(() => {
-    let payload = {
+    const payload = {
       branch_id: params?.branchId,
       account_ids: params?.accountId?.split(","),
       productLineCodes: params?.productId?.split(","),
@@ -34,7 +33,11 @@ const LicenseOptimisationView = () => {
     dispatch(getLicenseOptimisation(payload));
   }, [params]);
 
-  // Table column definition
+  const openModal = (features) =>
+    setModal({ show: true, features: features || [] });
+
+  const closeModal = () => setModal({ show: false, features: [] });
+
   const columns = useMemo(
     () => [
       { field: "user_id", headerName: "User ID", width: 600 },
@@ -52,14 +55,16 @@ const LicenseOptimisationView = () => {
       { field: "usage_type", headerName: "Usage Type", width: 200 },
       {
         field: "product_lines",
-        headerName: "Product Line Code / Type of License Assigned",
+        headerName: "Product Line Code / License Type",
         width: 320,
         renderCell: ({ value }) => {
-          let Arr = value?.map((item) => `${item?.name} - (${item?.code})`);
+          const label = value
+            ?.map((item) => `${item?.name} (${item?.code})`)
+            ?.join(", ");
           return (
-            <div>
-              <Tooltip title={Arr?.join(", ") || ""}>{Arr?.join(", ")}</Tooltip>
-            </div>
+            <Tooltip title={label}>
+              <span className="text-gray-500">{label}</span>
+            </Tooltip>
           );
         },
       },
@@ -79,17 +84,12 @@ const LicenseOptimisationView = () => {
         headerName: "Features",
         width: 150,
         renderCell: ({ value }) => (
-          <span
-            onClick={() =>
-              setModal((prev) => ({
-                show: true,
-                features: value,
-              }))
-            }
+          <button
+            onClick={() => openModal(value)}
             className="assign-button text-black px-3 py-1 rounded border-0"
           >
             Show Features
-          </span>
+          </button>
         ),
       },
     ],
@@ -98,25 +98,39 @@ const LicenseOptimisationView = () => {
 
   const featuresColumns = useMemo(
     () => [
-      {
-        field: "name",
-        headerName: "Name",
-        width: 200,
-        flex: 1,
-      },
-      {
-        field: "count",
-        headerName: "Count",
-        width: 200,
-        flex: 1,
-      },
+      { field: "name", headerName: "Name", flex: 1 },
+      { field: "count", headerName: "Count", flex: 1 },
     ],
     []
   );
+
+  const dummyStats = [
+    { title: "Total License Count", value: 5505150.75 },
+    { title: "Total License Optimise", value: 5505150.75 },
+    { title: "Total License Count", value: 5505150.75 },
+    { title: "Total License Optimise", value: 5505150.75 },
+  ];
+
   return (
     <>
-      <div className="commom-header-title mb-0">License Optimise</div>
+      <div className="commom-header-title mb-0">License Optimisation</div>
       <span className="common-breadcrum-msg">Welcome to your Team</span>
+
+      <div className="license-optimise-widgets">
+        {dummyStats.map((stat, idx) => (
+          <div className="stat-card" key={idx}>
+            <div className="stat-card-left">
+              <div className="stat-text">
+                <div className="stat-title">{stat.title}</div>
+              </div>
+            </div>
+            <div className="stat-progress">
+              <div className="stat-value">{stat.value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="mt-4">
         {licenseOptimizationLoading ? (
           <SkeletonLoader />
@@ -132,15 +146,11 @@ const LicenseOptimisationView = () => {
           </div>
         )}
       </div>
+
       <CommonModal
         isOpen={modal?.show}
-        handleClose={() =>
-          setModal({
-            show: false,
-            features: [],
-          })
-        }
-        title={"View Features"}
+        handleClose={closeModal}
+        title="View Features"
         scrollable
       >
         <CommonTable
