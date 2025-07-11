@@ -1,6 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAccountInformation } from "../slice/accountSlice";
+import {
+  getAccountByBdPerson,
+  getAccountInformation,
+} from "../slice/accountSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Autocomplete, TextField, Tooltip, Zoom } from "@mui/material";
@@ -50,6 +53,7 @@ const AssignUserBranch = ({ id, handleCallback }) => {
       allClientData: state?.account?.allUserData?.Client || [],
       branch_list: state?.insightMetrics?.branchList || [],
     }));
+  const [associateAccount, setAssociateAccount] = useState([]);
 
   useEffect(() => {
     if (id) {
@@ -57,6 +61,19 @@ const AssignUserBranch = ({ id, handleCallback }) => {
     }
   }, [id, dispatch]);
 
+  useEffect(() => {
+    if (accountInformation?.user_assign?.length > 0) {
+      let bdIds = accountInformation?.user_assign?.map((item) => item?.id);
+      dispatch(getAccountByBdPerson(bdIds)).then((res) => {
+        setAssociateAccount(
+          res?.payload?.data?.map((item) => ({
+            label: `${item?.name} - (${item?.csn})`,
+            value: item?.id,
+          }))
+        );
+      });
+    }
+  }, [accountInformation?.user_assign]);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -141,6 +158,13 @@ const AssignUserBranch = ({ id, handleCallback }) => {
         }
         formik={formik}
       />
+      {/* <AutocompleteField
+        label="Associate Account"
+        name="associateAccount"
+        options={associateAccount}
+        multiple
+        formik={formik}
+      /> */}
 
       <div className="form-group col-12 justify-content-center mt-4">
         <Tooltip
