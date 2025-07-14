@@ -8,7 +8,7 @@ import insightMetricsReducer from "@/modules/insightMetrics/slice/insightMetrics
 import insightMetricsReducerV2 from "@/modules/insightMetricsV2/slice/insightMetricsV2Slice";
 import alertSubscriptionReducer from "@/modules/alertSubscription/slice/alertSubscription";
 import accountReducer from "@/modules/accounts/slice/accountSlice";
-import quotationReducer from "@/modules/quotations/slice/quotationSlice";
+import quotationReducer from "@/modules/newQuotation/slice/quotationSlice";
 import opportunityReducer from "@/modules/opportunity/slice/opportunitySlice";
 import usugesReducer from "@/modules/getUsage/slice/UsuagesSlice";
 import subscriptionReducer from "@/modules/subscription/slice/subscriptionSlice";

@@ -5,11 +5,10 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
-import { getSalesStage } from "@/modules/quotations/slice/quotationSlice";
+import { addSalesStage, getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
 import { useEffect, useState } from "react";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonModal from "@/components/common/modal/CommonModal";
-import { AddSalesStage } from "@/modules/quotations/pages/AddQuotation";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import {
   getAllAccountByBdPersonIds,
@@ -30,6 +29,60 @@ const validationSchema = Yup.object({
   branch: Yup.string().required("Branch is required."),
   account: Yup.string().required("Account is required."),
 });
+export const AddSalesStage = ({ setModal }) => {
+  const dispatch = useDispatch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { handleBlur, handleChange, errors, values, touched, handleSubmit } =
+    useFormik({
+      initialValues: {
+        salesStage: "",
+      },
+      validationSchema: Yup.object({
+        salesStage: Yup.string().required("Sales stage is required."),
+      }),
+      onSubmit: (values) => {
+        setIsSubmitting(true);
+        dispatch(addSalesStage({ name: values?.salesStage })).then((res) => {
+          if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+            toast.success("Sales stage created successfully.");
+            setModal((prev) => ({ ...prev, isOpen: false }));
+          }
+          dispatch(getSalesStage());
+          setIsSubmitting(false);
+        });
+      },
+    });
+
+  return (
+    <div className="add-sales-stage-form">
+      <CommonInputTextField
+        labelName="Sales Stage Name"
+        id="salesStage"
+        name="salesStage"
+        className="input"
+        required
+        mainDiv="form-group"
+        labelClass="label"
+        value={values.salesStage}
+        placeHolder="Enter sales stage"
+        isInvalid={!!errors.salesStage && touched.salesStage}
+        errorText={errors.salesStage}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        requiredText
+      />
+      <div className="d-flex justify-content-center mt-4">
+        <button
+          onClick={handleSubmit}
+          className="btn btn-primary"
+          disabled={isSubmitting}
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const AddEditNewQuotation = () => {
   const dispatch = useDispatch();
@@ -395,7 +448,7 @@ const AddEditNewQuotation = () => {
         size={modal?.type === 1 ? "sm" : "xl"}
         isAdd
         handleAdd={() => {
-          debugger
+          debugger;
         }}
       >
         {modal?.type === 1 ? (

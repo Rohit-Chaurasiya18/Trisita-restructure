@@ -12,8 +12,6 @@ import {
   ChangePassword,
   Account,
   AddAccount,
-  Quotations,
-  AddQuotation,
   Opportunity,
   Subscription,
   NewSubscription,
@@ -123,14 +121,7 @@ const routesConfig = {
         { path: "add_new_opportunity", component: AddEditNewQuotaion },
       ],
     },
-    {
-      path: routesConstants.QUOTATION,
-      component: Outlet,
-      children: [
-        { index: true, component: Quotations },
-        { path: "add_quotation", component: AddQuotation },
-      ],
-    },
+    
     {
       path: routesConstants.SUBSCRIPTION,
       component: Subscription,
