@@ -75,11 +75,11 @@ export const navLinks = [
         href: routesConstants?.NEW_OPPORTUNITY,
         iconUrl: <ContactsOutlinedIcon />,
       },
-      {
-        itemName: "Quotation",
-        href: routesConstants?.QUOTATION,
-        iconUrl: <ContactsOutlinedIcon />,
-      },
+      // {
+      //   itemName: "Quotation",
+      //   href: routesConstants?.QUOTATION,
+      //   iconUrl: <ContactsOutlinedIcon />,
+      // },
     ],
   },
   {

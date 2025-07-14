@@ -54,24 +54,25 @@ const LicenseOptimisationView = () => {
       },
       { field: "usage_type", headerName: "Usage Type", width: 200 },
       {
-        field: "product_lines",
-        headerName: "Product Line Code / License Type",
+        field: "productLineCode",
+        headerName: "Product Line Codes",
         width: 320,
-        renderCell: ({ value }) => {
-          const label = value
-            ?.map((item) => `${item?.name} (${item?.code})`)
-            ?.join(", ");
-          return (
-            <Tooltip title={label}>
-              <span className="text-gray-500">{label}</span>
-            </Tooltip>
-          );
-        },
       },
       { field: "team_name", headerName: "Team Name", width: 200 },
+
       {
         field: "primary_admin_email",
         headerName: "Primary Admin Email",
+        width: 200,
+      },
+      {
+        field: "total_days_count",
+        headerName: "Days Count",
+        width: 200,
+      },
+      {
+        field: "licensedType",
+        headerName: "Licensed Type",
         width: 200,
       },
       {
@@ -107,7 +108,7 @@ const LicenseOptimisationView = () => {
   const dummyStats = [
     { title: "Total License Count", value: 5505150.75 },
     { title: "Total License Optimise", value: 5505150.75 },
-    { title: "Total License Count", value: 5505150.75 },
+    { title: "Total Unique Count", value: 5505150.75 },
     { title: "Total License Optimise", value: 5505150.75 },
   ];
 

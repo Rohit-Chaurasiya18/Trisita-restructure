@@ -48,10 +48,10 @@ export const Opportunity = lazy(() =>
   import("@/modules/opportunity/pages/index")
 );
 export const NewOpportunity = lazy(() =>
-  import("@/modules/newOpportunity/pages/index")
+  import("@/modules/newQuotation/pages/index")
 );
 export const AddEditNewOpportunity = lazy(() =>
-  import("@/modules/newOpportunity/pages/AddEditNewOpportunity")
+  import("@/modules/newQuotation/pages/AddEditNewQuotation")
 );
 export const Subscription = lazy(() =>
   import("@/modules/subscription/pages/index")

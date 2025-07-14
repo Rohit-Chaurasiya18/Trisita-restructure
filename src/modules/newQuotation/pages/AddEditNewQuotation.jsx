@@ -12,6 +12,7 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import { AddSalesStage } from "@/modules/quotations/pages/AddQuotation";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import {
+  getAllAccountByBdPersonIds,
   getAllBdPersonByBranchId,
   getLicenseOptimizationData,
 } from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
@@ -19,6 +20,7 @@ import { addNewOpportunity } from "@/modules/opportunity/slice/opportunitySlice"
 import { toast } from "react-toastify";
 import routesConstants from "@/routes/routesConstants";
 import { useNavigate } from "react-router-dom";
+import AddProductDetailsForm from "../components/AddProductDetailsForm";
 
 const validationSchema = Yup.object({
   quotationDate: Yup.string().required("Quotation date is required."),
@@ -29,13 +31,14 @@ const validationSchema = Yup.object({
   account: Yup.string().required("Account is required."),
 });
 
-const AddEditNewOpportunity = () => {
+const AddEditNewQuotation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modal, setModal] = useState({
     isOpen: false,
+    type: null,
   });
   const [bdOptions, setBdOptions] = useState([]);
   const [accountOption, setAccountOption] = useState([]);
@@ -61,6 +64,7 @@ const AddEditNewOpportunity = () => {
     account: "",
     generalTotal: "",
     salesStage: null,
+    productDetails: null,
     opportunity: "",
     billingContact: "",
     validUntil: "",
@@ -102,6 +106,7 @@ const AddEditNewOpportunity = () => {
       });
     },
   });
+
   const handleBranchChange = (branchId) => {
     if (branchId) {
       dispatch(getAllBdPersonByBranchId(branchId)).then((res) => {
@@ -116,8 +121,10 @@ const AddEditNewOpportunity = () => {
               data?.map((itm) => itm?.value)?.includes(i)
             );
             setFieldValue("bdPerson", drr);
+            setFieldValue("account", "");
           } else {
             setFieldValue("bdPerson", []);
+            setFieldValue("account", "");
           }
         } else {
           setBdOptions([]);
@@ -125,10 +132,40 @@ const AddEditNewOpportunity = () => {
         }
       });
     } else {
+      setBdOptions([]);
+      setFieldValue("bdPerson", []);
       setAccountOption([]);
+      setFieldValue("account", "");
     }
   };
-  console.log(values?.bdPerson);
+
+  const handeleBdChange = (bdIds) => {
+    if (bdIds?.length > 0) {
+      dispatch(getAllAccountByBdPersonIds(bdIds)).then((res) => {
+        if (res?.payload?.data?.length > 0) {
+          let formattedOptions = res?.payload?.data?.map((item) => ({
+            value: item?.account_id,
+            label: `${item?.account_name} (${item?.account_csn})`,
+            bdIds: item?.bd_person_ids,
+          }));
+          setAccountOption(formattedOptions);
+          if (values?.account) {
+            let findAccount = formattedOptions?.find(
+              (item) => item?.value === values.account
+            );
+            if (values?.account !== findAccount?.value) {
+              setFieldValue("account", "");
+            }
+          }
+        } else {
+          setAccountOption([]);
+        }
+      });
+    } else {
+      setFieldValue("account", "");
+    }
+  };
+
   return (
     <>
       <div>
@@ -173,7 +210,6 @@ const AddEditNewOpportunity = () => {
               )}
               onChange={(selectedOption) => {
                 setFieldValue("branch", selectedOption?.value);
-                setFieldValue("account", "");
                 handleBranchChange(selectedOption?.value);
               }}
               options={branch_list}
@@ -195,6 +231,8 @@ const AddEditNewOpportunity = () => {
                   "bdPerson",
                   selectedOption?.map((item) => item?.value)
                 );
+                let bdIds = selectedOption?.map((item) => item?.value);
+                handeleBdChange(bdIds);
               }}
               options={bdOptions}
               placeholder="Select a BD Person"
@@ -243,7 +281,6 @@ const AddEditNewOpportunity = () => {
                     label: item?.name,
                     value: item?.id,
                   }))}
-                // value={values.salesStage}
                 onChange={(selected) =>
                   setFieldValue("salesStage", selected?.value)
                 }
@@ -259,7 +296,36 @@ const AddEditNewOpportunity = () => {
               <AddIcon
                 style={{ marginTop: "1rem", cursor: "pointer" }}
                 onClick={() => {
-                  setModal((prev) => ({ ...prev, isOpen: true }));
+                  setModal((prev) => ({ ...prev, isOpen: true, type: 1 }));
+                }}
+              />
+            </div>
+            <div className="quotation_sales">
+              <CustomSelect
+                label="Product Detail"
+                name="productDetails"
+                // value={salesStage
+                //   ?.filter((item) => item?.id === values?.salesStage)
+                //   ?.map((item) => ({
+                //     label: item?.name,
+                //     value: item?.id,
+                //   }))}
+                onChange={(selected) =>
+                  setFieldValue("productDetails", selected?.value)
+                }
+                // options={salesStage?.map((item) => ({
+                //   label: item?.name,
+                //   value: item?.id,
+                // }))}
+                placeholder="Select a Product Detail"
+                error={errors.productDetails && touched.productDetails}
+                errorText={errors.productDetails}
+                // isDisabled={salesStageLoading}
+              />
+              <AddIcon
+                style={{ marginTop: "1rem", cursor: "pointer" }}
+                onClick={() => {
+                  setModal((prev) => ({ ...prev, isOpen: true, type: 2 }));
                 }}
               />
             </div>
@@ -317,7 +383,7 @@ const AddEditNewOpportunity = () => {
         </div>
       </div>
       <CommonModal
-        title={"Add  sales stage"}
+        title={modal?.type === 1 ? "Add  sales stage" : "Add product details"}
         isOpen={modal?.isOpen}
         handleClose={() => {
           setModal((prev) => ({
@@ -326,12 +392,20 @@ const AddEditNewOpportunity = () => {
           }));
         }}
         scrollable
-        maxWidth={"450px"}
+        size={modal?.type === 1 ? "sm" : "xl"}
+        isAdd
+        handleAdd={() => {
+          debugger
+        }}
       >
-        <AddSalesStage setModal={setModal} />
+        {modal?.type === 1 ? (
+          <AddSalesStage setModal={setModal} />
+        ) : (
+          <AddProductDetailsForm />
+        )}
       </CommonModal>
     </>
   );
 };
 
-export default AddEditNewOpportunity;
+export default AddEditNewQuotation;
