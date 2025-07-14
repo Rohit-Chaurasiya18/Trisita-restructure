@@ -42,6 +42,9 @@ export const AddAccount = lazy(() =>
 export const Opportunity = lazy(() =>
   import("@/modules/opportunity/pages/index")
 );
+export const NewOpportunity = lazy(() =>
+  import("@/modules/newOpportunity/pages/index")
+);
 export const NewQuotaion = lazy(() =>
   import("@/modules/newQuotation/pages/index")
 );

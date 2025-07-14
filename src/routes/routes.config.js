@@ -42,6 +42,7 @@ import {
   AddEditNewQuotaion,
   License_Optimisation_View,
   NewQuotaion,
+  NewOpportunity,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -112,6 +113,10 @@ const routesConfig = {
     {
       path: routesConstants.OPPORTUNITY,
       component: Opportunity,
+    },
+    {
+      path: routesConstants.NEW_OPPORTUNITY,
+      component: NewOpportunity,
     },
     {
       path: routesConstants.NEW_QUOTATION,

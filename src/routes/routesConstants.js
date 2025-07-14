@@ -14,6 +14,7 @@ const routesConstants = {
   UPDATE_ACCOUNT: "/update_account",
   THIRD_PARTY_ACCOUNT: "/third_party_account",
   OPPORTUNITY: "/renewal_opportunity",
+  NEW_OPPORTUNITY: "/new_opportunity",
   NEW_QUOTATION: "/new_quotation",
   ADD_NEW_QUOTATION: "/add_new_quotation",
   QUOTATION: "/quotation",
