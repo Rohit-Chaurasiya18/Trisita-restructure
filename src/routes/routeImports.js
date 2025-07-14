@@ -47,10 +47,10 @@ export const AddQuotation = lazy(() =>
 export const Opportunity = lazy(() =>
   import("@/modules/opportunity/pages/index")
 );
-export const NewOpportunity = lazy(() =>
+export const NewQuotaion = lazy(() =>
   import("@/modules/newQuotation/pages/index")
 );
-export const AddEditNewOpportunity = lazy(() =>
+export const AddEditNewQuotaion = lazy(() =>
   import("@/modules/newQuotation/pages/AddEditNewQuotation")
 );
 export const Subscription = lazy(() =>

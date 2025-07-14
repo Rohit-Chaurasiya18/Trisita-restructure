@@ -40,10 +40,10 @@ import {
   OrderLoadingDistributor,
   RAOrder,
   License_optization,
-  NewOpportunity,
   ContactInformation,
-  AddEditNewOpportunity,
+  AddEditNewQuotaion,
   License_Optimisation_View,
+  NewQuotaion,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -119,8 +119,8 @@ const routesConfig = {
       path: routesConstants.NEW_OPPORTUNITY,
       component: Outlet,
       children: [
-        { index: true, component: NewOpportunity },
-        { path: "add_new_opportunity", component: AddEditNewOpportunity },
+        { index: true, component: NewQuotaion },
+        { path: "add_new_opportunity", component: AddEditNewQuotaion },
       ],
     },
     {
