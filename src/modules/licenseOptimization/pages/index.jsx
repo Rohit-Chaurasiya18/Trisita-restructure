@@ -125,20 +125,17 @@ const LicenseOptization = () => {
         end_date: filters?.endDate,
       };
       dispatch(getLicenseOptimisation(payload)).then((res) => {
-        if (res?.payload?.status === 200) {
-          navigate(
-            routesConstants?.LICENSE_OPTIMIZATION +
-              routesConstants?.VIEW_LICENSE_OPTIMIZATION +
-              `/${filters?.account?.map((item) => item?.value)}` +
-              `/${filters?.branch?.value}` +
-              `/${filters?.productLineCode?.map((item) => item?.value)}` +
-              `/${filters?.startDate}` +
-              `/${filters?.endDate}`
-          );
-        }
-
         setIsSubmit(false);
       });
+      navigate(
+        routesConstants?.LICENSE_OPTIMIZATION +
+          routesConstants?.VIEW_LICENSE_OPTIMIZATION +
+          `/${filters?.account?.map((item) => item?.value)}` +
+          `/${filters?.branch?.value}` +
+          `/${filters?.productLineCode?.map((item) => item?.value)}` +
+          `/${filters?.startDate}` +
+          `/${filters?.endDate}`
+      );
     }
   };
   return (
