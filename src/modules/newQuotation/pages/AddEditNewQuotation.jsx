@@ -152,7 +152,7 @@ const AddEditNewQuotation = () => {
       dispatch(addNewOpportunity(payload)).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
           toast.success("New Quotation created succesfully.");
-          navigate(routesConstants?.NEW_OPPORTUNITY);
+          navigate(routesConstants?.NEW_QUOTATION);
           resetForm();
         }
         setIsSubmitting(false);

@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 
-const NewOpportunity = () => {
+const NewQuotation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -157,8 +157,8 @@ const NewOpportunity = () => {
               onClick={() => {
                 navigate(
                   `${
-                    routesConstants?.NEW_OPPORTUNITY +
-                    routesConstants?.ADD_NEW_OPPORTUNITY
+                    routesConstants?.NEW_QUOTATION +
+                    routesConstants?.ADD_NEW_QUOTATION
                   }`
                 );
               }}
@@ -195,4 +195,4 @@ const NewOpportunity = () => {
   );
 };
 
-export default NewOpportunity;
+export default NewQuotation;

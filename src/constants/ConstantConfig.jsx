@@ -72,14 +72,9 @@ export const navLinks = [
       },
       {
         itemName: "New Quotation",
-        href: routesConstants?.NEW_OPPORTUNITY,
+        href: routesConstants?.NEW_QUOTATION,
         iconUrl: <ContactsOutlinedIcon />,
       },
-      // {
-      //   itemName: "Quotation",
-      //   href: routesConstants?.QUOTATION,
-      //   iconUrl: <ContactsOutlinedIcon />,
-      // },
     ],
   },
   {

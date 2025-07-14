@@ -114,11 +114,11 @@ const routesConfig = {
       component: Opportunity,
     },
     {
-      path: routesConstants.NEW_OPPORTUNITY,
+      path: routesConstants.NEW_QUOTATION,
       component: Outlet,
       children: [
         { index: true, component: NewQuotaion },
-        { path: "add_new_opportunity", component: AddEditNewQuotaion },
+        { path: "add_new_quotation", component: AddEditNewQuotaion },
       ],
     },
     
