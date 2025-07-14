@@ -45,7 +45,7 @@ export const getLicenseOptimizationData = createAsyncThunk(
     try {
       const response = await axiosReact.get(
         GET_BRANCH_ACCOUNT_PRODUCTLINE +
-          `?branch_id=${payload?.branch}&account_ids=${payload?.account}`
+          `?branch_id=${payload?.branch}&account_ids=${payload?.account}&productLineCode=${payload?.productLineCode}`
       );
       return response;
     } catch (err) {

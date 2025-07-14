@@ -13,7 +13,6 @@ import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice
 import {
   getAllAccountByBdPersonIds,
   getAllBdPersonByBranchId,
-  getLicenseOptimizationData,
 } from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
 import { addNewOpportunity } from "@/modules/opportunity/slice/opportunitySlice";
 import { toast } from "react-toastify";

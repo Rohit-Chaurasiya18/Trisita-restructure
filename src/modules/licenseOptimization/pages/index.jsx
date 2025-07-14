@@ -1,10 +1,7 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
-import {
-  getAllAccount,
-  getAllBranch,
-} from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +9,7 @@ import {
   getLicenseOptimisation,
   getLicenseOptimizationData,
 } from "../slice/LicenseOptimizationSlice";
-import { Autocomplete, TextField, Typography } from "@mui/material";
+import { Autocomplete, tabClasses, TextField, Typography } from "@mui/material";
 import routesConstants from "@/routes/routesConstants";
 
 const LicenseOptization = () => {
@@ -56,6 +53,9 @@ const LicenseOptization = () => {
       let payload = {
         branch: filters?.branch?.value || "",
         account: filters?.account?.map((account) => account?.value) || "",
+        productLineCode: filters?.productLineCode?.map(
+          (productLineCode) => productLineCode?.value || ""
+        ),
       };
       dispatch(getLicenseOptimizationData(payload)).then((res) => {
         if (res?.payload?.data?.accounts?.length > 0) {
@@ -86,7 +86,7 @@ const LicenseOptization = () => {
         } else {
           setProductLineCodeOptions([]);
         }
-        setTotalCount(res?.payload?.data?.totalCount);
+        setTotalCount(res?.payload?.data?.totalSeats);
       });
     } else {
       setAccountOptions([]);
@@ -204,18 +204,6 @@ const LicenseOptization = () => {
           )}
         />
 
-        {totalCount > 0 && (
-          <TextField
-            disabled
-            id="outlined-disabled"
-            label="Total Count"
-            defaultValue={totalCount}
-            sx={{
-              width: "100px",
-              marginTop: "9px",
-            }}
-          />
-        )}
         <Autocomplete
           value={filters?.productLineCode}
           onChange={(event, newValues) => {
@@ -255,7 +243,18 @@ const LicenseOptization = () => {
             />
           )}
         />
-
+        {totalCount > 0 && (
+          <TextField
+            disabled
+            id="outlined-disabled"
+            label="Total Count"
+            value={totalCount}
+            sx={{
+              width: "100px",
+              marginTop: "9px",
+            }}
+          />
+        )}
         <CommonDateRangePicker
           value={dateRange}
           onChange={handleChange}
