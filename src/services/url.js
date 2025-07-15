@@ -100,3 +100,4 @@ export const GET_ALL_BD_PERSON_BY_BRANCH = "/v1/api/get_branch_wise_bd_person/";
 export const GET_ALL_ACCOUNT_BY_BD_PERSON =
   "/v1/api/get_bd_person_wise_account/";
 export const PRODUCT_DETAILS = "/v1/product/product_details/";
+export const DOWNLOAD_PDF_QUOTATION = "/v1/product/download_pdf_quotation/";

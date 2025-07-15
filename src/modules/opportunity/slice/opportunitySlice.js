@@ -75,6 +75,22 @@ export const addNewOpportunity = createAsyncThunk(
   }
 );
 
+export const updateNewOpportunity = createAsyncThunk(
+  "opportunities/updateNewOpportunity",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        GET_NEW_OPPORTUNITY + payload?.id,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const initialValue = {
   opportunityLoading: false,
   opportunityList: [],

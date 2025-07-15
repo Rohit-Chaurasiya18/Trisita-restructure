@@ -73,12 +73,12 @@ const AddProductDetail = forwardRef((props, ref) => {
         sgst_amount: sgstAmount,
         cgst_amount: cgstAmount,
         igst_amount: igstAmount,
-        remarks:values?.remarks
+        remarks: values?.remarks,
+        id: data?.selectedProduct?.id,
       };
       props?.handleAddProductDetail(formattedData);
     }
   };
-
   const {
     values,
     touched,
@@ -97,7 +97,6 @@ const AddProductDetail = forwardRef((props, ref) => {
   });
 
   const { data } = props;
-
   const { sgstAmount, cgstAmount, igstAmount } = useMemo(() => {
     const billingStateCode = data?.billingGSTNumber?.substring(0, 2);
     const sellingAmount = parseFloat(values?.sellingAmount) || 0;
@@ -119,6 +118,21 @@ const AddProductDetail = forwardRef((props, ref) => {
       };
     }
   }, [data, stateCode, values?.sellingAmount]);
+
+  useEffect(() => {
+    if (data?.selectedProduct) {
+      let productDetails = data?.selectedProduct;
+      setFieldValue("productMaster", {
+        value: productDetails?.product_master,
+        label: productDetails?.product_master_label,
+      });
+      setFieldValue("quantity", productDetails?.quantity);
+      setFieldValue("sellingAmount", productDetails?.selling_amount);
+      setFieldValue("purchaseAmount", productDetails?.purchase_amount);
+      setFieldValue("remarks", productDetails?.remarks);
+      setFieldValue("totalACVAmount", productDetails?.total_acv_amount_exc_gst);
+    }
+  }, [data?.selectedProduct]);
 
   // Expose submit function to parent using ref
   useImperativeHandle(ref, () => ({

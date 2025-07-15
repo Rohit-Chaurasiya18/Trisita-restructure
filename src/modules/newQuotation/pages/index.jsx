@@ -9,6 +9,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import { Tooltip } from "@mui/material";
+import { downloadQuotation } from "../slice/quotationSlice";
+import { toast } from "react-toastify";
 
 const NewQuotation = () => {
   const dispatch = useDispatch();
@@ -41,8 +44,19 @@ const NewQuotation = () => {
       {
         field: "quotation_no",
         headerName: "Quotation Number",
-        width: 250,
-        renderCell: (params) => <span>{params?.value}</span>,
+        width: 300,
+        renderCell: (params) => (
+          <Tooltip title={params?.value || ""}>
+            <button
+              className={`text-red-600  border-0`}
+              onClick={() =>
+                navigate(routesConstants?.NEW_QUOTATION + `/${params?.row?.id}`)
+              }
+            >
+              <span className="table-cell-truncate">{params.value}</span>
+            </button>
+          </Tooltip>
+        ),
       },
       {
         field: "quotation_date",
@@ -53,12 +67,6 @@ const NewQuotation = () => {
       {
         field: "name",
         headerName: "Name",
-        width: 150,
-        renderCell: (params) => <span>{params?.value}</span>,
-      },
-      {
-        field: "general_total",
-        headerName: "General Total",
         width: 150,
         renderCell: (params) => <span>{params?.value}</span>,
       },
@@ -121,6 +129,37 @@ const NewQuotation = () => {
             )}
           >
             {moment(params?.row?.created_at).format("DD MMM YYYY [at] hh:mm A")}
+          </span>
+        ),
+      },
+      {
+        field: "download_btn",
+        headerName: "Download Quotation",
+        width: 200,
+        cellClassName: "text-center",
+        renderCell: (params, index) => (
+          <span
+            onClick={() => {
+              dispatch(downloadQuotation(params?.row?.id)).then((res) => {
+                if (res?.payload) {
+                  const blob = new Blob([res.payload], {
+                    type: "application/pdf",
+                  });
+                  const url = URL.createObjectURL(blob);
+
+                  // ✅ Open in new tab
+                  window.open(url, "_blank");
+
+                  // Optional: Revoke object URL after use
+                  setTimeout(() => URL.revokeObjectURL(url), 500);
+                } else {
+                  toast.error("Failed to download quotation.");
+                }
+              });
+            }}
+            className="assign-button text-black px-3 py-1 rounded border-0"
+          >
+            Download Quotation
           </span>
         ),
       },

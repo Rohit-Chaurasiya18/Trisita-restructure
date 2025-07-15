@@ -1,7 +1,9 @@
 import { axiosReact } from "@/services/api";
 import {
+  DOWNLOAD_PDF_QUOTATION,
   GET_ADD_QUOTATION,
   GET_ADD_SALES_STAGE,
+  GET_NEW_OPPORTUNITY,
   PRODUCT_DETAILS,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -31,11 +33,12 @@ export const addSalesStage = createAsyncThunk(
     }
   }
 );
-export const addProductDetails = createAsyncThunk(
-  "quotation/addProductDetails",
+
+export const getQuotationById = createAsyncThunk(
+  "quotation/getQuotationById",
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.post(PRODUCT_DETAILS, payload);
+      const response = await axiosReact.get(GET_NEW_OPPORTUNITY + payload);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -43,6 +46,25 @@ export const addProductDetails = createAsyncThunk(
     }
   }
 );
+
+export const downloadQuotation = createAsyncThunk(
+  "quotation/downloadQuotation",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        DOWNLOAD_PDF_QUOTATION + `${payload}/`,
+        {
+          responseType: "blob", // 🔥 IMPORTANT
+        }
+      );
+      return response?.data;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const initialValue = {
   salesStageLoading: false,
   salesStage: [],

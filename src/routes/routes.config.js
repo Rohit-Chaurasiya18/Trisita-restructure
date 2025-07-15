@@ -124,9 +124,10 @@ const routesConfig = {
       children: [
         { index: true, component: NewQuotaion },
         { path: "add_new_quotation", component: AddEditNewQuotaion },
+        { path: ":quotationId", component: AddEditNewQuotaion },
       ],
     },
-    
+
     {
       path: routesConstants.SUBSCRIPTION,
       component: Subscription,
