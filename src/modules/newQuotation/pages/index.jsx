@@ -3,14 +3,13 @@ import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { getNewOpportunity } from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Tooltip } from "@mui/material";
-import { downloadQuotation } from "../slice/quotationSlice";
+import { downloadQuotation, getNewQuotation } from "../slice/quotationSlice";
 import { toast } from "react-toastify";
 
 const NewQuotation = () => {
@@ -18,13 +17,13 @@ const NewQuotation = () => {
   const navigate = useNavigate();
 
   const {
-    newOpportunityList,
-    newOpportunityListLoading,
+    newQuotationList,
+    newQuotationListLoading,
     branch_list,
     branchListLoading,
   } = useSelector((state) => ({
-    newOpportunityList: state?.opportunity?.newOpportunityList,
-    newOpportunityListLoading: state?.opportunity?.newOpportunityListLoading,
+    newQuotationList: state?.quotation?.newQuotationList,
+    newQuotationListLoading: state?.quotation?.newQuotationListLoading,
     branch_list: state?.insightMetrics?.branchList,
     branchListLoading: state?.insightMetrics?.branchListLoading,
   }));
@@ -34,7 +33,7 @@ const NewQuotation = () => {
   });
 
   useEffect(() => {
-    dispatch(getNewOpportunity());
+    dispatch(getNewQuotation());
     dispatch(getAllBranch());
   }, []);
 
@@ -168,11 +167,11 @@ const NewQuotation = () => {
   );
 
   useEffect(() => {
-    setFilteredData(newOpportunityList);
-  }, [newOpportunityList]);
+    setFilteredData(newQuotationList);
+  }, [newQuotationList]);
 
   useEffect(() => {
-    let data = newOpportunityList;
+    let data = newQuotationList;
     if (filters?.branch?.value) {
       data = data?.filter((item) => item?.branch === filters?.branch?.value);
     }
@@ -218,7 +217,7 @@ const NewQuotation = () => {
             />
           </div>
         </div>
-        {newOpportunityListLoading ? (
+        {newQuotationListLoading ? (
           <SkeletonLoader />
         ) : (
           <CommonTable

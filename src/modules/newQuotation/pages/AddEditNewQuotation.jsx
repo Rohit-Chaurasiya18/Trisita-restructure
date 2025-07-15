@@ -6,9 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
 import {
+  addNewOpportunity,
   addSalesStage,
   getQuotationById,
   getSalesStage,
+  updateNewOpportunity,
 } from "@/modules/newQuotation/slice/quotationSlice";
 import { useEffect, useRef, useState } from "react";
 import CommonButton from "@/components/common/buttons/CommonButton";
@@ -18,10 +20,6 @@ import {
   getAllAccountByBdPersonIds,
   getAllBdPersonByBranchId,
 } from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
-import {
-  addNewOpportunity,
-  updateNewOpportunity,
-} from "@/modules/opportunity/slice/opportunitySlice";
 import { toast } from "react-toastify";
 import routesConstants from "@/routes/routesConstants";
 import { useNavigate, useParams } from "react-router-dom";

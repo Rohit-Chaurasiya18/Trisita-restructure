@@ -1,10 +1,8 @@
 import { axiosReact } from "@/services/api";
 import {
   DOWNLOAD_PDF_QUOTATION,
-  GET_ADD_QUOTATION,
   GET_ADD_SALES_STAGE,
-  GET_NEW_OPPORTUNITY,
-  PRODUCT_DETAILS,
+  GET_NEW_QUOTATION,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -38,7 +36,7 @@ export const getQuotationById = createAsyncThunk(
   "quotation/getQuotationById",
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_NEW_OPPORTUNITY + payload);
+      const response = await axiosReact.get(GET_NEW_QUOTATION + payload);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -64,10 +62,51 @@ export const downloadQuotation = createAsyncThunk(
     }
   }
 );
+export const getNewQuotation = createAsyncThunk(
+  "opportunities/getNewQuotation",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_NEW_QUOTATION);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const addNewOpportunity = createAsyncThunk(
+  "opportunities/addNewOpportunity",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_NEW_QUOTATION, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 
+export const updateNewOpportunity = createAsyncThunk(
+  "opportunities/updateNewOpportunity",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        GET_NEW_QUOTATION + payload?.id,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 const initialValue = {
   salesStageLoading: false,
   salesStage: [],
+  newQuotationList: [],
+  newQuotationListLoading: false,
 };
 
 const quotationSlice = createSlice({
@@ -87,6 +126,20 @@ const quotationSlice = createSlice({
     builder.addCase(getSalesStage.rejected, (state, action) => {
       state.salesStage = [];
       state.salesStageLoading = false;
+    });
+
+    // Get New Quotaion
+    builder.addCase(getNewQuotation.pending, (state, action) => {
+      state.newQuotationListLoading = true;
+      state.newQuotationList = [];
+    });
+    builder.addCase(getNewQuotation.fulfilled, (state, action) => {
+      state.newQuotationListLoading = false;
+      state.newQuotationList = action.payload.data;
+    });
+    builder.addCase(getNewQuotation.rejected, (state, action) => {
+      state.newQuotationListLoading = false;
+      state.newQuotationList = [];
     });
   },
 });

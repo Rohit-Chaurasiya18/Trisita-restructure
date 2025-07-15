@@ -2,7 +2,6 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   GET_EXPORT_OPPORTUNITIES,
-  GET_NEW_OPPORTUNITY,
   GET_OPPORTUNITY_DETAIL,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -40,48 +39,6 @@ export const getOpportunityDetail = createAsyncThunk(
     try {
       const response = await axiosReact.get(
         GET_OPPORTUNITY_DETAIL + `/${payload}`
-      );
-      return response;
-    } catch (err) {
-      toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
-    }
-  }
-);
-
-export const getNewOpportunity = createAsyncThunk(
-  "opportunities/getNewOpportunity",
-  async (payload, thunkAPI) => {
-    try {
-      const response = await axiosReact.get(GET_NEW_OPPORTUNITY);
-      return response;
-    } catch (err) {
-      toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
-    }
-  }
-);
-
-export const addNewOpportunity = createAsyncThunk(
-  "opportunities/addNewOpportunity",
-  async (payload, thunkAPI) => {
-    try {
-      const response = await axiosReact.post(GET_NEW_OPPORTUNITY, payload);
-      return response;
-    } catch (err) {
-      toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
-    }
-  }
-);
-
-export const updateNewOpportunity = createAsyncThunk(
-  "opportunities/updateNewOpportunity",
-  async (payload, thunkAPI) => {
-    try {
-      const response = await axiosReact.put(
-        GET_NEW_OPPORTUNITY + payload?.id,
-        payload
       );
       return response;
     } catch (err) {
@@ -138,20 +95,6 @@ const opportunitySlice = createSlice({
     builder.addCase(getOpportunityDetail.rejected, (state, action) => {
       state.opportunityDetailLoading = false;
       state.opportunityDetail = null;
-    });
-
-    // Get New Opportunity
-    builder.addCase(getNewOpportunity.pending, (state, action) => {
-      state.newOpportunityListLoading = true;
-      state.newOpportunityList = [];
-    });
-    builder.addCase(getNewOpportunity.fulfilled, (state, action) => {
-      state.newOpportunityListLoading = false;
-      state.newOpportunityList = action.payload.data;
-    });
-    builder.addCase(getNewOpportunity.rejected, (state, action) => {
-      state.newOpportunityListLoading = false;
-      state.newOpportunityList = [];
     });
   },
 });
