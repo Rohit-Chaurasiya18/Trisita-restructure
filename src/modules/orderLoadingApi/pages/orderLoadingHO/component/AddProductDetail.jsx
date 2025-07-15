@@ -25,9 +25,8 @@ const AddProductDetail = forwardRef((props, ref) => {
     activeProductMaster: state?.orderLoadingApi?.activeProductMaster,
     productMasterById: state?.product?.productMasterById,
     productMasterByIdLoading: state?.product?.productMasterByIdLoading,
-    stateCode: state?.orderLoadingApi?.stateCode,
+    stateCode: props?.stateCode || state?.orderLoadingApi?.stateCode,
   }));
-
   useEffect(() => {
     dispatch(getActiveProductMaster());
   }, []);
@@ -51,6 +50,7 @@ const AddProductDetail = forwardRef((props, ref) => {
     quantity: "",
     sellingAmount: "",
     purchaseAmount: "",
+    remarks: "",
     totalACVAmount: 0,
   };
   const onSubmit = (values, { resetForm }) => {
@@ -73,6 +73,7 @@ const AddProductDetail = forwardRef((props, ref) => {
         sgst_amount: sgstAmount,
         cgst_amount: cgstAmount,
         igst_amount: igstAmount,
+        remarks:values?.remarks
       };
       props?.handleAddProductDetail(formattedData);
     }
@@ -260,6 +261,26 @@ const AddProductDetail = forwardRef((props, ref) => {
           <div className="col-sm-3">IGST Amount (per unit):</div>
           <div className="col-sm-9">{parseFloat(igstAmount)?.toFixed(2)}</div>
         </div>
+        {props?.isRemark && (
+          <div className="col-sm-12 mb-3">
+            <div className="col-sm-3">Remarks:</div>
+            <div className="col-sm-9">
+              <CommonInputTextField
+                id="remarks"
+                name="remarks"
+                className="input"
+                mainDiv="form-group"
+                placeHolder="Enter Remarks"
+                value={values?.remarks}
+                isInvalid={errors?.remarks && touched?.remarks}
+                errorText={errors?.remarks}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                min={1}
+              />
+            </div>
+          </div>
+        )}
       </form>
     </>
   );

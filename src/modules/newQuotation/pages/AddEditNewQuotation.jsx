@@ -5,8 +5,12 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
-import { addSalesStage, getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
-import { useEffect, useState } from "react";
+import {
+  addProductDetails,
+  addSalesStage,
+  getSalesStage,
+} from "@/modules/newQuotation/slice/quotationSlice";
+import { useEffect, useRef, useState } from "react";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonModal from "@/components/common/modal/CommonModal";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
@@ -19,6 +23,8 @@ import { toast } from "react-toastify";
 import routesConstants from "@/routes/routesConstants";
 import { useNavigate } from "react-router-dom";
 import AddProductDetailsForm from "../components/AddProductDetailsForm";
+import ProductDetailModal from "@/modules/orderLoadingApi/pages/orderLoadingHO/component/ProductDetailModal";
+import AddProductDetail from "@/modules/orderLoadingApi/pages/orderLoadingHO/component/AddProductDetail";
 
 const validationSchema = Yup.object({
   quotationDate: Yup.string().required("Quotation date is required."),
@@ -27,9 +33,18 @@ const validationSchema = Yup.object({
   salesStage: Yup.string().required("Sales stage is required."),
   branch: Yup.string().required("Branch is required."),
   account: Yup.string().required("Account is required."),
+  bdPerson: Yup.array()
+    .of(Yup.mixed()) // or Yup.number(), Yup.string(), depending on type
+    .min(1, "At least one value must be selected")
+    .required("This field is required"),
+  billingAddress: Yup.string().required("Billing Address is required"),
+  billingGSTNumber: Yup.string().required("Billing GST Number is required"),
+  shippingAddress: Yup.string().required("Shipping Address is required"),
+  shippingGSTNumber: Yup.string().required("Shipping GST Number is required"),
 });
 export const AddSalesStage = ({ setModal }) => {
   const dispatch = useDispatch();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { handleBlur, handleChange, errors, values, touched, handleSubmit } =
     useFormik({
@@ -86,6 +101,7 @@ export const AddSalesStage = ({ setModal }) => {
 const AddEditNewQuotation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const productFormRef = useRef();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modal, setModal] = useState({
@@ -94,7 +110,10 @@ const AddEditNewQuotation = () => {
   });
   const [bdOptions, setBdOptions] = useState([]);
   const [accountOption, setAccountOption] = useState([]);
-
+  const [addProductDetailModal, setAddProductDetailModal] = useState({
+    isShow: false,
+  });
+  const [stateCode, setStateCode] = useState(0);
   const { salesStage, salesStageLoading, branch_list, branchListLoading } =
     useSelector((state) => ({
       salesStage: state?.quotation?.salesStage,
@@ -121,6 +140,11 @@ const AddEditNewQuotation = () => {
     billingContact: "",
     validUntil: "",
     remarks: "",
+    productDetails: [],
+    billingAddress: "",
+    billingGSTNumber: "",
+    shippingAddress: "",
+    shippingGSTNumber: "",
   };
   const {
     values,
@@ -158,6 +182,32 @@ const AddEditNewQuotation = () => {
       });
     },
   });
+  const handleAddProductDetail = (data) => {
+    let formattedPayload = {
+      product_master: data?.product_master,
+      quantity: data?.quantity,
+      selling_amount: data?.selling_amount,
+      purchase_amount: data?.purchase_amount,
+      remarks: data?.remarks,
+    };
+    dispatch(addProductDetails(formattedPayload)).then((res) => {
+      if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+        toast.success("Product details added successfully.");
+        let Arr = [...values?.productDetails, data];
+        setFieldValue("productDetails", Arr);
+      }
+      setAddProductDetailModal({
+        isShow: false,
+      });
+    });
+  };
+
+  const handleDeleteRow = (id) => {
+    let filteredArr = values?.productDetails?.filter(
+      (item, idx) => id !== idx + 1
+    );
+    setFieldValue("productDetails", filteredArr);
+  };
 
   const handleBranchChange = (branchId) => {
     if (branchId) {
@@ -181,6 +231,9 @@ const AddEditNewQuotation = () => {
         } else {
           setBdOptions([]);
           setFieldValue("bdPerson", []);
+        }
+        if (res?.payload?.data?.state_code) {
+          setStateCode(res?.payload?.data?.state_code);
         }
       });
     } else {
@@ -217,7 +270,6 @@ const AddEditNewQuotation = () => {
       setFieldValue("account", "");
     }
   };
-
   return (
     <>
       <div>
@@ -405,6 +457,72 @@ const AddEditNewQuotation = () => {
               onChange={handleChange}
               onBlur={handleBlur}
             />
+            <CommonInputTextField
+              labelName="Billing Address"
+              id="billingAddress"
+              name="billingAddress"
+              className="input"
+              mainDiv="form-group"
+              labelClass="label"
+              placeHolder="Enter Billing Address"
+              required
+              value={values?.billingAddress}
+              isInvalid={errors?.billingAddress && touched?.billingAddress}
+              errorText={errors?.billingAddress}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              requiredText
+            />
+            <CommonInputTextField
+              labelName="Billing GST Number"
+              id="billingGSTNumber"
+              name="billingGSTNumber"
+              className="input"
+              mainDiv="form-group"
+              labelClass="label"
+              placeHolder="Enter Billing GST Number"
+              required
+              value={values?.billingGSTNumber}
+              isInvalid={errors?.billingGSTNumber && touched?.billingGSTNumber}
+              errorText={errors?.billingGSTNumber}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              requiredText
+            />
+            <CommonInputTextField
+              labelName="Shipping Address"
+              id="shippingAddress"
+              name="shippingAddress"
+              className="input"
+              mainDiv="form-group"
+              labelClass="label"
+              placeHolder="Enter Shipping Address"
+              required
+              value={values?.shippingAddress}
+              isInvalid={errors?.shippingAddress && touched?.shippingAddress}
+              errorText={errors?.shippingAddress}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              requiredText
+            />
+            <CommonInputTextField
+              labelName="Shipping GST Number"
+              id="shippingGSTNumber"
+              name="shippingGSTNumber"
+              className="input"
+              mainDiv="form-group"
+              labelClass="label"
+              placeHolder="Enter Shipping GST Number"
+              required
+              value={values?.shippingGSTNumber}
+              isInvalid={
+                errors?.shippingGSTNumber && touched?.shippingGSTNumber
+              }
+              errorText={errors?.shippingGSTNumber}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              requiredText
+            />
             <CommonDatePicker
               label="Valid Until"
               name="validUntil"
@@ -435,7 +553,7 @@ const AddEditNewQuotation = () => {
         </div>
       </div>
       <CommonModal
-        title={modal?.type === 1 ? "Add  sales stage" : "Add product details"}
+        title={modal?.type === 1 ? "Add  sales stage" : "Product Details"}
         isOpen={modal?.isOpen}
         handleClose={() => {
           setModal((prev) => ({
@@ -447,14 +565,46 @@ const AddEditNewQuotation = () => {
         size={modal?.type === 1 ? "sm" : "xl"}
         isAdd
         handleAdd={() => {
-          debugger;
+          setAddProductDetailModal({
+            isShow: true,
+          });
         }}
       >
         {modal?.type === 1 ? (
           <AddSalesStage setModal={setModal} />
         ) : (
-          <AddProductDetailsForm />
+          <ProductDetailModal
+            data={values?.productDetails?.map((item, idx) => ({
+              ...item,
+              id: idx + 1,
+            }))}
+            handleDeleteRow={handleDeleteRow}
+          />
         )}
+      </CommonModal>
+      <CommonModal
+        isOpen={addProductDetailModal?.isShow}
+        title={"Add Product Details"}
+        handleClose={() => {
+          setAddProductDetailModal({
+            isShow: false,
+          });
+        }}
+        scrollable
+        isAdd
+        handleAdd={() => {
+          if (productFormRef.current) {
+            productFormRef.current.submitForm(); // this triggers formik submit in AddProductDetail
+          }
+        }}
+      >
+        <AddProductDetail
+          ref={productFormRef}
+          data={{ billingGSTNumber: values?.billingGSTNumber }}
+          stateCode={stateCode}
+          handleAddProductDetail={handleAddProductDetail}
+          isRemark={true}
+        />
       </CommonModal>
     </>
   );

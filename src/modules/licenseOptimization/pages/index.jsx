@@ -52,7 +52,7 @@ const LicenseOptization = () => {
     if (filters?.branch?.value) {
       let payload = {
         branch: filters?.branch?.value || "",
-        account: filters?.account?.map((account) => account?.value) || "",
+        account: filters?.account?.map((account) => account?.csn) || "",
         productLineCode: filters?.productLineCode?.map(
           (productLineCode) => productLineCode?.value || ""
         ),
@@ -119,7 +119,7 @@ const LicenseOptization = () => {
       setIsSubmit(true);
       let payload = {
         branch_id: filters?.branch?.value,
-        account_ids: filters?.account?.map((item) => item?.value),
+        account_csns: filters?.account?.map((item) => item?.csn),
         productLineCodes: filters?.productLineCode?.map((item) => item?.value),
         start_date: filters?.startDate,
         end_date: filters?.endDate,
@@ -130,7 +130,7 @@ const LicenseOptization = () => {
       navigate(
         routesConstants?.LICENSE_OPTIMIZATION +
           routesConstants?.VIEW_LICENSE_OPTIMIZATION +
-          `/${filters?.account?.map((item) => item?.value)}` +
+          `/${filters?.account?.map((item) => item?.csn)}` +
           `/${filters?.branch?.value}` +
           `/${filters?.productLineCode?.map((item) => item?.value)}` +
           `/${filters?.startDate}` +
@@ -140,7 +140,7 @@ const LicenseOptization = () => {
   };
   return (
     <>
-      <div className="commom-header-title mb-0">License Optization</div>
+      <div className="commom-header-title mb-0">License Optimisation</div>
       <span className="common-breadcrum-msg">Welcome to you Team</span>
       <div className="get-usuage-filter license-optimise">
         <CommonAutocomplete
@@ -269,7 +269,7 @@ const LicenseOptization = () => {
           }}
           isDisabled={checkFilters() || isSubmit}
         >
-          License Optization
+          License Optimisation
         </CommonButton>
       </div>
     </>

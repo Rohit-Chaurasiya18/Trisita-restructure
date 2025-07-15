@@ -11,21 +11,28 @@ import CommonModal from "@/components/common/modal/CommonModal";
 const LicenseOptimisationView = () => {
   const params = useParams();
   const dispatch = useDispatch();
-  const { licenseOptimizationData, licenseOptimizationLoading } = useSelector(
-    (state) => ({
-      licenseOptimizationData:
-        state?.LicenseOptimization?.licenseOptimizationData,
-      licenseOptimizationLoading:
-        state?.LicenseOptimization?.licenseOptimizationLoading,
-    })
-  );
+  const {
+    licenseOptimizationData,
+    licenseOptimizationLoading,
+    totalLicenseCount,
+    totalUniqueUser,
+    totalLicenseOptimized,
+  } = useSelector((state) => ({
+    licenseOptimizationData:
+      state?.LicenseOptimization?.licenseOptimizationData,
+    licenseOptimizationLoading:
+      state?.LicenseOptimization?.licenseOptimizationLoading,
+    totalLicenseCount: state?.LicenseOptimization?.totalLicenseCount,
+    totalUniqueUser: state?.LicenseOptimization?.totalUniqueUser,
+    totalLicenseOptimized: state?.LicenseOptimization?.totalLicenseOptimized,
+  }));
 
   const [modal, setModal] = useState({ show: false, features: [] });
 
   useEffect(() => {
     const payload = {
       branch_id: params?.branchId,
-      account_ids: params?.accountId?.split(","),
+      account_csns: params?.accountId?.split(","),
       productLineCodes: params?.productId?.split(","),
       start_date: params?.startDate,
       end_date: params?.endDate,
@@ -67,7 +74,7 @@ const LicenseOptimisationView = () => {
       },
       {
         field: "total_days_count",
-        headerName: "Days Count",
+        headerName: "Product Feature Count",
         width: 200,
       },
       {
@@ -105,12 +112,15 @@ const LicenseOptimisationView = () => {
     []
   );
 
-  const dummyStats = [
-    { title: "Total License Count", value: 5505150.75 },
-    { title: "Total License Optimise", value: 5505150.75 },
-    { title: "Total Unique Count", value: 5505150.75 },
-    { title: "Total License Optimise", value: 5505150.75 },
-  ];
+  const dummyStats = useMemo(
+    () => [
+      { title: "Total License Count", value: totalLicenseCount },
+      { title: "Total License Optimised", value: totalLicenseOptimized },
+      { title: "Total Unique Count", value: totalUniqueUser },
+      { title: "Total License Optimised", value: 5505150.75 },
+    ],
+    [totalLicenseCount, totalUniqueUser, totalLicenseOptimized]
+  );
 
   return (
     <>

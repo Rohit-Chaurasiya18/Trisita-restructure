@@ -45,7 +45,7 @@ export const getLicenseOptimizationData = createAsyncThunk(
     try {
       const response = await axiosReact.get(
         GET_BRANCH_ACCOUNT_PRODUCTLINE +
-          `?branch_id=${payload?.branch}&account_ids=${payload?.account}&productLineCode=${payload?.productLineCode}`
+          `?branch_id=${payload?.branch}&account_csns=${payload?.account}&productLineCode=${payload?.productLineCode}`
       );
       return response;
     } catch (err) {
@@ -71,6 +71,9 @@ export const getLicenseOptimisation = createAsyncThunk(
 const LicenseOptimizationState = {
   licenseOptimizationData: null,
   licenseOptimizationLoading: false,
+  totalLicenseCount: 0,
+  totalUniqueUser: 0,
+  totalLicenseOptimized: 0,
 };
 
 const LicenseOptimizationSlice = createSlice({
@@ -89,6 +92,10 @@ const LicenseOptimizationSlice = createSlice({
         productLineCode: i?.product_lines?.map((ix) => ix?.code)?.join(", "),
         licensedType: i?.product_lines?.map((ix) => ix?.name)?.join(", "),
       }));
+      state.totalLicenseCount = action.payload.data?.total_license_count;
+      state.totalUniqueUser = action.payload.data?.total_unique_user;
+      state.totalLicenseOptimized =
+        action.payload.data?.total_license_optimized;
     });
     builder.addCase(getLicenseOptimisation.rejected, (state) => {
       state.licenseOptimizationLoading = false;
