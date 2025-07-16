@@ -26,6 +26,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ProductDetailModal from "@/modules/orderLoadingApi/pages/orderLoadingHO/component/ProductDetailModal";
 import AddProductDetail from "@/modules/orderLoadingApi/pages/orderLoadingHO/component/AddProductDetail";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 
 const validationSchema = Yup.object({
   quotationDate: Yup.string().required("Quotation date is required."),
@@ -405,8 +406,25 @@ const AddEditNewQuotation = () => {
                     (item) => item?.value === values?.branch
                   )}
                   onChange={(selectedOption) => {
-                    setFieldValue("branch", selectedOption?.value);
-                    handleBranchChange(selectedOption?.value);
+                    if (values?.bdPerson?.length > 0 || values?.account) {
+                      CustomSweetAlert(
+                        "Change Branch?",
+                        "Changing the branch will update the BD Person(s) and Account based on the selected branch. Do you want to continue?",
+                        "Warning",
+                        true,
+                        "Yes, Change Branch",
+                        "Cancel",
+                        (result) => {
+                          if (result.isConfirmed) {
+                            setFieldValue("branch", selectedOption?.value);
+                            handleBranchChange(selectedOption?.value);
+                          }
+                        }
+                      );
+                    } else {
+                      setFieldValue("branch", selectedOption?.value);
+                      handleBranchChange(selectedOption?.value);
+                    }
                   }}
                   options={branch_list}
                   placeholder="Select a Branch"
@@ -423,12 +441,35 @@ const AddEditNewQuotation = () => {
                     values?.bdPerson?.includes(item?.value)
                   )}
                   onChange={(selectedOption) => {
-                    setFieldValue(
-                      "bdPerson",
-                      selectedOption?.map((item) => item?.value)
-                    );
-                    let bdIds = selectedOption?.map((item) => item?.value);
-                    handeleBdChange(bdIds);
+                    if (values?.account) {
+                      CustomSweetAlert(
+                        "Change BD Person?",
+                        "Changing the bd person will update the Account based on the selected bd person. Do you want to continue?",
+                        "Warning",
+                        true,
+                        "Yes, Change Bd Person",
+                        "Cancel",
+                        (result) => {
+                          if (result.isConfirmed) {
+                            setFieldValue(
+                              "bdPerson",
+                              selectedOption?.map((item) => item?.value)
+                            );
+                            let bdIds = selectedOption?.map(
+                              (item) => item?.value
+                            );
+                            handeleBdChange(bdIds);
+                          }
+                        }
+                      );
+                    } else {
+                      setFieldValue(
+                        "bdPerson",
+                        selectedOption?.map((item) => item?.value)
+                      );
+                      let bdIds = selectedOption?.map((item) => item?.value);
+                      handeleBdChange(bdIds);
+                    }
                   }}
                   options={bdOptions}
                   placeholder="Select a BD Person"
@@ -443,7 +484,19 @@ const AddEditNewQuotation = () => {
                     (item) => item?.value === values?.account
                   )}
                   onChange={(selectedOption) => {
-                    setFieldValue("account", selectedOption?.value);
+                    CustomSweetAlert(
+                      "Account Selection?",
+                      "Do you confirm that Account CSN is selected correctly?",
+                      "Warning",
+                      true,
+                      "Yes, Select account",
+                      "Cancel",
+                      (result) => {
+                        if (result.isConfirmed) {
+                          setFieldValue("account", selectedOption?.value);
+                        }
+                      }
+                    );
                   }}
                   options={accountOption}
                   placeholder="Select a Account"
