@@ -3,6 +3,8 @@ import {
   DOWNLOAD_PDF_QUOTATION,
   GET_ADD_SALES_STAGE,
   GET_NEW_QUOTATION,
+  GET_QUOTATION_TEMPLATE,
+  SEND_QUOTATION,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -62,6 +64,31 @@ export const downloadQuotation = createAsyncThunk(
     }
   }
 );
+
+export const quotationTemplate = createAsyncThunk(
+  "quotation/quotationTemplate",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_QUOTATION_TEMPLATE);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const handleSendQuotation = createAsyncThunk(
+  "quotation/handleSendQuotation",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(SEND_QUOTATION, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 export const getNewQuotation = createAsyncThunk(
   "opportunities/getNewQuotation",
   async (payload, thunkAPI) => {
@@ -107,6 +134,8 @@ const initialValue = {
   salesStage: [],
   newQuotationList: [],
   newQuotationListLoading: false,
+  quotationTemplate: [],
+  quotationTemplateLoading: false,
 };
 
 const quotationSlice = createSlice({
@@ -141,6 +170,28 @@ const quotationSlice = createSlice({
       state.newQuotationListLoading = false;
       state.newQuotationList = [];
     });
+
+    //Get quotation template
+    builder.addCase(quotationTemplate.pending, (state) => {
+      state.quotationTemplate = [];
+      state.quotationTemplateLoading = true;
+    });
+    builder.addCase(quotationTemplate.fulfilled, (state, action) => {
+      state.quotationTemplate = action.payload.data?.map((item) => ({
+        label: item?.name,
+        value: item?.id,
+        days: item?.days,
+        content: item?.content,
+      }));
+      state.quotationTemplateLoading = false;
+    });
+    builder.addCase(quotationTemplate.rejected, (state) => {
+      state.quotationTemplate = [];
+      state.quotationTemplateLoading = false;
+    });
+
+    //Send Quotation
+    // handleSendQuotation
   },
 });
 export const {} = quotationSlice.actions;

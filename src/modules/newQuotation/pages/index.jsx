@@ -9,8 +9,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Tooltip } from "@mui/material";
-import { downloadQuotation, getNewQuotation } from "../slice/quotationSlice";
+import {
+  downloadQuotation,
+  getNewQuotation,
+  quotationTemplate,
+} from "../slice/quotationSlice";
 import { toast } from "react-toastify";
+import CommonModal from "@/components/common/modal/CommonModal";
+import SetTrigger from "@/modules/subscription/components/SetTrigger";
 
 const NewQuotation = () => {
   const dispatch = useDispatch();
@@ -30,6 +36,10 @@ const NewQuotation = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [filters, setFilters] = useState({
     branch: null,
+  });
+  const [modal, setModal] = useState({
+    show: false,
+    id: null,
   });
 
   useEffect(() => {
@@ -135,7 +145,7 @@ const NewQuotation = () => {
         field: "download_btn",
         headerName: "Download Quotation",
         width: 200,
-        cellClassName: "text-center",
+        cellClassName: "",
         renderCell: (params, index) => (
           <span
             onClick={() => {
@@ -159,6 +169,23 @@ const NewQuotation = () => {
             className="assign-button text-black px-3 py-1 rounded border-0"
           >
             Download Quotation
+          </span>
+        ),
+      },
+
+      {
+        field: "action",
+        headerName: "Action",
+        width: 200,
+        cellClassName: "",
+        renderCell: (params, index) => (
+          <span
+            onClick={() => {
+              setModal({ show: true, id: params?.row?.id });
+            }}
+            className="assign-button text-black px-3 py-1 rounded border-0"
+          >
+            Send Quotation
           </span>
         ),
       },
@@ -229,6 +256,23 @@ const NewQuotation = () => {
           />
         )}
       </div>
+      <CommonModal
+        isOpen={modal.show}
+        handleClose={() => setModal({ show: false, id: null })}
+        scrollable
+        title={"Send Quotation"}
+      >
+        <SetTrigger
+          modal={modal}
+          isQuotation={true}
+          handleClose={() => {
+            setModal({
+              id: null,
+              show: false,
+            });
+          }}
+        />
+      </CommonModal>
     </>
   );
 };

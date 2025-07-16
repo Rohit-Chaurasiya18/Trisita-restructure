@@ -101,3 +101,5 @@ export const GET_ALL_ACCOUNT_BY_BD_PERSON =
   "/v1/api/get_bd_person_wise_account/";
 export const PRODUCT_DETAILS = "/v1/product/product_details/";
 export const DOWNLOAD_PDF_QUOTATION = "/v1/product/download_pdf_quotation/";
+export const GET_QUOTATION_TEMPLATE = "/v1/api/get_new_templates_quotation/";
+export const SEND_QUOTATION = "/v1/product/send_quotation_mail/";
