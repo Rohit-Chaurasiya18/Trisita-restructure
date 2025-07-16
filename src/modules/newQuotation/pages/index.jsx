@@ -17,6 +17,7 @@ import {
 import { toast } from "react-toastify";
 import CommonModal from "@/components/common/modal/CommonModal";
 import SetTrigger from "@/modules/subscription/components/SetTrigger";
+import CommonSelect from "@/components/common/dropdown/CommonSelect";
 
 const NewQuotation = () => {
   const dispatch = useDispatch();
@@ -36,10 +37,13 @@ const NewQuotation = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [filters, setFilters] = useState({
     branch: null,
+    status: "All Status",
   });
   const [modal, setModal] = useState({
     show: false,
     id: null,
+    type: null,
+    productDetails: [],
   });
 
   useEffect(() => {
@@ -106,6 +110,46 @@ const NewQuotation = () => {
       {
         field: "branch_name",
         headerName: "Branch",
+        width: 150,
+        renderCell: (params) => <span>{params?.value}</span>,
+      },
+      {
+        field: "product",
+        headerName: "Product Details",
+        width: 120,
+        renderCell: (params) => (
+          <div className="">
+            <span
+              onClick={() => {
+                setModal({
+                  show: true,
+                  id: params?.row?.id,
+                  type: 2,
+                  productDetails: params?.row?.product_details,
+                });
+              }}
+              className="assign-button text-black px-3 py-1 rounded border-0"
+            >
+              Show
+            </span>
+          </div>
+        ),
+      },
+      {
+        field: "sub_total",
+        headerName: "Sub Total",
+        width: 150,
+        renderCell: (params) => <span>{params?.value}</span>,
+      },
+      {
+        field: "gst_total",
+        headerName: "GST Total",
+        width: 150,
+        renderCell: (params) => <span>{params?.value}</span>,
+      },
+      {
+        field: "grand_total",
+        headerName: "Grand Total",
         width: 150,
         renderCell: (params) => <span>{params?.value}</span>,
       },
@@ -181,7 +225,12 @@ const NewQuotation = () => {
         renderCell: (params, index) => (
           <span
             onClick={() => {
-              setModal({ show: true, id: params?.row?.id });
+              setModal({
+                show: true,
+                id: params?.row?.id,
+                type: 1,
+                productDetails: [],
+              });
             }}
             className="assign-button text-black px-3 py-1 rounded border-0"
           >
@@ -202,8 +251,37 @@ const NewQuotation = () => {
     if (filters?.branch?.value) {
       data = data?.filter((item) => item?.branch === filters?.branch?.value);
     }
+    if (filters?.status !== "All Status") {
+      data = data?.filter((item) => item?.status === filters?.status);
+    }
     setFilteredData(data);
-  }, [filters?.branch]);
+  }, [filters?.branch, filters?.status]);
+
+  const product_master_Columns = [
+    {
+      field: "product_name",
+      headerName: "Product Master",
+      width: 450,
+      renderCell: (params) => (
+        <Tooltip title={params.value || ""}>{params?.value}</Tooltip>
+      ),
+    },
+    { field: "quantity", headerName: "Quantity" },
+    { field: "selling_amount", headerName: "Selling Amount" },
+    {
+      field: "total_selling_amount_exc_gst",
+      headerName: "Total Selling Amount",
+    },
+    { field: "purchase_amount", headerName: "Purchase Amount" },
+    {
+      field: "total_purchase_amount_exc_gst",
+      headerName: "Total Purchase Amount",
+    },
+    { field: "total_acv_amount_exc_gst", headerName: "Total ACV Amount" },
+    { field: "sgst_amount", headerName: "SGST Amount (per unit)" },
+    { field: "cgst_amount", headerName: "CGST Amount (per unit)" },
+    { field: "igst_amount", headerName: "IGST Amount (per unit)" },
+  ];
 
   return (
     <>
@@ -230,6 +308,20 @@ const NewQuotation = () => {
             >
               Add New Quotation
             </CommonButton>
+            <CommonSelect
+              value={filters?.status}
+              options={[
+                { value: "All Status", label: "All Status" },
+                { value: "Active", label: "Active" },
+                { value: "Expired", label: "Expired" },
+              ]}
+              onChange={(e) => {
+                setFilters((prev) => ({
+                  ...prev,
+                  status: e.target.value,
+                }));
+              }}
+            />
             <CommonAutocomplete
               onChange={(event, newValue) => {
                 setFilters((prev) => ({
@@ -258,20 +350,34 @@ const NewQuotation = () => {
       </div>
       <CommonModal
         isOpen={modal.show}
-        handleClose={() => setModal({ show: false, id: null })}
+        handleClose={() =>
+          setModal({ show: false, id: null, type: null, productDetails: [] })
+        }
         scrollable
-        title={"Send Quotation"}
+        title={modal?.type === 1 ? "Send Quotation" : "Product details"}
+        size={modal?.type === 1 ? "lg" : "xl"}
       >
-        <SetTrigger
-          modal={modal}
-          isQuotation={true}
-          handleClose={() => {
-            setModal({
-              id: null,
-              show: false,
-            });
-          }}
-        />
+        {modal?.type === 1 ? (
+          <SetTrigger
+            modal={modal}
+            isQuotation={true}
+            handleClose={() => {
+              setModal({
+                id: null,
+                show: false,
+                type: null,
+                productDetails: [],
+              });
+            }}
+          />
+        ) : (
+          <CommonTable
+            rows={modal?.productDetails}
+            columns={product_master_Columns}
+            getRowId={(row) => row?.product_detail_id}
+            toolbar
+          />
+        )}
       </CommonModal>
     </>
   );

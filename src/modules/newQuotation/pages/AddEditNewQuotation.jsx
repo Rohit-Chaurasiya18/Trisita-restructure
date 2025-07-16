@@ -45,6 +45,7 @@ const validationSchema = Yup.object({
   billingGSTNumber: Yup.string().required("Billing GST Number is required"),
   shippingAddress: Yup.string().required("Shipping Address is required"),
   shippingGSTNumber: Yup.string().required("Shipping GST Number is required"),
+  validUntil: Yup.string().required("Valid until is required."),
 });
 export const AddSalesStage = ({ setModal }) => {
   const dispatch = useDispatch();
@@ -648,9 +649,12 @@ const AddEditNewQuotation = () => {
                 />
                 <CommonDatePicker
                   label="Valid Until"
+                  required
                   name="validUntil"
                   value={values?.validUntil}
                   onChange={(date) => setFieldValue("validUntil", date)}
+                  error={touched.validUntil && !!errors.validUntil}
+                  errorText={errors.validUntil}
                 />
                 <div className="form-group">
                   <label className="form-label label mb-0">
