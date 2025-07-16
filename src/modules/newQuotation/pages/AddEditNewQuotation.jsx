@@ -552,69 +552,15 @@ const AddEditNewQuotation = () => {
                     }}
                   />
                 </div>
-                <div className="form-group">
-                  <label className="form-label label mb-0">
-                    Product Details
-                  </label>
-                  <div style={{ cursor: "pointer" }}>
-                    <AddIcon
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        if (!values?.branch) {
-                          toast.error("Please select branch");
-                        } else {
-                          setModal((prev) => ({
-                            ...prev,
-                            isOpen: true,
-                            type: 2,
-                          }));
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-                {/* <div className="quotation_sales">
-              <CustomSelect
-                label="Product Detail"
-                name="productDetails"
-                // value={salesStage
-                //   ?.filter((item) => item?.id === values?.salesStage)
-                //   ?.map((item) => ({
-                //     label: item?.name,
-                //     value: item?.id,
-                //   }))}
-                onChange={(selected) =>
-                  setFieldValue("productDetails", selected?.value)
-                }
-                // options={salesStage?.map((item) => ({
-                //   label: item?.name,
-                //   value: item?.id,
-                // }))}
-                placeholder="Select a Product Detail"
-                error={errors.productDetails && touched.productDetails}
-                errorText={errors.productDetails}
-                // isDisabled={salesStageLoading}
-              />
-              <AddIcon
-                style={{ marginTop: "1rem", cursor: "pointer" }}
-                onClick={() => {
-                  if (!values?.branch) {
-                    toast.error("Please select branch");
-                  } else {
-                    setModal((prev) => ({ ...prev, isOpen: true, type: 2 }));
-                  }
-                }}
-              />
-            </div> */}
                 <CommonInputTextField
-                  labelName="Opportunity"
+                  labelName="Opportunity name"
                   id="opportunity"
                   name="opportunity"
                   className="input"
                   mainDiv="form-group"
                   labelClass="label"
                   value={values.opportunity}
-                  placeHolder="Enter opportunity"
+                  placeHolder="Enter opportunity name"
                   onChange={handleChange}
                   onBlur={handleBlur}
                 />
@@ -706,6 +652,29 @@ const AddEditNewQuotation = () => {
                   value={values?.validUntil}
                   onChange={(date) => setFieldValue("validUntil", date)}
                 />
+                <div className="form-group">
+                  <label className="form-label label mb-0">
+                    Product Details
+                  </label>
+                  <div style={{ cursor: "pointer" }}>
+                    <AddIcon
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        if (!values?.branch) {
+                          toast.error("Please select branch");
+                        } else if (!values?.billingGSTNumber) {
+                          toast.error("Please provide billing gst number");
+                        } else {
+                          setModal((prev) => ({
+                            ...prev,
+                            isOpen: true,
+                            type: 2,
+                          }));
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
                 <CommonInputTextField
                   labelName="Remarks"
                   id="remarks"

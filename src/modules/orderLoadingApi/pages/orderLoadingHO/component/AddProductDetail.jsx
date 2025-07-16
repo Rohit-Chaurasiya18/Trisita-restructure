@@ -69,7 +69,7 @@ const AddProductDetail = forwardRef((props, ref) => {
         total_purchase_amount_exc_gst:
           +values?.purchaseAmount * +values?.quantity,
         total_acv_amount_exc_gst:
-          +values?.totalACVAmount * +values?.sellingAmount,
+          +values?.totalACVAmount * +values?.quantity,
         sgst_amount: sgstAmount,
         cgst_amount: cgstAmount,
         igst_amount: igstAmount,
@@ -258,7 +258,7 @@ const AddProductDetail = forwardRef((props, ref) => {
         <div className="col-sm-12 mb-3">
           <div className="col-sm-3">Total ACV Amount:</div>
           <div className="col-sm-9">
-            {+values?.totalACVAmount * +values?.sellingAmount}
+            {+values?.totalACVAmount * +values?.quantity}
           </div>
         </div>
 

@@ -116,7 +116,7 @@ const SetTrigger = ({ modal, handleClose, isQuotation = false }) => {
 
       <div className="form-group col-10">
         <div className="col-5">
-          <label>CC Emails:</label>
+          <label>{isQuotation ? "To Emails:" : "CC Emails:"}</label>
         </div>
         <div className="col-5">
           <EmailTagInput
