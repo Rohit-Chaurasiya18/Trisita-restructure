@@ -103,7 +103,7 @@ const DeletedSubscription = () => {
   const [filters, setFilters] = useState({
     account: [],
     branch: null,
-    status: "All Status",
+    status: "Active",
     startDate: "",
     endDate: "",
   });

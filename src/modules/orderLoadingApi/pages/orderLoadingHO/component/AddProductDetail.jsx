@@ -68,8 +68,7 @@ const AddProductDetail = forwardRef((props, ref) => {
           +values?.sellingAmount * +values?.quantity,
         total_purchase_amount_exc_gst:
           +values?.purchaseAmount * +values?.quantity,
-        total_acv_amount_exc_gst:
-          +values?.totalACVAmount * +values?.quantity,
+        total_acv_amount_exc_gst: +values?.totalACVAmount * +values?.quantity,
         sgst_amount: sgstAmount,
         cgst_amount: cgstAmount,
         igst_amount: igstAmount,
@@ -155,10 +154,11 @@ const AddProductDetail = forwardRef((props, ref) => {
                 dispatch(getProductMasterById(selectedOption?.value)).then(
                   (res) => {
                     if (res?.payload?.data?.product_master) {
-                      setFieldValue(
-                        "totalACVAmount",
-                        Number(res?.payload?.data?.product_master?.acv_price)
-                      );
+                      let acvPrice = res?.payload?.data?.product_master
+                        ?.acv_price_decimal
+                        ? res?.payload?.data?.product_master?.acv_price_decimal
+                        : res?.payload?.data?.product_master?.acv_price;
+                      setFieldValue("totalACVAmount", Number(acvPrice));
                     }
                   }
                 );

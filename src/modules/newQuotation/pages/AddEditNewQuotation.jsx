@@ -477,33 +477,41 @@ const AddEditNewQuotation = () => {
                   error={errors?.bdPerson && touched?.bdPerson}
                   errorText={errors?.bdPerson}
                 />
-                <CustomSelect
-                  label="Account"
-                  required
-                  name="account"
-                  value={accountOption?.filter(
-                    (item) => item?.value === values?.account
-                  )}
-                  onChange={(selectedOption) => {
-                    CustomSweetAlert(
-                      "Account Selection?",
-                      "Do you confirm that Account CSN is selected correctly?",
-                      "Warning",
-                      true,
-                      "Yes, Select account",
-                      "Cancel",
-                      (result) => {
-                        if (result.isConfirmed) {
-                          setFieldValue("account", selectedOption?.value);
+                <div className="quotation_sales">
+                  <CustomSelect
+                    label="Account"
+                    required
+                    name="account"
+                    value={accountOption?.filter(
+                      (item) => item?.value === values?.account
+                    )}
+                    onChange={(selectedOption) => {
+                      CustomSweetAlert(
+                        "Account Selection?",
+                        "Do you confirm that Account CSN is selected correctly?",
+                        "Warning",
+                        true,
+                        "Yes, Select account",
+                        "Cancel",
+                        (result) => {
+                          if (result.isConfirmed) {
+                            setFieldValue("account", selectedOption?.value);
+                          }
                         }
-                      }
-                    );
-                  }}
-                  options={accountOption}
-                  placeholder="Select a Account"
-                  error={errors?.account && touched?.account}
-                  errorText={errors?.account}
-                />
+                      );
+                    }}
+                    options={accountOption}
+                    placeholder="Select a Account"
+                    error={errors?.account && touched?.account}
+                    errorText={errors?.account}
+                  />
+                  <AddIcon
+                    style={{ marginTop: "1rem", cursor: "pointer" }}
+                    onClick={() => {
+                      navigate(routesConstants?.ADD_ACCOUNT);
+                    }}
+                  />
+                </div>
                 <CommonInputTextField
                   labelName="Purchase Payment Terms"
                   id="purchasePaymentTerms"

@@ -207,7 +207,9 @@ const OpportunityDetail = ({ id }) => {
   const [activeTab, setActiveTab] = useState("1");
 
   useEffect(() => {
-    dispatch(getOpportunityDetail(id));
+    if (id) {
+      dispatch(getOpportunityDetail(id));
+    }
   }, [id]);
 
   useEffect(() => {

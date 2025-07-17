@@ -353,6 +353,7 @@ const Opportunity = () => {
     },
     { field: "reseller_name", headerName: "Reseller", width: 200 },
     { field: "account_name", headerName: "Account", width: 200 },
+    { field: "account_type", headerName: "Account Type", width: 200 },
     { field: "account_group", headerName: "Account Group", width: 200 },
     {
       field: "bd_person_name",
@@ -400,6 +401,16 @@ const Opportunity = () => {
     {
       field: "contract_manager_email",
       headerName: "Contract Msg Email",
+      width: 220,
+    },
+    {
+      field: "productLine",
+      headerName: "Product Line",
+      width: 220,
+    },
+    {
+      field: "productLineCode",
+      headerName: "Product Line Code",
       width: 220,
     },
     {
