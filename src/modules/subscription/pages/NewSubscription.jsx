@@ -1263,6 +1263,7 @@ const NewSubscription = () => {
                   endDate: null,
                 });
                 setBarColor("");
+                setDateRange([null, null])
               }}
             >
               All

@@ -1604,6 +1604,7 @@ const Subscription = () => {
                   endDate: null,
                 });
                 setBarColor("");
+                setDateRange([null, null])
               }}
             >
               All

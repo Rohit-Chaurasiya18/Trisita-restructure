@@ -1174,6 +1174,7 @@ const RAOrder = () => {
                   endDate: null,
                 });
                 setBarColor("");
+                setDateRange([null, null]);
               }}
             >
               All

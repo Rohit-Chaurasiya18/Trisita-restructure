@@ -1185,8 +1185,10 @@ const AlertSubscription = () => {
                   status: "All Status",
                   startDate: null,
                   endDate: null,
+                  rorFilter: "All",
                 });
                 setBarColor("");
+                setDateRange([null, null])
               }}
             >
               All

@@ -1202,6 +1202,7 @@ const DeletedSubscription = () => {
                   endDate: null,
                 });
                 setBarColor("");
+                setDateRange([null, null])
               }}
             >
               All
