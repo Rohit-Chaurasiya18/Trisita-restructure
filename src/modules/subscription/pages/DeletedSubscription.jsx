@@ -925,7 +925,7 @@ const DeletedSubscription = () => {
     const monthlyData = {};
 
     // Determine base month (start from selected startDate if available, else current month)
-    const baseMonth = filters?.startDate ? dayjs(filters.startDate) : dayjs(); // fallback to current month
+    const baseMonth = filters?.endDate ? dayjs(filters.endDate) : dayjs(); // fallback to current month
 
     // Previous 12 months
     for (let i = 11; i >= 0; i--) {
