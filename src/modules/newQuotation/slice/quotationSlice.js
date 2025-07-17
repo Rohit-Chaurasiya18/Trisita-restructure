@@ -1,8 +1,10 @@
+import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   DOWNLOAD_PDF_QUOTATION,
   GET_ADD_SALES_STAGE,
   GET_NEW_QUOTATION,
+  GET_PURCHASED_PAYMENT_TERMS,
   GET_QUOTATION_TEMPLATE,
   SEND_QUOTATION,
 } from "@/services/url";
@@ -33,7 +35,33 @@ export const addSalesStage = createAsyncThunk(
     }
   }
 );
-
+export const getPurchasedPaymentTerms = createAsyncThunk(
+  "quotation/getPurchasedPaymentTerms",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_PURCHASED_PAYMENT_TERMS);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const addPurchasedPaymentTerms = createAsyncThunk(
+  "quotation/addPurchasedPaymentTerms",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        GET_PURCHASED_PAYMENT_TERMS,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 export const getQuotationById = createAsyncThunk(
   "quotation/getQuotationById",
   async (payload, thunkAPI) => {
@@ -136,6 +164,8 @@ const initialValue = {
   newQuotationListLoading: false,
   quotationTemplate: [],
   quotationTemplateLoading: false,
+  purchasedPaymentTerms: [],
+  purchasedPaymentTermsLoading: false,
 };
 
 const quotationSlice = createSlice({
@@ -155,6 +185,20 @@ const quotationSlice = createSlice({
     builder.addCase(getSalesStage.rejected, (state, action) => {
       state.salesStage = [];
       state.salesStageLoading = false;
+    });
+
+    // Get Purchased Payment Terms
+    builder.addCase(getPurchasedPaymentTerms.pending, (state, action) => {
+      state.purchasedPaymentTerms = [];
+      state.purchasedPaymentTermsLoading = true;
+    });
+    builder.addCase(getPurchasedPaymentTerms.fulfilled, (state, action) => {
+      state.purchasedPaymentTerms = action.payload.data;
+      state.purchasedPaymentTermsLoading = false;
+    });
+    builder.addCase(getPurchasedPaymentTerms.rejected, (state, action) => {
+      state.purchasedPaymentTerms = [];
+      state.purchasedPaymentTermsLoading = false;
     });
 
     // Get New Quotaion

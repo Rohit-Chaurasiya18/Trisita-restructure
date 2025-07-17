@@ -7,7 +7,9 @@ import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
 import {
   addNewOpportunity,
+  addPurchasedPaymentTerms,
   addSalesStage,
+  getPurchasedPaymentTerms,
   getQuotationById,
   getSalesStage,
   updateNewOpportunity,
@@ -47,7 +49,7 @@ const validationSchema = Yup.object({
   shippingGSTNumber: Yup.string().required("Shipping GST Number is required"),
   validUntil: Yup.string().required("Valid until is required."),
 });
-export const AddSalesStage = ({ setModal }) => {
+export const AddSalesStage = ({ setModal, modal }) => {
   const dispatch = useDispatch();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,41 +57,89 @@ export const AddSalesStage = ({ setModal }) => {
     useFormik({
       initialValues: {
         salesStage: "",
+        purchasedPaymentTerms: null,
       },
       validationSchema: Yup.object({
-        salesStage: Yup.string().required("Sales stage is required."),
+        salesStage:
+          modal?.type === 1
+            ? Yup.string().required("Sales stage is required.")
+            : Yup.string().notRequired(),
+        purchasedPaymentTerms:
+          modal?.type === 2
+            ? Yup.number().required("Purchased payment terms is required.")
+            : Yup.number().notRequired(),
       }),
       onSubmit: (values) => {
         setIsSubmitting(true);
-        dispatch(addSalesStage({ name: values?.salesStage })).then((res) => {
-          if (res?.payload?.status === 200 || res?.payload?.status === 201) {
-            toast.success("Sales stage created successfully.");
-            setModal((prev) => ({ ...prev, isOpen: false }));
-          }
-          dispatch(getSalesStage());
-          setIsSubmitting(false);
-        });
+        if (modal?.type === 1) {
+          dispatch(addSalesStage({ name: values?.salesStage })).then((res) => {
+            if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+              toast.success("Sales stage created successfully.");
+              setModal((prev) => ({ ...prev, isOpen: false }));
+            }
+            dispatch(getSalesStage());
+            setIsSubmitting(false);
+          });
+        } else if (modal?.type === 2) {
+          dispatch(
+            addPurchasedPaymentTerms({
+              payment_terms: values?.purchasedPaymentTerms,
+            })
+          ).then((res) => {
+            if (res?.payload?.status === 200 || res?.payload?.status === 201) {
+              toast.success("Purchased payment terms created successfully.");
+              setModal((prev) => ({ ...prev, isOpen: false }));
+            }
+            dispatch(getPurchasedPaymentTerms());
+            setIsSubmitting(false);
+          });
+        }
       },
     });
 
   return (
     <div className="add-sales-stage-form">
-      <CommonInputTextField
-        labelName="Sales Stage Name"
-        id="salesStage"
-        name="salesStage"
-        className="input"
-        required
-        mainDiv="form-group"
-        labelClass="label"
-        value={values.salesStage}
-        placeHolder="Enter sales stage"
-        isInvalid={!!errors.salesStage && touched.salesStage}
-        errorText={errors.salesStage}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        requiredText
-      />
+      {modal?.type === 1 ? (
+        <CommonInputTextField
+          labelName="Sales Stage Name"
+          id="salesStage"
+          name="salesStage"
+          className="input"
+          required
+          mainDiv="form-group"
+          labelClass="label"
+          value={values.salesStage}
+          placeHolder="Enter sales stage"
+          isInvalid={!!errors.salesStage && touched.salesStage}
+          errorText={errors.salesStage}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          requiredText
+        />
+      ) : modal?.type === 2 ? (
+        <CommonInputTextField
+          labelName="Purchased Payment Terms"
+          id="purchasedPaymentTerms"
+          name="purchasedPaymentTerms"
+          className="input"
+          required
+          type="number"
+          min={1}
+          mainDiv="form-group"
+          labelClass="label"
+          value={values.purchasedPaymentTerms}
+          placeHolder="Enter purchased payment terms"
+          isInvalid={
+            !!errors.purchasedPaymentTerms && touched.purchasedPaymentTerms
+          }
+          errorText={errors.purchasedPaymentTerms}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          requiredText
+        />
+      ) : (
+        <></>
+      )}
       <div className="d-flex justify-content-center mt-4">
         <button
           onClick={handleSubmit}
@@ -122,17 +172,27 @@ const AddEditNewQuotation = () => {
     selectedProduct: null,
   });
   const [stateCode, setStateCode] = useState(0);
-  const { salesStage, salesStageLoading, branch_list, branchListLoading } =
-    useSelector((state) => ({
-      salesStage: state?.quotation?.salesStage,
-      salesStageLoading: state?.quotation?.salesStageLoading,
-      branch_list: state?.insightMetrics?.branchList,
-      branchListLoading: state?.insightMetrics?.branchListLoading,
-    }));
+  const {
+    salesStage,
+    salesStageLoading,
+    branch_list,
+    branchListLoading,
+    purchasedPaymentTerms,
+    purchasedPaymentTermsLoading,
+  } = useSelector((state) => ({
+    salesStage: state?.quotation?.salesStage,
+    salesStageLoading: state?.quotation?.salesStageLoading,
+    purchasedPaymentTerms: state?.quotation?.purchasedPaymentTerms,
+    purchasedPaymentTermsLoading:
+      state?.quotation?.purchasedPaymentTermsLoading,
+    branch_list: state?.insightMetrics?.branchList,
+    branchListLoading: state?.insightMetrics?.branchListLoading,
+  }));
 
   useEffect(() => {
     dispatch(getSalesStage());
     dispatch(getAllBranch());
+    dispatch(getPurchasedPaymentTerms());
   }, []);
 
   const initialValues = {
@@ -359,7 +419,7 @@ const AddEditNewQuotation = () => {
       });
     }
   }, [quotationId]);
-  
+
   return (
     <>
       {quotationId && isLoading ? (
@@ -512,25 +572,41 @@ const AddEditNewQuotation = () => {
                     }}
                   />
                 </div>
-                <CommonInputTextField
-                  labelName="Purchase Payment Terms"
-                  id="purchasePaymentTerms"
-                  name="purchasePaymentTerms"
-                  className="input"
-                  mainDiv="form-group"
-                  labelClass="label"
-                  type="number"
-                  value={values.purchasePaymentTerms}
-                  placeHolder="Enter purchase payment terms"
-                  isInvalid={
-                    errors.purchasePaymentTerms && touched.purchasePaymentTerms
-                  }
-                  errorText={errors.purchasePaymentTerms}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  required
-                  requiredText
-                />
+                <div className="quotation_sales">
+                  <CustomSelect
+                    label="Purchase Payment Terms"
+                    required
+                    name="purchasePaymentTerms"
+                    value={purchasedPaymentTerms
+                      ?.filter(
+                        (item) => item?.id === values?.purchasePaymentTerms
+                      )
+                      ?.map((item) => ({
+                        label: item?.payment_terms,
+                        value: item?.id,
+                      }))}
+                    onChange={(selected) =>
+                      setFieldValue("purchasePaymentTerms", selected?.value)
+                    }
+                    options={purchasedPaymentTerms?.map((item) => ({
+                      label: item?.payment_terms,
+                      value: item?.id,
+                    }))}
+                    placeholder="Select purchase payment terms"
+                    error={
+                      errors.purchasePaymentTerms &&
+                      touched.purchasePaymentTerms
+                    }
+                    errorText={errors?.purchasePaymentTerms}
+                    isDisabled={purchasedPaymentTermsLoading}
+                  />
+                  <AddIcon
+                    style={{ marginTop: "1rem", cursor: "pointer" }}
+                    onClick={() => {
+                      setModal((prev) => ({ ...prev, isOpen: true, type: 2 }));
+                    }}
+                  />
+                </div>
                 <div className="quotation_sales">
                   <CustomSelect
                     label="Sales Stage"
@@ -680,7 +756,7 @@ const AddEditNewQuotation = () => {
                           setModal((prev) => ({
                             ...prev,
                             isOpen: true,
-                            type: 2,
+                            type: 3,
                           }));
                         }
                       }}
@@ -710,18 +786,25 @@ const AddEditNewQuotation = () => {
               </form>
             </div>
           </div>
+          {/* Modal for Stages Sales , Purchased Payment Terms , Product Details */}
           <CommonModal
-            title={modal?.type === 1 ? "Add  sales stage" : "Product Details"}
+            title={
+              modal?.type === 1
+                ? "Add  sales stage"
+                : modal?.type === 2
+                ? "Add purchased payment terms"
+                : "Product Details"
+            }
             isOpen={modal?.isOpen}
             handleClose={() => {
-              setModal((prev) => ({
-                ...prev,
+              setModal(() => ({
                 isOpen: false,
+                type: null,
               }));
             }}
             scrollable
-            size={modal?.type === 1 ? "sm" : "xl"}
-            isAdd
+            size={modal?.type === 1 || modal?.type === 2 ? "lg" : "xl"}
+            isAdd={modal?.type === 3}
             handleAdd={() => {
               setAddProductDetailModal({
                 isShow: true,
@@ -729,9 +812,9 @@ const AddEditNewQuotation = () => {
               });
             }}
           >
-            {modal?.type === 1 ? (
-              <AddSalesStage setModal={setModal} />
-            ) : (
+            {modal?.type === 1 || modal?.type === 2 ? (
+              <AddSalesStage setModal={setModal} modal={modal} />
+            ) : modal?.type === 3 ? (
               <ProductDetailModal
                 data={values?.productDetails?.map((item, idx) => ({
                   ...item,
@@ -740,8 +823,13 @@ const AddEditNewQuotation = () => {
                 handleDeleteRow={handleDeleteRow}
                 handleRowSelect={handleRowSelect}
               />
+            ) : (
+              <></>
             )}
           </CommonModal>
+          {/* Modal for Stages Sales , Purchased Payment Terms , Product Details */}
+
+          {/* Modal For Adding Product */}
           <CommonModal
             isOpen={addProductDetailModal?.isShow}
             title={"Add Product Details"}
@@ -770,6 +858,7 @@ const AddEditNewQuotation = () => {
               isRemark={true}
             />
           </CommonModal>
+          {/* Modal For Adding Product */}
         </>
       )}
     </>
