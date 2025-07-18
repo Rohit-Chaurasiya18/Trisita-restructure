@@ -73,6 +73,7 @@ const LicenseOptimizationState = {
   licenseOptimizationLoading: false,
   totalLicenseCount: 0,
   totalUniqueUser: 0,
+  freeLicenseCount: 0,
   totalLicenseOptimized: 0,
 };
 
@@ -94,6 +95,7 @@ const LicenseOptimizationSlice = createSlice({
       }));
       state.totalLicenseCount = action.payload.data?.total_license_count;
       state.totalUniqueUser = action.payload.data?.total_unique_user;
+      state.freeLicenseCount = action.payload.data?.free_license_count;
       state.totalLicenseOptimized =
         action.payload.data?.total_license_optimized;
     });

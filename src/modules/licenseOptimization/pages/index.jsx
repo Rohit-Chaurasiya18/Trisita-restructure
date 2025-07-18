@@ -170,8 +170,8 @@ const LicenseOptization = () => {
             accountOptions?.filter(
               (item) =>
                 !filters?.account
-                  ?.map((item) => item?.label)
-                  ?.includes(item?.label)
+                  ?.map((item) => item?.value)
+                  ?.includes(item?.value)
             ) || []
           }
           multiple

@@ -15,6 +15,7 @@ import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import useDebounce from "@/hooks/useDebounce";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import dayjs from "dayjs";
+import CommonSelect from "@/components/common/dropdown/CommonSelect";
 
 const CommonChart = ({
   title,
@@ -102,6 +103,7 @@ const Opportunity = () => {
     from_date: "",
     to_date: "",
     cardFilter: "",
+    status: "All Status",
   });
 
   const [opportunityBarChart, SetOpportunityBarChart] = useState([]);
@@ -159,6 +161,7 @@ const Opportunity = () => {
   useEffect(() => {
     const payload = {
       branch: filters?.branch?.value,
+      status: filters?.status,
       cardFilter: filters?.cardFilter,
       ...(debounce
         ? {
@@ -172,7 +175,7 @@ const Opportunity = () => {
     };
 
     dispatch(getExportedOpportunities(payload));
-  }, [filters?.branch, debounce, filters?.cardFilter]);
+  }, [filters?.branch, debounce, filters?.cardFilter, filters?.status]);
 
   const handleDateChange = (newValue) => {
     const [start, end] = newValue;
@@ -1300,7 +1303,21 @@ const Opportunity = () => {
                 placeholderEnd="End date"
                 disabled={opportunityLoading}
               />
-
+              <CommonSelect
+                value={filters?.status}
+                options={[
+                  { value: "All Status", label: "All Status" },
+                  { value: "Open", label: "Open" },
+                  { value: "Cancelled", label: "Cancelled" },
+                  { value: "Completed", label: "Completed" },
+                ]}
+                onChange={(e) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    status: e.target.value,
+                  }));
+                }}
+              />
               <CommonAutocomplete
                 onChange={(event, newValue) => {
                   setFilters((prev) => ({

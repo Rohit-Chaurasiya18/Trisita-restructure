@@ -15,6 +15,9 @@ export const getExportedOpportunities = createAsyncThunk(
       if (payload?.branch) {
         params.append("branch", encodeURIComponent(payload?.branch));
       }
+      if (payload?.status) {
+        params.append("status", encodeURIComponent(payload?.status));
+      }
       if (payload?.from_date && payload?.to_date) {
         params.append("from_date", encodeURIComponent(payload?.from_date));
         params.append("to_date", encodeURIComponent(payload?.to_date));

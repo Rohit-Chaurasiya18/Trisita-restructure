@@ -16,6 +16,7 @@ const LicenseOptimisationView = () => {
     licenseOptimizationLoading,
     totalLicenseCount,
     totalUniqueUser,
+    freeLicenseCount,
     totalLicenseOptimized,
   } = useSelector((state) => ({
     licenseOptimizationData:
@@ -24,6 +25,7 @@ const LicenseOptimisationView = () => {
       state?.LicenseOptimization?.licenseOptimizationLoading,
     totalLicenseCount: state?.LicenseOptimization?.totalLicenseCount,
     totalUniqueUser: state?.LicenseOptimization?.totalUniqueUser,
+    freeLicenseCount: state?.LicenseOptimization?.freeLicenseCount,
     totalLicenseOptimized: state?.LicenseOptimization?.totalLicenseOptimized,
   }));
 
@@ -117,7 +119,7 @@ const LicenseOptimisationView = () => {
       { title: "Total License Count", value: totalLicenseCount },
       { title: "Total License Optimised", value: totalLicenseOptimized },
       { title: "Total Unique Count", value: totalUniqueUser },
-      { title: "Total License Optimised", value: 5505150.75 },
+      { title: "Free License Count", value: freeLicenseCount },
     ],
     [totalLicenseCount, totalUniqueUser, totalLicenseOptimized]
   );
