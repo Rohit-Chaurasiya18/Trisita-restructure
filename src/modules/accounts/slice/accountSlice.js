@@ -439,6 +439,7 @@ const accountSlice = createSlice({
           account?.associated_account?.length > 0
             ? account?.associated_account?.join(",  ")
             : "",
+        associated_account_arr: account?.associated_account,
       }));
 
       const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
