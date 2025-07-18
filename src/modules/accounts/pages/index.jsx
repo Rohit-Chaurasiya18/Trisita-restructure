@@ -1157,33 +1157,37 @@ const Account = () => {
             )
           )}
         </div>
-        {isThirdPartyAccount && (
-          <div className="opportunity-retention-account subscription-chart">
-            <CommonChart
-              title={getBdPersonTitle()}
-              options={bdPersonPieChart?.options}
-              series={bdPersonPieChart?.series}
-              className="chart-data-2"
-              // subCategory={["Subscription", "DTP", "ACV"]}
-              // onSubCategoryClick={(index) => {
-              //   if (index === 0) handleBdPersonChange("subscription");
-              //   if (index === 1) handleBdPersonChange("dtp_price");
-              //   if (index === 2) handleBdPersonChange("acv_price");
-              // }}
-            />
-            <CommonChart
-              title={getAssociatedAccountTitle()}
-              options={associatedAccountPieChart?.options}
-              series={associatedAccountPieChart?.series}
-              className="chart-data-2"
-              // subCategory={["Subscription", "DTP", "ACV"]}
-              // onSubCategoryClick={(index) => {
-              //   if (index === 0) handleBdPersonChange("subscription");
-              //   if (index === 1) handleBdPersonChange("dtp_price");
-              //   if (index === 2) handleBdPersonChange("acv_price");
-              // }}
-            />
-          </div>
+        {exportedAccountDataLoading ? (
+          <SkeletonLoader />
+        ) : (
+          isThirdPartyAccount && (
+            <div className="opportunity-retention-account subscription-chart">
+              <CommonChart
+                title={getBdPersonTitle()}
+                options={bdPersonPieChart?.options}
+                series={bdPersonPieChart?.series}
+                className="chart-data-2"
+                // subCategory={["Subscription", "DTP", "ACV"]}
+                // onSubCategoryClick={(index) => {
+                //   if (index === 0) handleBdPersonChange("subscription");
+                //   if (index === 1) handleBdPersonChange("dtp_price");
+                //   if (index === 2) handleBdPersonChange("acv_price");
+                // }}
+              />
+              <CommonChart
+                title={getAssociatedAccountTitle()}
+                options={associatedAccountPieChart?.options}
+                series={associatedAccountPieChart?.series}
+                className="chart-data-2"
+                // subCategory={["Subscription", "DTP", "ACV"]}
+                // onSubCategoryClick={(index) => {
+                //   if (index === 0) handleBdPersonChange("subscription");
+                //   if (index === 1) handleBdPersonChange("dtp_price");
+                //   if (index === 2) handleBdPersonChange("acv_price");
+                // }}
+              />
+            </div>
+          )
         )}
         <div className="account-table mt-4">
           {exportedAccountDataLoading ? (
