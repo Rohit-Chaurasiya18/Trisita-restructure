@@ -103,7 +103,7 @@ const Opportunity = () => {
     from_date: "",
     to_date: "",
     cardFilter: "",
-    status: "All Status",
+    status: "Open",
   });
 
   const [opportunityBarChart, SetOpportunityBarChart] = useState([]);
