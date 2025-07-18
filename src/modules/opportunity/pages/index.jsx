@@ -194,122 +194,7 @@ const Opportunity = () => {
       cardFilter: name,
     }));
   };
-  useEffect(() => {
-    if (opportunityList?.length > 0) {
-      setFilteredData(opportunityList);
-    } else {
-      setFilteredData([]);
-    }
-  }, [opportunityList]);
-
-  useEffect(() => {
-    if (filteredData) {
-      processChartData(filteredData);
-    }
-  }, [filteredData]);
-
-  const processChartData = (data) => {
-    const accountNameCounts = {};
-    const modifiedData = [];
-
-    data.forEach((item) => {
-      if (item.account_name) {
-        accountNameCounts[item.account_name] =
-          (accountNameCounts[item.account_name] || 0) + 1;
-      }
-
-      if (item.subscription_end_date && item.total_quantity) {
-        modifiedData.push({
-          label: item.subscription_end_date,
-          value: parseInt(item.total_quantity, 10),
-        });
-      }
-    });
-    SetOpportunityBarChart(modifiedData);
-    SetOpportunityDataSecondGraph(accountNameCounts);
-  };
-
-  // All User Product Seat data Graph
-  const categories = useMemo(
-    () => opportunityBarChart?.map((item) => item.label) || [],
-    [opportunityBarChart]
-  );
-  const dataValues = useMemo(
-    () => opportunityBarChart?.map((item) => item.value) || [],
-    [opportunityBarChart]
-  );
-
-  const LineChartData = useMemo(
-    () => ({
-      series: [
-        {
-          name: "Seats",
-          data: dataValues,
-        },
-      ],
-      options: {
-        chart: {
-          type: "line",
-          width: "100%",
-          zoom: {
-            enabled: false,
-          },
-          height: 350,
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: "straight",
-        },
-        title: {
-          text: "",
-          align: "left",
-        },
-        grid: {
-          row: {
-            colors: ["#f3f3f3", "transparent"],
-            opacity: 0.5,
-          },
-        },
-        xaxis: {
-          categories: categories,
-        },
-      },
-    }),
-    [dataValues, categories]
-  );
-
-  const secondgraphdata = Object.values(opportunityAccountDataSecondGraph);
-  const secondgraphlabel = Object.keys(opportunityAccountDataSecondGraph);
-  const AccountDataChart = useMemo(
-    () => ({
-      series: secondgraphdata,
-      options: {
-        chart: {
-          type: "pie",
-          height: 350,
-          //   width: 350,
-        },
-        labels: secondgraphlabel,
-        responsive: [
-          {
-            breakpoint: 2260,
-            options: {
-              legend: {
-                position: "bottom",
-              },
-              chart: {
-                height: 500,
-              },
-            },
-          },
-        ],
-      },
-    }),
-    [secondgraphlabel]
-  );
-
+  // Columns
   const columns = [
     {
       field: "opportunity_number",
@@ -413,6 +298,8 @@ const Opportunity = () => {
       width: 220,
     },
   ];
+
+  // Handle Export
   const handleSelectionChange = (selectedRows) => {
     const idArray = [...selectedRows?.ids];
     if (idArray?.length > 0) {
@@ -428,6 +315,194 @@ const Opportunity = () => {
         selectedId.includes(item?.opportunity_number)
       ),
     [selectedId]
+  );
+
+  useEffect(() => {
+    if (opportunityList?.length > 0) {
+      setFilteredData(opportunityList);
+    } else {
+      setFilteredData([]);
+    }
+  }, [opportunityList]);
+
+  useEffect(() => {
+    if (filteredData) {
+      processChartData(filteredData);
+    }
+  }, [filteredData]);
+
+  const processChartData = (data) => {
+    const accountNameCounts = {};
+
+    // Use filters.to_date or default to current month
+    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs();
+
+    // Step 1: Generate exactly 12 months (YYYY-MM → label)
+    const last12Months = [];
+    const monthlyQuantityMap = {};
+
+    for (let i = 11; i >= 0; i--) {
+      const monthKey = baseMonth.subtract(i, "month").format("YYYY-MM");
+      const monthLabel = dayjs(monthKey).format("MMM YYYY");
+      last12Months.push({ key: monthKey, label: monthLabel });
+      monthlyQuantityMap[monthKey] = 0;
+    }
+
+    // Step 2: Aggregate quantity per month
+    data.forEach((item) => {
+      const endMonth = dayjs(item.subscription_end_date).format("YYYY-MM");
+      if (monthlyQuantityMap.hasOwnProperty(endMonth)) {
+        monthlyQuantityMap[endMonth] += parseInt(item.total_quantity, 10) || 0;
+      }
+
+      if (item.account_name) {
+        accountNameCounts[item.account_name] =
+          (accountNameCounts[item.account_name] || 0) + 1;
+      }
+    });
+
+    // Step 3: Prepare final chart data (even if some months have 0)
+    const modifiedData = last12Months.map((month) => ({
+      label: month.label,
+      value: monthlyQuantityMap[month.key],
+    }));
+
+    SetOpportunityBarChart(modifiedData);
+
+    // Top 25 accounts
+    const top25 = Object.entries(accountNameCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 25);
+
+    SetOpportunityDataSecondGraph(Object.fromEntries(top25));
+  };
+
+  // All User Product Seat data Graph
+  const categories = useMemo(
+    () => opportunityBarChart?.map((item) => item.label) || [],
+    [opportunityBarChart]
+  );
+
+  const dataValues = useMemo(
+    () => opportunityBarChart?.map((item) => item.value) || [],
+    [opportunityBarChart]
+  );
+  const LineChartData = useMemo(
+    () => ({
+      series: [
+        {
+          name: "Seats",
+          data: dataValues,
+        },
+      ],
+      options: {
+        chart: {
+          type: "line",
+          width: "100%",
+          zoom: {
+            enabled: false,
+          },
+          height: 350,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          curve: "straight",
+        },
+        title: {
+          text: "",
+          align: "left",
+        },
+        grid: {
+          row: {
+            colors: ["#f3f3f3", "transparent"],
+            opacity: 0.5,
+          },
+        },
+        xaxis: {
+          categories: categories,
+        },
+      },
+    }),
+    [dataValues, categories]
+  );
+
+  const secondgraphdata = Object.values(opportunityAccountDataSecondGraph);
+  const secondgraphlabel = Object.keys(opportunityAccountDataSecondGraph);
+  const [accountNameLegend, setAccountNameLegend] = useState("");
+
+  const handleAccountNameLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountNameLegend === data;
+    if (isSameColor) {
+      allData = opportunityList;
+    } else {
+      allData = filteredData;
+    }
+    setAccountNameLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown" ? item?.account_name === data : !item?.account_name
+        );
+
+    setFilteredData(updatedData);
+  };
+  const AccountDataChart = useMemo(
+    () => ({
+      options: {
+        chart: {
+          type: "pie",
+          height: 350,
+          events: {
+            legendClick: (chartContext, seriesIndex) => {
+              const clickedLegend = secondgraphlabel[seriesIndex];
+              if (clickedLegend) {
+                handleAccountNameLegendClick(clickedLegend);
+              }
+            },
+          },
+        },
+        labels: secondgraphlabel,
+        legend: {
+          position: "bottom",
+          onItemClick: {
+            toggleDataSeries: true, // Enable toggling of data series
+          },
+          onItemHover: {
+            highlightDataSeries: true, // Highlight the hovered series
+          },
+          formatter: (seriesName, opts) => {
+            const isHighlighted = seriesName === accountGroupLegend;
+            const count = opts.w.globals.series[opts.seriesIndex];
+            return `<span style="color: ${
+              isHighlighted ? "black" : "black"
+            };">${seriesName} - ${count}</span>`;
+          },
+        },
+        plotOptions: {
+          bar: {
+            distributed: true, // Distribute colors across bars
+          },
+        },
+        responsive: [
+          {
+            breakpoint: 2260,
+            options: {
+              legend: {
+                position: "bottom",
+              },
+              chart: {
+                height: 500,
+              },
+            },
+          },
+        ],
+      },
+      series: secondgraphdata,
+    }),
+    [secondgraphlabel]
   );
 
   // Total Amount as per Months
@@ -463,7 +538,6 @@ const Opportunity = () => {
     return { categories, dtpData, acvData };
   }, [filteredData, filters?.startDate]);
 
-  // ApexCharts config
   const amountPerMonth = {
     options: {
       chart: { height: 350, type: "bar" },
@@ -1365,7 +1439,7 @@ const Opportunity = () => {
                 }}
               />
               <CommonChart
-                title="Oppen. by Account name"
+                title="Oppen. by Account name (Top 25)"
                 options={AccountDataChart.options}
                 series={AccountDataChart.series}
               />
