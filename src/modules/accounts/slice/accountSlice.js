@@ -247,8 +247,6 @@ const accountState = {
   contractsDetails: null,
   endCustomerAccountLoading: false,
   endCustomerAccount: null,
-  thirdPartyIndustryGroupCount: {},
-  industryGroupCount: {},
   accountInformation: null,
   accountInformationLoading: false,
   subscriptionByThirdParty: [],
@@ -258,49 +256,7 @@ const accountState = {
 const accountSlice = createSlice({
   name: "account",
   initialState: accountState,
-  reducers: {
-    setIndustryGroupCount: (state, action) => {
-      // if (action?.payload) {
-      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
-
-      const groupedCounts = {
-        All: { title: "All", active: 0, expired: 0, total: 0 },
-      };
-
-      for (const group of fixedOrder) {
-        groupedCounts[group] = {
-          title: group,
-          active: 0,
-          expired: 0,
-          total: 0,
-        };
-      }
-
-      for (const item of action?.payload?.data) {
-        const group = item.industryGroup || "Null";
-        const status = item.contract_status === "Active" ? "active" : "expired";
-
-        const key = fixedOrder.includes(group) ? group : "Unknown";
-
-        groupedCounts[key][status]++;
-        groupedCounts[key].total++;
-
-        groupedCounts.All[status]++;
-        groupedCounts.All.total++;
-      }
-
-      const industryGroupStats = [
-        groupedCounts["All"],
-        ...fixedOrder.map((key) => groupedCounts[key]),
-      ];
-      const key = action?.payload?.isThirdPartyAccount
-        ? "thirdPartyIndustryGroupCount"
-        : "industryGroupCount";
-
-      state[key] = industryGroupStats;
-    },
-    // },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // getAllUser
     builder.addCase(getAllUser.pending, (state) => {
@@ -325,16 +281,9 @@ const accountSlice = createSlice({
         email: account?.contract_manager_email?.[0] ?? null,
         phone: account?.contract_manager_phone?.[0] ?? null,
         name: account?.name ?? "",
-
-        // industryGroup: account?.industryGroup ?? null,
         industryGroup: account?.industryGroup ?? "Unknown",
-
-        // industrySegment: account?.industrySegment ?? null,
         industrySegment: account?.industrySegment ?? "Unknown",
-
-        // industrySubSegment: account?.industrySubSegment ?? null,
         industrySubSegment: account?.industrySubSegment ?? "Unknown",
-
         address1: account?.address1 ?? null,
         city: account?.city ?? null,
         status: account?.status ?? null,
@@ -346,45 +295,14 @@ const accountSlice = createSlice({
           account?.user_assign_first_names?.length > 0
             ? account?.user_assign_first_names?.join(", ")
             : "",
+        user_assign_Arr: account?.user_assign_first_names,
         renewal_person:
           account?.renewal_person_first_names?.length > 0
             ? account?.renewal_person_first_names?.join(", ")
             : "",
+        productLineCodes: account?.productLineCodes,
+        totalSeats: account?.total_seats,
       }));
-
-      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
-
-      const groupedCounts = {
-        All: { title: "All", active: 0, expired: 0, total: 0 },
-      };
-
-      for (const group of fixedOrder) {
-        groupedCounts[group] = {
-          title: group,
-          active: 0,
-          expired: 0,
-          total: 0,
-        };
-      }
-
-      for (const item of formattedData) {
-        const group = item.industryGroup || "Null";
-        const status = item.contract_status === "Active" ? "active" : "expired";
-
-        const key = fixedOrder.includes(group) ? group : "Unknown";
-
-        groupedCounts[key][status]++;
-        groupedCounts[key].total++;
-
-        groupedCounts.All[status]++;
-        groupedCounts.All.total++;
-      }
-
-      const industryGroupStats = [
-        groupedCounts["All"],
-        ...fixedOrder.map((key) => groupedCounts[key]),
-      ];
-      state.industryGroupCount = industryGroupStats;
       state.exportedAccountData = formattedData;
       state.exportedAccountDataLoading = false;
       state.last_updated = action.payload.data?.last_updated;
@@ -407,16 +325,9 @@ const accountSlice = createSlice({
         email: account?.contract_manager_email?.[0] ?? null,
         phone: account?.contract_manager_phone?.[0] ?? null,
         name: account?.name ?? "",
-
-        // industryGroup: account?.industryGroup ?? null,
         industryGroup: account?.industryGroup ?? "Unknown",
-
-        // industrySegment: account?.industrySegment ?? null,
         industrySegment: account?.industrySegment ?? "Unknown",
-
-        // industrySubSegment: account?.industrySubSegment ?? null,
         industrySubSegment: account?.industrySubSegment ?? "Unknown",
-
         address1: account?.address1 ?? null,
         city: account?.city ?? null,
         status: account?.status ?? null,
@@ -440,44 +351,12 @@ const accountSlice = createSlice({
             ? account?.associated_account?.join(",  ")
             : "",
         associated_account_arr: account?.associated_account,
+        productLineCodes: account?.productLineCode,
+        totalSeats: account?.total_seats,
       }));
-
-      const fixedOrder = ["AEC", "MFG", "M&E", "EDU", "OTH", "Unknown"];
-
-      const groupedCounts = {
-        All: { title: "All", active: 0, expired: 0, total: 0 },
-      };
-
-      for (const group of fixedOrder) {
-        groupedCounts[group] = {
-          title: group,
-          active: 0,
-          expired: 0,
-          total: 0,
-        };
-      }
-
-      for (const item of formattedData) {
-        const group = item.industryGroup || "Null";
-        const status = item.contract_status === "Active" ? "active" : "expired";
-
-        const key = fixedOrder.includes(group) ? group : "Unknown";
-
-        groupedCounts[key][status]++;
-        groupedCounts[key].total++;
-
-        groupedCounts.All[status]++;
-        groupedCounts.All.total++;
-      }
-
-      const industryGroupStats = [
-        groupedCounts["All"],
-        ...fixedOrder.map((key) => groupedCounts[key]),
-      ];
       state.thirdPartyExportedAccountData = formattedData;
       state.thirdPartyExportedAccountDataLoading = false;
       state.thirdPartyLast_updated = action.payload.data?.last_updated;
-      state.thirdPartyIndustryGroupCount = industryGroupStats;
     });
     builder.addCase(getThirdPartyExportedAccount.rejected, (state) => {
       state.thirdPartyExportedAccountData = [];
@@ -570,5 +449,5 @@ const accountSlice = createSlice({
   },
 });
 
-export const { setIndustryGroupCount } = accountSlice.actions;
+export const {} = accountSlice.actions;
 export default accountSlice.reducer;

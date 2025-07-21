@@ -1339,7 +1339,7 @@ const Opportunity = () => {
     <>
       <div className="opportunity-container">
         <div className="opportunity-header">
-          <h5 className="commom-header-title mb-0">Opportunity Dashboard</h5>
+          <h5 className="commom-header-title mb-0">Renewal Opportunity Dashboard</h5>
           <span className="common-breadcrum-msg">
             Use of PWS Oppportunity Export API data to show details below
           </span>

@@ -594,41 +594,6 @@ export const LineChartData = {
     },
   },
 };
-export const ChartData = {
-  series: [10, 20, 30, 40, 50],
-  options: {
-    chart: {
-      type: "donut",
-      events: {},
-      height: 350,
-      width: "100%",
-      stacked: true,
-    },
-    colors: ["#5372b9", "#90be82", "#fdc66d", "#fa7870", "#6eb8d8"],
-    labels: ["25", "50", "75", "100", "NA"],
-    legend: {
-      show: true,
-      position: "right",
-    },
-    dataLabels: {
-      enabled: true,
-      offsetY: -20,
-    },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200,
-          },
-          legend: {
-            position: "bottom",
-          },
-        },
-      },
-    ],
-  },
-};
 export const barChartData = {
   series: [],
   options: {

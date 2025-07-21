@@ -3,9 +3,8 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
-import CommonCategoryGrid from "../components/CommonCategoryGrid";
 import CommonTable from "@/components/common/dataTable/CommonTable";
-import { barChartData, ChartData } from "../constants";
+import { barChartData } from "../constants";
 import ReactApexChart from "react-apexcharts";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +18,6 @@ import {
   getInsightMetricsCsn,
   getSubscriptionByThirdParty,
   getThirdPartyExportedAccount,
-  setIndustryGroupCount,
 } from "../slice/accountSlice";
 import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
@@ -37,10 +35,9 @@ const CommonChart = ({
   series,
   subCategory,
   className,
-  subCategoryChange,
-  setSelectedIndex,
-  selectedIndex,
+  onSubCategoryClick,
 }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
   return (
     <div className={`insight-metrics-chart ${className}`}>
       <div className="chart-data">
@@ -51,10 +48,10 @@ const CommonChart = ({
               <p
                 key={index}
                 onClick={() => {
-                  subCategoryChange(index);
+                  onSubCategoryClick && onSubCategoryClick(index);
                   setSelectedIndex(index);
                 }}
-                style={{ color: `${selectedIndex === index ? "#1800ee" : ""}` }}
+                className={`${index === selectedIndex && "active-subcategory"}`}
               >
                 {item}
               </p>
@@ -71,39 +68,15 @@ const CommonChart = ({
     </div>
   );
 };
-
-// Helper function to compute industry chart data
-const computeIndustryChartData = (data, groupByKey) => {
-  if (!data || data.length === 0) return { series: [], categories: [] };
-
-  const groupCounts = data.reduce((acc, item) => {
-    const key = item[groupByKey] || "Unknown";
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-
-  const sortedKeys = Object.keys(groupCounts).sort();
-  const seriesData = sortedKeys.map((key) => groupCounts[key]);
-
-  return {
-    series: [{ name: "Accounts", data: seriesData }],
-    categories: sortedKeys,
-  };
-};
+const getRowId = (row) => row.id;
 
 const Account = () => {
   const [filters, setFilters] = useState({
     searchValue: "",
     branch: null,
     status: "All Status",
-    industryCategory: "",
   });
   const [filteredData, setFilteredData] = useState([]);
-  const [selectedValue, setSelectedValue] = useState({
-    title: "All",
-    status: "Total",
-  });
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [modal, setModal] = useState({
     isOpen: false,
     id: "",
@@ -124,7 +97,6 @@ const Account = () => {
       searchValue: "",
       branch: null,
       status: "All Status",
-      industryCategory: "",
     });
   }, [isThirdPartyAccount]);
 
@@ -188,7 +160,6 @@ const Account = () => {
   }, [filter?.csn, isThirdPartyAccount]);
 
   const handleFilters = (data = exportedAccountData) => {
-    // let data = exportedAccountData;
     if (filters?.branch?.label) {
       data = data?.filter?.((item) => item?.branch === filters?.branch?.label);
     }
@@ -207,7 +178,6 @@ const Account = () => {
   };
   useEffect(() => {
     let data = handleFilters(exportedAccountData);
-    dispatch(setIndustryGroupCount({ data, isThirdPartyAccount }));
     setFilteredData(data);
   }, [exportedAccountData, isThirdPartyAccount]);
 
@@ -219,15 +189,8 @@ const Account = () => {
     ) {
       let data = handleFilters();
       setFilteredData(data);
-      dispatch(setIndustryGroupCount({ data, isThirdPartyAccount }));
     } else {
       setFilteredData(exportedAccountData);
-      dispatch(
-        setIndustryGroupCount({
-          data: exportedAccountData,
-          isThirdPartyAccount,
-        })
-      );
     }
   }, [filters?.branch, filters?.status, filters?.searchValue]);
 
@@ -471,29 +434,35 @@ const Account = () => {
     },
   ];
 
-  const getRowId = (row) => row.id;
-
-  const handleClick = (title, status) => {
-    setSelectedValue({ title, status });
-    let data = handleFilters();
-    if (title !== "All") {
-      if (title === "Unknown") {
-        data = data?.filter(
-          (item) => !item?.industryGroup || item?.industryGroup === "Unknown"
-        );
-      } else {
-        data = data?.filter(
-          (item) =>
-            item?.industryGroup?.toString()?.toLowerCase() ===
-            title?.toString()?.toLowerCase()
-        );
-      }
-    }
-    if (status !== "Total") {
-      data = data?.filter((item) => item?.contract_status === status);
-    }
-    setFilteredData(data);
+  const handleCallback = () => {
+    setModal({
+      isOpen: false,
+      id: "",
+      isAssign: false,
+      type: null,
+    });
+    dispatch(
+      getExportedAccount({
+        id: filter?.csn === "All CSN" ? "" : filter?.csn,
+        isThirdParty: isThirdPartyAccount,
+      })
+    );
   };
+  const handleSelectionChange = (selectedRows) => {
+    const idArray = [...selectedRows?.ids];
+    if (idArray?.length > 0) {
+      setSelectedId(idArray);
+    } else {
+      setSelectedId([]);
+    }
+  };
+
+  const exportedData = useMemo(
+    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
+    [selectedId]
+  );
+
+  //Top 12 cities
 
   const handleCityBarClick = (cityName, clickedStatus) => {
     let data = handleFilters();
@@ -511,7 +480,7 @@ const Account = () => {
     if (clickedStatus) {
       data = data?.filter((item) => item?.contract_status === clickedStatus);
     }
-    dispatch(setIndustryGroupCount({ data, isThirdPartyAccount }));
+
     setFilteredData(data);
   };
 
@@ -519,7 +488,6 @@ const Account = () => {
     const cityCounts = {};
 
     filteredData.forEach((item) => {
-      // const rawCity = item?.city || "Unknown";
       const rawCity = item?.city || "Unknown";
 
       const city = rawCity.toLowerCase().trim(); // Normalize city name
@@ -542,7 +510,6 @@ const Account = () => {
       }
     });
 
-    // Sort by total and get top 12
     const sortedCities = Object.entries(cityCounts)
       .sort((a, b) => {
         const totalA = a[1].Active + a[1].Expired;
@@ -590,51 +557,6 @@ const Account = () => {
     };
   };
 
-  const handleCallback = () => {
-    setModal({
-      isOpen: false,
-      id: "",
-      isAssign: false,
-      type: null,
-    });
-    dispatch(
-      getExportedAccount({
-        id: filter?.csn === "All CSN" ? "" : filter?.csn,
-        isThirdParty: isThirdPartyAccount,
-      })
-    );
-  };
-  const handleSelectionChange = (selectedRows) => {
-    const idArray = [...selectedRows?.ids];
-    if (idArray?.length > 0) {
-      setSelectedId(idArray);
-    } else {
-      setSelectedId([]);
-    }
-  };
-
-  const exportedData = useMemo(
-    () => filteredData?.filter((item) => selectedId.includes(item?.id)),
-    [selectedId]
-  );
-
-  // Compute chart data based on selected grouping
-  const industryChartData = useMemo(() => {
-    const groupByKey =
-      selectedIndex === 0
-        ? "industryGroup"
-        : selectedIndex === 1
-        ? "industrySegment"
-        : "industrySubSegment";
-
-    return computeIndustryChartData(filteredData, groupByKey);
-  }, [filteredData, selectedIndex]);
-
-  // Handle chart grouping change
-  const handleGroupChange = (index) => {
-    setSelectedIndex(index);
-  };
-
   // BD Person Graph
   const [bdPersonType, setBdPersonType] = useState("subscription");
   const [bdPersonLegend, setBdPersonLegend] = useState("");
@@ -655,7 +577,7 @@ const Account = () => {
             ? item?.user_assign_Arr?.includes(data)
             : item?.user_assign_Arr?.length === 0
         );
-    dispatch(setIndustryGroupCount({ data: updatedData, isThirdPartyAccount }));
+
     setFilteredData(updatedData);
   };
 
@@ -868,7 +790,7 @@ const Account = () => {
       : allData?.filter((item) =>
           data !== "Unknown" ? item?.name === data : item?.name
         );
-    dispatch(setIndustryGroupCount({ data: updatedData, isThirdPartyAccount }));
+
     setFilteredData(updatedData);
   };
 
@@ -1039,9 +961,9 @@ const Account = () => {
   const getAssociatedAccountTitle = () => {
     switch (associatedAccountType) {
       case "dtp_price":
-        return "Total DTP Price as per BD Person";
+        return "Associated account (Top 25)";
       case "acv_price":
-        return "Total ACV Price as per BD Person";
+        return "Associated account (Top 25)";
       case "subscription":
       default:
         return "Associated account (Top 25)";
@@ -1050,6 +972,336 @@ const Account = () => {
 
   const handleAssociatedAccountChange = (viewType) => {
     setAssociatedAccountType(viewType);
+  };
+  // Number of seats chart
+  const [chartViewType, setChartViewType] = useState("byAccountName");
+  const [numberOfSeatsBar, setNumberOfSeatsBar] = useState("");
+
+  const handleNumberOfSeatsClick = (data) => {
+    let allData;
+    const isSameColor = numberOfSeatsBar === data;
+    if (isSameColor) {
+      allData = handleFilters();
+    } else {
+      allData = filteredData;
+    }
+    setNumberOfSeatsBar(isSameColor ? "" : data);
+    let key;
+    if (chartViewType === "byProductLine") {
+      key = "productLineCodes";
+    } else if (chartViewType === "byAccountName") {
+      key = "name";
+    }
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item[key] === data);
+    setFilteredData(updatedData);
+  };
+
+  const numberOfSeats = useMemo(() => {
+    if (filteredData?.length > 0) {
+      let aggregationMap = new Map();
+      let groupKey;
+      let truncateLabels = false;
+      let rotateLabels = false;
+      let sortDescending = true;
+
+      // Determine grouping key based on chart view type
+      if (chartViewType === "byAccountName") {
+        groupKey = "name";
+        truncateLabels = true;
+        rotateLabels = true;
+      } else {
+        truncateLabels = true;
+        rotateLabels = true;
+        groupKey = "productLineCodes"; // Default to product line
+      }
+
+      filteredData.forEach((item) => {
+        if (groupKey === "productLineCodes") {
+          const productLines = Array.isArray(item?.productLineCodes)
+            ? item.productLineCodes
+            : [];
+
+          productLines.forEach(({ name, seats }) => {
+            if (!name) return;
+            const current = aggregationMap.get(name) || 0;
+            aggregationMap.set(name, current + (seats || 0));
+          });
+        } else {
+          const key = item[groupKey];
+          if (!key) return;
+          const current = aggregationMap.get(key) || 0;
+          aggregationMap.set(key, current + (item.totalSeats || 0));
+        }
+      });
+
+      // Convert to array and sort
+      let sortedData = Array.from(aggregationMap.entries())
+        .map(([key, total]) => ({ key, total }))
+        .sort((a, b) => b.total - a.total);
+
+      // Sort other views by total descending
+      sortedData = sortedData.sort((a, b) => b.total - a.total);
+
+      // Take top 50 (except for years which are limited)
+      const topData = sortedData.slice(0, 50);
+
+      // Extract categories and data values
+      const categories = topData.map((item) => item.key);
+      const seriesData = topData.map((item) => item.total);
+      return {
+        options: {
+          chart: {
+            events: {
+              xAxisLabelClick: function (event, chartContext, config) {
+                const clickedCategory =
+                  config?.config?.xaxis?.categories[config.labelIndex];
+                if (clickedCategory) {
+                  if (chartViewType === "byProductLine") {
+                    return;
+                  } else {
+                    handleNumberOfSeatsClick(clickedCategory);
+                  }
+                }
+              },
+            },
+            type: "bar",
+            height: 350,
+            width: "100%",
+          },
+          xaxis: {
+            categories, // Will be populated with top 50 product codes
+            labels: {
+              rotate: rotateLabels ? -45 : 0,
+              formatter: (value) => {
+                // Truncate long labels
+                if (truncateLabels && value.length > 20) {
+                  return value.substring(0, 20) + "...";
+                }
+                return value;
+              },
+            },
+          },
+          yaxis: {
+            title: { text: "Total Seats" },
+          },
+          dataLabels: {
+            position: "top",
+          },
+        },
+        series: [{ name: "seats", data: seriesData }],
+      };
+    } else {
+      return {
+        options: {
+          chart: {
+            events: {},
+            type: "bar",
+            height: 350,
+            width: "100%",
+          },
+          xaxis: {
+            categories: [], // Will be populated with top 50 product codes
+            labels: {
+              rotate: 0,
+            },
+          },
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+          yaxis: {
+            title: { text: "Total Seats" },
+          },
+          dataLabels: {
+            position: "top",
+          },
+        },
+        series: [{ name: "seats", data: [] }],
+      };
+    }
+  }, [filteredData, chartViewType]);
+
+  const handleChartViewChange = (viewType) => {
+    setChartViewType(viewType);
+  };
+
+  // Total Account count
+  const [accountType, setAccountType] = useState("industry");
+  const [accountBar, setAccountBar] = useState("");
+
+  const handleAccountClick = (data) => {
+    let allData;
+    const isSameColor = accountBar === data;
+    if (isSameColor) {
+      allData = handleFilters();
+    } else {
+      allData = filteredData;
+    }
+    setAccountBar(isSameColor ? "" : data);
+    let key;
+    if (accountType === "industry") {
+      key = "industryGroup";
+    } else if (accountType === "segment") {
+      key = "industrySegment";
+    } else if (accountType === "subSegment") {
+      key = "industrySubSegment";
+    }
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item[key] === data);
+    setFilteredData(updatedData);
+  };
+
+  const accountTypeChart = useMemo(() => {
+    if (filteredData?.length > 0) {
+      let aggregationMap = new Map();
+      let groupKey;
+      let truncateLabels = false;
+      let rotateLabels = false;
+
+      // Determine grouping key based on chart view type
+      if (accountType === "industry") {
+        groupKey = "industryGroup";
+        truncateLabels = true;
+        rotateLabels = true;
+      } else if (accountType === "segment") {
+        groupKey = "industrySegment";
+        truncateLabels = true;
+        rotateLabels = true;
+      } else if (accountType === "subSegment") {
+        groupKey = "industrySubSegment";
+        truncateLabels = true;
+        rotateLabels = true;
+      }
+
+      filteredData.forEach((item) => {
+        const key = item[groupKey];
+        if (!key) return;
+        const current = aggregationMap.get(key) || 0;
+        aggregationMap.set(key, current + 1);
+      });
+
+      // Convert to array and sort
+      let sortedData = Array.from(aggregationMap.entries())
+        .map(([key, total]) => ({ key, total }))
+        .sort((a, b) => b.total - a.total);
+
+      // Sort other views by total descending
+      sortedData = sortedData.sort((a, b) => b.total - a.total);
+
+      // Take top 50 (except for years which are limited)
+      const topData = sortedData.slice(0, 50);
+
+      // Extract categories and data values
+      const categories = topData.map((item) => item.key);
+      const seriesData = topData.map((item) => item.total);
+      return {
+        options: {
+          chart: {
+            events: {
+              xAxisLabelClick: function (event, chartContext, config) {
+                const clickedCategory =
+                  config?.config?.xaxis?.categories[config.labelIndex];
+                if (clickedCategory) {
+                  if (chartViewType === "byProductLine") {
+                    return;
+                  } else {
+                    handleAccountClick(clickedCategory);
+                  }
+                }
+              },
+              legendClick: function (chartContext, seriesIndex, config) {
+                const clickedCategory =
+                  config?.config?.xaxis?.categories[seriesIndex];
+                if (clickedCategory) {
+                  handleAccountClick(clickedCategory);
+                }
+              },
+            },
+            type: "bar",
+            height: 350,
+            width: "100%",
+          },
+          xaxis: {
+            categories, // Will be populated with top 50 product codes
+            labels: {
+              rotate: rotateLabels ? -45 : 0,
+              formatter: (value) => {
+                // Truncate long labels
+                if (truncateLabels && value.length > 20) {
+                  return value.substring(0, 20) + "...";
+                }
+                return value;
+              },
+            },
+          },
+          yaxis: {
+            title: { text: "Total Seats" },
+          },
+          plotOptions: {
+            bar: {
+              borderRadius: 5,
+              columnWidth: "50%",
+              distributed: true,
+            },
+          },
+          dataLabels: {
+            position: "top",
+          },
+        },
+        series: [{ name: "seats", data: seriesData }],
+      };
+    } else {
+      return {
+        options: {
+          chart: {
+            events: {},
+            type: "bar",
+            height: 350,
+            width: "100%",
+          },
+          xaxis: {
+            categories: [], // Will be populated with top 50 product codes
+            labels: {
+              rotate: 0,
+            },
+          },
+          noData: {
+            text: "No data available",
+            align: "center",
+            verticalAlign: "middle",
+            offsetX: 0,
+            offsetY: 0,
+            style: {
+              color: "#888",
+              fontSize: "14px",
+              fontFamily: "Arial, sans-serif",
+            },
+          },
+          yaxis: {
+            title: { text: "Total Seats" },
+          },
+          dataLabels: {
+            position: "top",
+          },
+        },
+        series: [{ name: "seats", data: [] }],
+      };
+    }
+  }, [filteredData, accountType]);
+
+  const handleAccountChange = (viewType) => {
+    setAccountType(viewType);
   };
 
   return (
@@ -1080,16 +1332,6 @@ const Account = () => {
                 branch: null,
                 status: "All Status",
               });
-              dispatch(
-                setIndustryGroupCount({
-                  data: exportedAccountData,
-                  isThirdPartyAccount,
-                })
-              );
-              setSelectedValue({
-                title: "All",
-                status: "Total",
-              });
             }}
           >
             All
@@ -1098,10 +1340,6 @@ const Account = () => {
           <CommonAutocomplete
             onChange={(event, newValue) => {
               setFilters((prev) => ({ ...prev, branch: newValue }));
-              setSelectedValue({
-                title: "",
-                status: "",
-              });
             }}
             options={branch_list}
             label="Select a Branch"
@@ -1120,12 +1358,7 @@ const Account = () => {
               setFilters((prev) => ({
                 ...prev,
                 status: e.target.value,
-                industryCategory: "All",
               }));
-              setSelectedValue({
-                title: "",
-                status: "",
-              });
             }}
           />
 
@@ -1136,58 +1369,100 @@ const Account = () => {
             debounceTime={400}
             onChange={(text) => {
               setFilters((prev) => ({ ...prev, searchValue: text }));
-              setSelectedValue({
-                title: "",
-                status: "",
-              });
-              setSelectedIndex(0);
             }}
           />
         </div>
-        <div className="mt-4">
+        <div className="subscription-chart number-of-seasts-chart">
           {exportedAccountDataLoading ? (
             <SkeletonLoader />
           ) : (
-            industryGroupCount?.length > 0 && (
-              <CommonCategoryGrid
-                data={industryGroupCount}
-                handleClick={handleClick}
-                selectedValue={selectedValue}
-              />
-            )
+            <CommonChart
+              title={
+                chartViewType === "byProductLine"
+                  ? "Trend of number of seats purchased by product line code"
+                  : chartViewType === "byAccountName"
+                  ? "Trend of number of seats purchased by account name"
+                  : "Trend of number of seats purchased by last purchase year"
+              }
+              options={numberOfSeats?.options}
+              series={numberOfSeats?.series}
+              subCategory={["By Account names", "By Product line"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleChartViewChange("byAccountName");
+                if (index === 1) handleChartViewChange("byProductLine");
+              }}
+            />
           )}
         </div>
-        {exportedAccountDataLoading ? (
-          <SkeletonLoader />
-        ) : (
-          isThirdPartyAccount && (
-            <div className="opportunity-retention-account subscription-chart">
-              <CommonChart
-                title={getBdPersonTitle()}
-                options={bdPersonPieChart?.options}
-                series={bdPersonPieChart?.series}
-                className="chart-data-2"
-                // subCategory={["Subscription", "DTP", "ACV"]}
-                // onSubCategoryClick={(index) => {
-                //   if (index === 0) handleBdPersonChange("subscription");
-                //   if (index === 1) handleBdPersonChange("dtp_price");
-                //   if (index === 2) handleBdPersonChange("acv_price");
-                // }}
-              />
+
+        <div className="subscription-chart number-of-seasts-chart">
+          {exportedAccountDataLoading ? (
+            <SkeletonLoader />
+          ) : (
+            <CommonChart
+              title={
+                accountType === "industry"
+                  ? "Total account by industry"
+                  : accountType === "segment"
+                  ? "Total account by segment"
+                  : "Total account by sub-segment"
+              }
+              options={accountTypeChart?.options}
+              series={accountTypeChart?.series}
+              subCategory={["Industry", "Segment", "Sub-Segment"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleAccountChange("industry");
+                if (index === 1) handleAccountChange("segment");
+                if (index === 2) handleAccountChange("subSegment");
+              }}
+            />
+          )}
+        </div>
+        {isThirdPartyAccount && (
+          <div className="subscription-chart number-of-seasts-chart">
+            {exportedAccountDataLoading ? (
+              <SkeletonLoader />
+            ) : (
               <CommonChart
                 title={getAssociatedAccountTitle()}
                 options={associatedAccountPieChart?.options}
                 series={associatedAccountPieChart?.series}
                 className="chart-data-2"
-                // subCategory={["Subscription", "DTP", "ACV"]}
-                // onSubCategoryClick={(index) => {
-                //   if (index === 0) handleBdPersonChange("subscription");
-                //   if (index === 1) handleBdPersonChange("dtp_price");
-                //   if (index === 2) handleBdPersonChange("acv_price");
-                // }}
+                subCategory={["Account", "DTP", "ACV"]}
+                onSubCategoryClick={(index) => {
+                  if (index === 0)
+                    handleAssociatedAccountChange("subscription");
+                  if (index === 1) handleAssociatedAccountChange("dtp_price");
+                  if (index === 2) handleAssociatedAccountChange("acv_price");
+                }}
               />
-            </div>
-          )
+            )}
+          </div>
+        )}
+
+        {exportedAccountDataLoading ? (
+          <SkeletonLoader />
+        ) : (
+          <div className="opportunity-retention-account subscription-chart">
+            <CommonChart
+              title={getBdPersonTitle()}
+              options={bdPersonPieChart?.options}
+              series={bdPersonPieChart?.series}
+              className="chart-data-2"
+              subCategory={["Account", "DTP", "ACV"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleBdPersonChange("subscription");
+                if (index === 1) handleBdPersonChange("dtp_price");
+                if (index === 2) handleBdPersonChange("acv_price");
+              }}
+            />
+            <CommonChart
+              title="Top 12 cities by number of account trend showing between active and inactive"
+              options={generateCityBarChartData().options}
+              className="chart-data-2"
+              series={generateCityBarChartData().series}
+            />
+          </div>
         )}
         <div className="account-table mt-4">
           {exportedAccountDataLoading ? (
@@ -1213,51 +1488,6 @@ const Account = () => {
               />
             </div>
           )}
-        </div>
-        <div className="account-industry-chart mt-4">
-          {!exportedAccountDataLoading ? (
-            <CommonChart
-              title="Trend of number of accounts by Industry"
-              options={{
-                chart: {
-                  type: "line",
-                  height: 350,
-                  zoom: { enabled: false },
-                },
-                dataLabels: { enabled: false },
-                stroke: { curve: "straight" },
-                grid: {
-                  row: { colors: ["#f3f3f3", "transparent"], opacity: 0.5 },
-                },
-                xaxis: { categories: industryChartData.categories },
-                yaxis: { title: { text: "Number of Accounts" } },
-              }}
-              series={industryChartData.series}
-              subCategory={[
-                "By Industry Group",
-                "By Segment",
-                "By Sub Segment",
-              ]}
-              subCategoryChange={handleGroupChange}
-              selectedIndex={selectedIndex}
-            />
-          ) : (
-            <SkeletonLoader isDashboard height="350px" />
-          )}
-        </div>
-        <div className="account-industry-chart-2 mt-4">
-          <CommonChart
-            title="Show by rediness scores"
-            options={ChartData.options}
-            series={ChartData.series}
-            className="chart-data-1"
-          />
-          <CommonChart
-            title="Top 12 cities by number of account trend showing between active and inactive"
-            options={generateCityBarChartData().options}
-            className="chart-data-2"
-            series={generateCityBarChartData().series}
-          />
         </div>
       </div>
       <CommonModal
