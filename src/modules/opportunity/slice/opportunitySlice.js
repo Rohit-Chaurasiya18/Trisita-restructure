@@ -74,7 +74,13 @@ const opportunitySlice = createSlice({
       state.last_updated = "";
     });
     builder.addCase(getExportedOpportunities.fulfilled, (state, action) => {
-      state.opportunityList = action.payload.data?.opportunity_data;
+      state.opportunityList = action.payload.data?.opportunity_data?.map(
+        (item) => ({
+          ...item,
+          productLineCodes: item?.productLineCodes?.join(", "),
+          productLines: item?.productLines?.join(", "),
+        })
+      );
       state.expiring_count = action.payload.data?.expiring_count;
       state.last_updated = action.payload.data?.last_updated;
       state.opportunityLoading = false;

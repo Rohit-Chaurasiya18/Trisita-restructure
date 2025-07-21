@@ -278,14 +278,14 @@ const Opportunity = () => {
       width: 220,
     },
     {
-      field: "productLine",
+      field: "productLines",
       headerName: "Product Line",
-      width: 220,
+      width: 250,
     },
     {
-      field: "productLineCode",
+      field: "productLineCodes",
       headerName: "Product Line Code",
-      width: 220,
+      width: 250,
     },
     {
       field: "acv_price",

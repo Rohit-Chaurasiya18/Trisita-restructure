@@ -29,7 +29,6 @@ const CommonChart = ({ title, options, series }) => (
 const Usuage = () => {
   const dispatch = useDispatch();
   const { csn, from_date, to_date } = useParams();
-
   const {
     filter,
     usuagesData,
@@ -91,7 +90,7 @@ const Usuage = () => {
         csn: selectedCsn,
         payload: {
           csn: selectedCsn,
-          ccsn: csn,
+          ccsn: csn?.split(","),
           from_date,
           to_date,
           product_line_code: "",
@@ -208,7 +207,7 @@ const Usuage = () => {
 
     const payload = {
       csn: selectedCsn,
-      ccsn: csn,
+      ccsn: csn?.split(","),
       from_date,
       to_date,
       product_line_code: productCode,

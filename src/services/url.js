@@ -34,10 +34,10 @@ export const GET_INSIGHT_METRICS_CONTRACT =
   "/v1/api/get_insight_metrics_contract";
 export const GET_INSIGHT_METRICS_V2_CONTRACT =
   "/v1/api/get_insight_metrics_v2_pop_up";
-export const GET_USUAGE_DATA = "/v1/api/get_usage_data/";
+export const GET_USUAGE_DATA = "/v1/api/new_get_usage_data/";
 export const GET_USUAGE_PRODUCT_FEATURE_CHART =
-  "/v1/api/get_usage_product_feature_chart/";
-export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/usage_user_count/";
+  "/v1/api/new_get_usage_product_feature_chart/";
+export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/new_usage_user_count/";
 export const GET_SUBSCRIPTION_DATA = "/v1/api/get_export_subscriptions/";
 export const GET_NEW_SUBSCRIPTION_DATA = "/v1/api/new_get_new_subscriptions/";
 export const GET_NEW_SUBSCRIPTION_DETAIL = "/v1/api/new_subscription/";

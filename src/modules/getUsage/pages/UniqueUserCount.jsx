@@ -42,7 +42,7 @@ const UniqueUserCount = () => {
     dispatch(
       getUniqueUsageUserCount({
         csn: filter?.csn !== "All CSN" ? filter?.csn : "",
-        ccsn: csn,
+        ccsn: csn?.split(","),
         from_date,
         to_date,
       })
