@@ -12,6 +12,7 @@ import {
   GET_EXPORTED_ACCOUNTS_DATA,
   GET_SUBS_BY_THIRD_PARTY,
   GET_THIRD_PARTY_ACCOUNT,
+  GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY,
   INSIGHT_METRICS_CSN,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -231,6 +232,22 @@ export const getSubscriptionByThirdParty = createAsyncThunk(
   }
 );
 
+// Get total amount per month data
+export const getTotalAmountPerMonthChart = createAsyncThunk(
+  `account/getTotalAmountPerMonthChart`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const accountState = {
   allUserData: null,
   last_updated: "",
@@ -251,6 +268,8 @@ const accountState = {
   accountInformationLoading: false,
   subscriptionByThirdParty: [],
   subscriptionByThirdPartyLoading: false,
+  totalAmountMonthThirdPartyLoading: false,
+  totalAmountMonthThirdParty: [],
 };
 
 const accountSlice = createSlice({
@@ -459,6 +478,20 @@ const accountSlice = createSlice({
     builder.addCase(getSubscriptionByThirdParty.rejected, (state) => {
       state.subscriptionByThirdParty = [];
       state.subscriptionByThirdPartyLoading = false;
+    });
+
+    // getTotalAmountPerMonthChart
+    builder.addCase(getTotalAmountPerMonthChart.pending, (state) => {
+      state.totalAmountMonthThirdParty = [];
+      state.totalAmountMonthThirdPartyLoading = true;
+    });
+    builder.addCase(getTotalAmountPerMonthChart.fulfilled, (state, action) => {
+      state.totalAmountMonthThirdParty = action.payload.data;
+      state.totalAmountMonthThirdPartyLoading = false;
+    });
+    builder.addCase(getTotalAmountPerMonthChart.rejected, (state) => {
+      state.totalAmountMonthThirdParty = [];
+      state.totalAmountMonthThirdPartyLoading = false;
     });
   },
 });

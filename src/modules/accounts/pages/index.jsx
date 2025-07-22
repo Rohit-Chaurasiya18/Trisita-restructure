@@ -18,6 +18,7 @@ import {
   getInsightMetricsCsn,
   getSubscriptionByThirdParty,
   getThirdPartyExportedAccount,
+  getTotalAmountPerMonthChart,
 } from "../slice/accountSlice";
 import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
@@ -28,6 +29,7 @@ import moment from "moment";
 import routesConstants from "@/routes/routesConstants";
 import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import SubscriptionDetail from "../components/SubscriptionDetail";
+import dayjs from "dayjs";
 
 const CommonChart = ({
   title,
@@ -107,10 +109,11 @@ const Account = () => {
     last_updated,
     exportedAccountDataLoading,
     exportedAccountData,
-    industryGroupCount,
     accountInformation,
     userDetail,
     dashboardStatus,
+    totalAmountMonthThirdParty,
+    totalAmountMonthThirdPartyLoading,
   } = useSelector((state) => ({
     branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
@@ -124,12 +127,12 @@ const Account = () => {
     last_updated: isThirdPartyAccount
       ? state?.account?.thirdPartyLast_updated
       : state?.account?.last_updated,
-    industryGroupCount: isThirdPartyAccount
-      ? state?.account?.thirdPartyIndustryGroupCount
-      : state?.account?.industryGroupCount,
     accountInformation: state?.account?.accountInformation,
     userDetail: state?.login?.userDetail,
     dashboardStatus: state?.dashboard?.dashboardStatus,
+    totalAmountMonthThirdParty: state?.account?.totalAmountMonthThirdParty,
+    totalAmountMonthThirdPartyLoading:
+      state?.account?.totalAmountMonthThirdPartyLoading,
   }));
   const [selectedId, setSelectedId] = useState([]);
 
@@ -145,6 +148,7 @@ const Account = () => {
   useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllUser());
+    dispatch(getTotalAmountPerMonthChart());
   }, []);
 
   useEffect(() => {
@@ -1525,6 +1529,64 @@ const Account = () => {
   const handleAccountTypeChange = (viewType) => {
     setAccountType_Type(viewType);
   };
+
+  // Total Amount as per Months
+  const chartData = useMemo(() => {
+    const monthlyData = {};
+
+    // Determine base month (start from selected startDate if available, else current month)
+    const baseMonth = dayjs(); // fallback to current month
+
+    // Previous 12 months
+    for (let i = 0; i < 12; i++) {
+      const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
+      monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
+    }
+
+    // Aggregate DTP and ACV by endDate month
+    (totalAmountMonthThirdParty || []).forEach((sub) => {
+      const endMonth = dayjs(sub?.subsEndDate).format("YYYY-MM");
+      if (monthlyData[endMonth]) {
+        monthlyData[endMonth].dtp_total += Number(sub?.totalDTP) || 0;
+        monthlyData[endMonth].acv_total += Number(sub?.totalAcv) || 0;
+      }
+    });
+
+    const categories = Object.keys(monthlyData);
+    const dtpData = categories.map((month) =>
+      parseFloat(monthlyData[month].dtp_total.toFixed(2))
+    );
+    const acvData = categories.map((month) =>
+      parseFloat(monthlyData[month].acv_total.toFixed(2))
+    );
+
+    return { categories, dtpData, acvData };
+  }, [totalAmountMonthThirdParty]);
+
+  const amountPerMonth = {
+    options: {
+      chart: { height: 350, type: "bar" },
+      xaxis: {
+        categories: chartData.categories,
+        title: { text: "Months" },
+      },
+      yaxis: {
+        title: { text: "Price" },
+      },
+      colors: ["#007BFF", "#FF5733"],
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          columnWidth: "50%",
+        },
+      },
+    },
+    series: [
+      { name: "DTP Price", data: chartData.dtpData },
+      { name: "ACV Price", data: chartData.acvData },
+    ],
+  };
+
   return (
     <>
       <div className="account">
@@ -1657,6 +1719,18 @@ const Account = () => {
                 }}
               />
             )}
+          </div>
+        )}
+        {totalAmountMonthThirdPartyLoading ? (
+          <SkeletonLoader />
+        ) : (
+          <div className="subscription-chart number-of-seasts-chart">
+            <CommonChart
+              title="Total Amount as per Months"
+              options={amountPerMonth.options}
+              series={amountPerMonth.series}
+              className="chart-data-2"
+            />
           </div>
         )}
 
