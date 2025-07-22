@@ -23,7 +23,7 @@ import ConfirmationModal from "@/components/common/modal/ConfirmationModal";
 import { toast } from "react-toastify";
 import { getOrderLoadingPo } from "@/modules/dashboard/slice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
-import { ACCEPTED_FILE_TYPES } from "@/constant";
+import { ACCEPTED_FILE_TYPES } from "@/constants";
 
 const orderTypeOptions = [
   { value: "New", label: "New" },

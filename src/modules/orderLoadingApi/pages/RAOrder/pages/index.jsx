@@ -20,6 +20,7 @@ import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonChart from "@/components/common/chart/CommonChart";
+import { getEmptyBarChartConfig, getEmptyPieChartConfig } from "@/constants";
 
 const RAOrder = () => {
   const dispatch = useDispatch();
@@ -362,7 +363,6 @@ const RAOrder = () => {
       let groupKey;
       let truncateLabels = false;
       let rotateLabels = false;
-      let sortDescending = true;
 
       // Determine grouping key based on chart view type
       if (chartViewType === "byAccountName") {
@@ -469,41 +469,7 @@ const RAOrder = () => {
         series: [{ name: "seats", data: seriesData }],
       };
     } else {
-      return {
-        options: {
-          chart: {
-            events: {},
-            type: "bar",
-            height: 350,
-            width: "100%",
-          },
-          xaxis: {
-            categories: [], // Will be populated with top 50 product codes
-            labels: {
-              rotate: 0,
-            },
-          },
-          noData: {
-            text: "No data available",
-            align: "center",
-            verticalAlign: "middle",
-            offsetX: 0,
-            offsetY: 0,
-            style: {
-              color: "#888",
-              fontSize: "14px",
-              fontFamily: "Arial, sans-serif",
-            },
-          },
-          yaxis: {
-            title: { text: "Total Seats" },
-          },
-          dataLabels: {
-            position: "top",
-          },
-        },
-        series: [{ name: "seats", data: [] }],
-      };
+      return getEmptyBarChartConfig();
     }
   }, [filteredData, chartViewType]);
 
@@ -619,55 +585,7 @@ const RAOrder = () => {
         series: series,
       };
     } else {
-      return {
-        options: {
-          chart: {
-            type: "pie",
-            height: 350,
-          },
-          labels: [],
-          noData: {
-            text: "No data available",
-            align: "center",
-            verticalAlign: "middle",
-            offsetX: 0,
-            offsetY: 0,
-            style: {
-              color: "#888",
-              fontSize: "14px",
-              fontFamily: "Arial, sans-serif",
-            },
-          },
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-          },
-          plotOptions: {
-            bar: {
-              distributed: true, // Distribute colors across bars
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: "100%",
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
-        },
-        series: [],
-      };
+      return getEmptyPieChartConfig();
     }
   }, [filteredData, accountGroupType]);
 
@@ -797,43 +715,7 @@ const RAOrder = () => {
         series: sortedSeries,
       };
     } else {
-      return {
-        options: {
-          chart: {
-            type: "pie",
-            height: 350,
-          },
-          labels: [],
-          legend: {
-            position: "bottom",
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-          },
-          plotOptions: {
-            bar: {
-              distributed: true, // Distribute colors across bars
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200,
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
-        },
-        series: [],
-      };
+      return getEmptyPieChartConfig();
     }
   }, [filteredData, accountType_Type]);
 
@@ -1029,62 +911,7 @@ const RAOrder = () => {
         series: sortedSeries,
       };
     } else {
-      return {
-        options: {
-          chart: {
-            type: "pie",
-            height: 350,
-          },
-          labels: [],
-          noData: {
-            text: "No data available",
-            align: "center",
-            verticalAlign: "middle",
-            offsetX: 0,
-            offsetY: 0,
-            style: {
-              color: "#888",
-              fontSize: "14px",
-              fontFamily: "Arial, sans-serif",
-            },
-          },
-          legend: {
-            position: "bottom",
-            formatter: (seriesName, opts) => {
-              const count = opts.w.globals.series[opts.seriesIndex];
-              const isHighlighted = seriesName === bdPersonLegend;
-              return `<span style="color: ${
-                isHighlighted ? "black" : "black"
-              };">${seriesName} - ${count}</span>`;
-            },
-            onItemClick: {
-              toggleDataSeries: true, // Enable toggling of data series
-            },
-            onItemHover: {
-              highlightDataSeries: true, // Highlight the hovered series
-            },
-          },
-          plotOptions: {
-            pie: {
-              distributed: true, // Distribute colors across slices
-            },
-          },
-          responsive: [
-            {
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: "100%",
-                },
-                legend: {
-                  position: "bottom",
-                },
-              },
-            },
-          ],
-        },
-        series: [],
-      };
+      return getEmptyPieChartConfig();
     }
   }, [filteredData, bdPersonType]);
 
