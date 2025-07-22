@@ -1189,30 +1189,42 @@ const Account = () => {
     if (filteredData?.length > 0) {
       let aggregationMap = new Map();
       let groupKey;
-      let truncateLabels = false;
-      let rotateLabels = false;
+      let truncateLabels = true;
+      let rotateLabels = true;
 
       // Determine grouping key based on chart view type
       if (accountType === "industry") {
         groupKey = "industryGroup";
-        truncateLabels = true;
-        rotateLabels = true;
       } else if (accountType === "segment") {
         groupKey = "industrySegment";
-        truncateLabels = true;
-        rotateLabels = true;
       } else if (accountType === "subSegment") {
         groupKey = "industrySubSegment";
-        truncateLabels = true;
-        rotateLabels = true;
       }
+      if (isThirdPartyAccount) {
+        filteredData.forEach((item) => {
+          const associatedAccounts = item.associated_account_details;
 
-      filteredData.forEach((item) => {
-        const key = item[groupKey];
-        if (!key) return;
-        const current = aggregationMap.get(key) || 0;
-        aggregationMap.set(key, current + 1);
-      });
+          if (
+            Array.isArray(associatedAccounts) &&
+            associatedAccounts.length > 0
+          ) {
+            associatedAccounts.forEach((account) => {
+              const key = account[groupKey]; // industryGroup / industrySegment / industrySubSegment
+              if (!key) return;
+
+              const current = aggregationMap.get(key) || 0;
+              aggregationMap.set(key, current + 1);
+            });
+          }
+        });
+      } else {
+        filteredData.forEach((item) => {
+          const key = item[groupKey];
+          if (!key) return;
+          const current = aggregationMap.get(key) || 0;
+          aggregationMap.set(key, current + 1);
+        });
+      }
 
       // Convert to array and sort
       let sortedData = Array.from(aggregationMap.entries())
@@ -1233,21 +1245,25 @@ const Account = () => {
           chart: {
             events: {
               xAxisLabelClick: function (event, chartContext, config) {
-                const clickedCategory =
-                  config?.config?.xaxis?.categories[config.labelIndex];
-                if (clickedCategory) {
-                  if (chartViewType === "byProductLine") {
-                    return;
-                  } else {
-                    handleAccountClick(clickedCategory);
+                if (!isThirdPartyAccount) {
+                  const clickedCategory =
+                    config?.config?.xaxis?.categories[config.labelIndex];
+                  if (clickedCategory) {
+                    if (chartViewType === "byProductLine") {
+                      return;
+                    } else {
+                      handleAccountClick(clickedCategory);
+                    }
                   }
                 }
               },
               legendClick: function (chartContext, seriesIndex, config) {
-                const clickedCategory =
-                  config?.config?.xaxis?.categories[seriesIndex];
-                if (clickedCategory) {
-                  handleAccountClick(clickedCategory);
+                if (!isThirdPartyAccount) {
+                  const clickedCategory =
+                    config?.config?.xaxis?.categories[seriesIndex];
+                  if (clickedCategory) {
+                    handleAccountClick(clickedCategory);
+                  }
                 }
               },
             },

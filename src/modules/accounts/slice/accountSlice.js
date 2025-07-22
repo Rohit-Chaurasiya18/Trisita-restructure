@@ -356,6 +356,14 @@ const accountSlice = createSlice({
           account?.associated_account?.length > 0
             ? account?.associated_account?.join(",  ")
             : "",
+        associated_account_details: account?.associated_account_details?.map(
+          (item) => ({
+            ...item,
+            industryGroup: item?.industry ?? "Unknown",
+            industrySegment: item?.industry_segment ?? "Unknown",
+            industrySubSegment: item?.industry_subsegment ?? "Unknown",
+          })
+        ),
         associated_account_arr: account?.associated_account,
         productLineCodes: account?.productLineCode,
         totalSeats: account?.total_seats,
