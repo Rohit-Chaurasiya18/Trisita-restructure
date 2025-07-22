@@ -260,6 +260,11 @@ const Account = () => {
         </Tooltip>
       ),
     },
+    {
+      field: "account_group",
+      headerName: "Acccount Group",
+      width: 130,
+    },
     ...(isThirdPartyAccount
       ? [
           {
@@ -391,11 +396,7 @@ const Account = () => {
       renderCell: (params) => <div>{Number(params?.value)}</div>,
       sortComparator: (v1, v2) => Number(v1) - Number(v2),
     },
-    {
-      field: "account_group",
-      headerName: "Acccount Group",
-      width: 130,
-    },
+
     ...(isThirdPartyAccount
       ? [
           {
@@ -566,7 +567,7 @@ const Account = () => {
   };
 
   // BD Person Graph
-  const [bdPersonType, setBdPersonType] = useState("subscription");
+  const [bdPersonType, setBdPersonType] = useState("account");
   const [bdPersonLegend, setBdPersonLegend] = useState("");
 
   const handleBDPersonLegendClick = (data) => {
@@ -633,7 +634,7 @@ const Account = () => {
         case "acv_price":
           series = groupValues.map((group) => parseFloat(group.acv.toFixed(2)));
           break;
-        case "subscription":
+        case "account":
         default:
           series = groupValues.map((group) => group.count);
       }
@@ -769,7 +770,7 @@ const Account = () => {
         return "Total DTP Price as per BD Person";
       case "acv_price":
         return "Total ACV Price as per BD Person";
-      case "subscription":
+      case "account":
       default:
         return "Total Account as per BD Person";
     }
@@ -780,8 +781,7 @@ const Account = () => {
   };
 
   // Associated Account
-  const [associatedAccountType, setAssociatedAccountType] =
-    useState("subscription");
+  const [associatedAccountType, setAssociatedAccountType] = useState("account");
   const [associatedAccountLegend, setAssociatedAccountLegend] = useState("");
 
   const handleAssociatedAccountLegendClick = (data) => {
@@ -836,7 +836,7 @@ const Account = () => {
         case "acv_price":
           series = groupValues.map((group) => parseFloat(group.acv.toFixed(2)));
           break;
-        case "subscription":
+        case "account":
         default:
           series = groupValues.map((group) => group.count);
       }
@@ -972,7 +972,7 @@ const Account = () => {
         return "Associated account (Top 25)";
       case "acv_price":
         return "Associated account (Top 25)";
-      case "subscription":
+      case "account":
       default:
         return "Associated account (Top 25)";
     }
@@ -1084,11 +1084,26 @@ const Account = () => {
               rotate: rotateLabels ? -45 : 0,
               formatter: (value) => {
                 // Truncate long labels
-                if (truncateLabels && value.length > 20) {
-                  return value.substring(0, 20) + "...";
+                if (truncateLabels && value.length > 15) {
+                  return value.substring(0, 15) + "...";
                 }
                 return value;
               },
+            },
+            tooltip: {
+              enabled: false, // disable native label tooltip
+            },
+          },
+          tooltip: {
+            enabled: true,
+            shared: false,
+            custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+              const fullLabel = w.globals.labels[dataPointIndex]; // this is the full, untruncated category
+              const value = series[seriesIndex][dataPointIndex];
+
+              return `<div style="padding: 6px 10px;">
+                <strong>${fullLabel}</strong>: ${value}
+              </div>`;
             },
           },
           yaxis: {
@@ -1246,8 +1261,8 @@ const Account = () => {
               rotate: rotateLabels ? -45 : 0,
               formatter: (value) => {
                 // Truncate long labels
-                if (truncateLabels && value.length > 20) {
-                  return value.substring(0, 20) + "...";
+                if (truncateLabels && value.length > 15) {
+                  return value.substring(0, 15) + "...";
                 }
                 return value;
               },
@@ -1312,6 +1327,188 @@ const Account = () => {
     setAccountType(viewType);
   };
 
+  // Total account as per Account Type
+  const [accountType_Type, setAccountType_Type] = useState("account");
+  const [accountTypeLegend, setAccountTypeLegend] = useState("");
+
+  const handleAccountTypeLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountTypeLegend === data;
+    if (isSameColor) {
+      allData = handleFilters();
+    } else {
+      allData = filteredData;
+    }
+    setAccountTypeLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item?.account_group === data);
+
+    setFilteredData(updatedData);
+  };
+
+  const accountTypePieChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountTypeGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.account_group || "Unknown";
+
+        // Initialize group if not exists
+        if (!accountTypeGroups[group]) {
+          accountTypeGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        accountTypeGroups[group].count += 1;
+        accountTypeGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        accountTypeGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(accountTypeGroups);
+      let series;
+
+      switch (accountType_Type) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(accountTypeGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(accountTypeGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "account":
+        default:
+          series = labels.map((group) => accountTypeGroups[group].count);
+      }
+
+      // Optional: Sort data descending by value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleAccountTypeLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === accountTypeLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            bar: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+          },
+          labels: [],
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+          },
+          plotOptions: {
+            bar: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: [],
+      };
+    }
+  }, [filteredData, accountType_Type]);
+
+  const getAccountTypeTitle = () => {
+    switch (accountType_Type) {
+      case "dtp_price":
+        return "Total DTP Price as per Account Type";
+      case "acv_price":
+        return "Total ACV Price as per Account Type";
+      case "account":
+      default:
+        return "Total Accounts as per Account Type";
+    }
+  };
+
+  const handleAccountTypeChange = (viewType) => {
+    setAccountType_Type(viewType);
+  };
   return (
     <>
       <div className="account">
@@ -1438,8 +1635,7 @@ const Account = () => {
                 className="chart-data-2"
                 subCategory={["Account", "DTP", "ACV"]}
                 onSubCategoryClick={(index) => {
-                  if (index === 0)
-                    handleAssociatedAccountChange("subscription");
+                  if (index === 0) handleAssociatedAccountChange("account");
                   if (index === 1) handleAssociatedAccountChange("dtp_price");
                   if (index === 2) handleAssociatedAccountChange("acv_price");
                 }}
@@ -1459,9 +1655,21 @@ const Account = () => {
               className="chart-data-2"
               subCategory={["Account", "DTP", "ACV"]}
               onSubCategoryClick={(index) => {
-                if (index === 0) handleBdPersonChange("subscription");
+                if (index === 0) handleBdPersonChange("account");
                 if (index === 1) handleBdPersonChange("dtp_price");
                 if (index === 2) handleBdPersonChange("acv_price");
+              }}
+            />
+            <CommonChart
+              title={getAccountTypeTitle()}
+              options={accountTypePieChart?.options}
+              series={accountTypePieChart?.series}
+              className="chart-data-2"
+              subCategory={["Account", "DTP", "ACV"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleAccountTypeChange("account");
+                if (index === 1) handleAccountTypeChange("dtp_price");
+                if (index === 2) handleAccountTypeChange("acv_price");
               }}
             />
             <CommonChart
