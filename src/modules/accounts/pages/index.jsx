@@ -370,26 +370,34 @@ const Account = () => {
         </div>
       ),
     },
+    {
+      field: "acv_price",
+      headerName: "Total ACV Price",
+      width: 130,
+      renderCell: (params) => <div>{Number(params?.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "dtp_price",
+      headerName: "Total DTP Price",
+      width: 130,
+      renderCell: (params) => <div>{Number(params?.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "total_seats",
+      headerName: "Total Seats",
+      width: 130,
+      renderCell: (params) => <div>{Number(params?.value)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "account_group",
+      headerName: "Acccount Group",
+      width: 130,
+    },
     ...(isThirdPartyAccount
       ? [
-          {
-            field: "acv_total",
-            headerName: "Total ACV Price",
-            width: 130,
-            renderCell: (params) => (
-              <div>{Number(params?.value).toFixed(2)}</div>
-            ),
-            sortComparator: (v1, v2) => Number(v1) - Number(v2),
-          },
-          {
-            field: "dtp_total",
-            headerName: "Total DTP Price",
-            width: 130,
-            renderCell: (params) => (
-              <div>{Number(params?.value).toFixed(2)}</div>
-            ),
-            sortComparator: (v1, v2) => Number(v1) - Number(v2),
-          },
           {
             field: "show_subscription",
             headerName: "Show subscription",
