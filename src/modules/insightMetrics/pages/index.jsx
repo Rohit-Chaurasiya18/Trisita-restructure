@@ -2,7 +2,6 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import { statusOption } from "../constants";
-import ReactApexChart from "react-apexcharts";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import { useEffect, useMemo, useState } from "react";
@@ -18,22 +17,7 @@ import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import CommonModal from "@/components/common/modal/CommonModal";
 import InsightMetricsContract from "../components/InsightMetricsContract";
-
-const CommonChart = ({ title, options, series }) => {
-  return (
-    <div className="insight-metrics-chart">
-      <div className="chart-data">
-        <h3>{title}</h3>
-        <ReactApexChart
-          options={options}
-          series={series}
-          type={options.chart.type}
-          height={options.chart.height}
-        />
-      </div>
-    </div>
-  );
-};
+import CommonChart from "@/components/common/chart/CommonChart";
 
 const InsightMetrics = () => {
   const dispatch = useDispatch();

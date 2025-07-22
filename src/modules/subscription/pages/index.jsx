@@ -1,7 +1,6 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
-import ReactApexChart from "react-apexcharts";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
@@ -9,12 +8,7 @@ import {
   getAllAccount,
   getAllBranch,
 } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import {
-  Autocomplete,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import {
   getBackupSubscriptionDetail,
@@ -27,48 +21,7 @@ import moment from "moment";
 import dayjs from "dayjs";
 import useDebounce from "@/hooks/useDebounce";
 import SetTrigger from "../components/SetTrigger";
-
-const CommonChart = ({
-  title,
-  options,
-  series,
-  subCategory,
-  className,
-  onSubCategoryClick,
-}) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  return (
-    <div className={`insight-metrics-chart ${className}`}>
-      <div className="chart-data">
-        <div className="chart-data-header">
-          <h3>{title}</h3>
-          <div className="chart-data-subcategory">
-            {subCategory?.map((item, index) => (
-              <p
-                key={index}
-                onClick={() => {
-                  onSubCategoryClick && onSubCategoryClick(index);
-                  setSelectedIndex(index);
-                }}
-                className={`${index === selectedIndex && "active-subcategory"}`}
-              >
-                {item}
-              </p>
-            ))}
-          </div>
-        </div>
-        <ReactApexChart
-          options={options}
-          series={series}
-          type={options.chart.type}
-          height={options.chart.height}
-        />
-      </div>
-    </div>
-  );
-};
-
-const getRowId = (row) => row.id;
+import CommonChart from "@/components/common/chart/CommonChart";
 
 const Subscription = () => {
   const dispatch = useDispatch();
@@ -1604,7 +1557,7 @@ const Subscription = () => {
                   endDate: null,
                 });
                 setBarColor("");
-                setDateRange([null, null])
+                setDateRange([null, null]);
               }}
             >
               All
@@ -1810,7 +1763,7 @@ const Subscription = () => {
               <CommonTable
                 rows={filteredData}
                 columns={columns}
-                getRowId={getRowId}
+                getRowId={(row) => row?.id}
                 checkboxSelection
                 toolbar
                 exportFileName={`subs_trisita`}

@@ -7,24 +7,10 @@ import {
 } from "../slice/UsuagesSlice";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
-import ReactApexChart from "react-apexcharts";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import CommonButton from "@/components/common/buttons/CommonButton";
+import CommonChart from "@/components/common/chart/CommonChart";
 
-// Chart Wrapper Component
-const CommonChart = ({ title, options, series }) => (
-  <div className="insight-metrics-chart">
-    <div className="chart-data">
-      <h3>{title}</h3>
-      <ReactApexChart
-        options={options}
-        series={series}
-        type={options.chart.type}
-        height={options.chart.height}
-      />
-    </div>
-  </div>
-);
 
 const Usuage = () => {
   const dispatch = useDispatch();

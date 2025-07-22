@@ -1,26 +1,11 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import ReactApexChart from "react-apexcharts";
 import { Tooltip } from "@mui/material";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { getUniqueUsageUserCount } from "../slice/UsuagesSlice";
-
-// Chart Wrapper Component
-const CommonChart = ({ title, options, series }) => (
-  <div className="insight-metrics-chart">
-    <div className="chart-data">
-      <h3>{title}</h3>
-      <ReactApexChart
-        options={options}
-        series={series}
-        type={options.chart.type}
-        height={options.chart.height}
-      />
-    </div>
-  </div>
-);
+import CommonChart from "@/components/common/chart/CommonChart";
 
 const UniqueUserCount = () => {
   const dispatch = useDispatch();

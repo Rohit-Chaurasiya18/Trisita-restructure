@@ -1,4 +1,3 @@
-import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
@@ -22,48 +21,7 @@ import moment from "moment";
 import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
-import ReactApexChart from "react-apexcharts";
-
-const CommonChart = ({
-  title,
-  options,
-  series,
-  subCategory,
-  className,
-  onSubCategoryClick,
-}) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  return (
-    <div className={`insight-metrics-chart ${className}`}>
-      <div className="chart-data">
-        <div className="chart-data-header">
-          <h3>{title}</h3>
-          <div className="chart-data-subcategory">
-            {subCategory?.map((item, index) => (
-              <p
-                key={index}
-                onClick={() => {
-                  onSubCategoryClick && onSubCategoryClick(index);
-                  setSelectedIndex(index);
-                }}
-                className={`${index === selectedIndex && "active-subcategory"}`}
-              >
-                {item}
-              </p>
-            ))}
-          </div>
-        </div>
-        <ReactApexChart
-          options={options}
-          series={series}
-          type={options.chart.type}
-          height={options.chart.height}
-        />
-      </div>
-    </div>
-  );
-};
-const getRowId = (row) => row?.id;
+import CommonChart from "@/components/common/chart/CommonChart";
 
 const DeletedSubscription = () => {
   const dispatch = useDispatch();
@@ -1202,7 +1160,7 @@ const DeletedSubscription = () => {
                   endDate: null,
                 });
                 setBarColor("");
-                setDateRange([null, null])
+                setDateRange([null, null]);
               }}
             >
               All
@@ -1377,7 +1335,7 @@ const DeletedSubscription = () => {
               <CommonTable
                 rows={filteredData}
                 columns={columns}
-                getRowId={getRowId}
+                getRowId={(row) => row?.id}
                 checkboxSelection
                 toolbar
                 exportFileName={`subs_trisita`}

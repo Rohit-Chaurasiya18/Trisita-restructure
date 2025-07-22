@@ -20,22 +20,7 @@ import {
   getAllAccount,
   getAllBranch,
 } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-
-const CommonChart = ({ title, options, series }) => {
-  return (
-    <div className="insight-metrics-chart">
-      <div className="chart-data">
-        <h3>{title}</h3>
-        <ReactApexChart
-          options={options}
-          series={series}
-          type={options.chart.type}
-          height={options.chart.height}
-        />
-      </div>
-    </div>
-  );
-};
+import CommonChart from "@/components/common/chart/CommonChart";
 
 const InsightMetricsV2 = () => {
   const dispatch = useDispatch();

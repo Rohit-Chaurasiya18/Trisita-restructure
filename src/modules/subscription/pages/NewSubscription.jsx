@@ -1,4 +1,3 @@
-import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
@@ -14,7 +13,6 @@ import {
 import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import useDebounce from "@/hooks/useDebounce";
-import ReactApexChart from "react-apexcharts";
 import {
   getAllAccount,
   getAllBranch,
@@ -22,6 +20,7 @@ import {
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import dayjs from "dayjs";
 import moment from "moment";
+import CommonChart from "@/components/common/chart/CommonChart";
 
 const SetAction = () => {
   return (
@@ -76,48 +75,6 @@ const SetAction = () => {
     </>
   );
 };
-
-const CommonChart = ({
-  title,
-  options,
-  series,
-  subCategory,
-  className,
-  onSubCategoryClick,
-}) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  return (
-    <div className={`insight-metrics-chart ${className}`}>
-      <div className="chart-data">
-        <div className="chart-data-header">
-          <h3>{title}</h3>
-          <div className="chart-data-subcategory">
-            {subCategory?.map((item, index) => (
-              <p
-                key={index}
-                onClick={() => {
-                  onSubCategoryClick && onSubCategoryClick(index);
-                  setSelectedIndex(index);
-                }}
-                className={`${index === selectedIndex && "active-subcategory"}`}
-              >
-                {item}
-              </p>
-            ))}
-          </div>
-        </div>
-        <ReactApexChart
-          options={options}
-          series={series}
-          type={options.chart.type}
-          height={options.chart.height}
-        />
-      </div>
-    </div>
-  );
-};
-
-const getRowId = (row) => row.id;
 
 const NewSubscription = () => {
   const dispatch = useDispatch();
@@ -987,7 +944,7 @@ const NewSubscription = () => {
 
     // Determine base month (start from selected startDate if available, else current month)
     const baseMonth = filters?.endDate ? dayjs(filters.endDate) : dayjs(); // fallback to current month
-    
+
     // Previous 12 months
     for (let i = 11; i >= 0; i--) {
       const monthKey = baseMonth.subtract(i, "month").format("YYYY-MM");
@@ -1263,7 +1220,7 @@ const NewSubscription = () => {
                   endDate: null,
                 });
                 setBarColor("");
-                setDateRange([null, null])
+                setDateRange([null, null]);
               }}
             >
               All
@@ -1438,7 +1395,7 @@ const NewSubscription = () => {
               <CommonTable
                 rows={filteredData}
                 columns={columns}
-                getRowId={getRowId}
+                getRowId={(row) => row?.id}
                 checkboxSelection
                 toolbar
                 exportFileName={`subs_trisita`}
