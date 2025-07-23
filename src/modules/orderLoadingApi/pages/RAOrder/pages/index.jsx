@@ -363,6 +363,7 @@ const RAOrder = () => {
       let groupKey;
       let truncateLabels = false;
       let rotateLabels = false;
+      let sortDescending
 
       // Determine grouping key based on chart view type
       if (chartViewType === "byAccountName") {
