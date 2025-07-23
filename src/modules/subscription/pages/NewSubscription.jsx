@@ -87,7 +87,6 @@ const NewSubscription = () => {
     account_list,
     filter,
     newSubscriptionLastUpdated,
-    userDetail,
     newSubscriptionData,
     newSubscriptionDataLoading,
   } = useSelector((state) => ({
@@ -96,17 +95,14 @@ const NewSubscription = () => {
     accountListLoading: state?.insightMetrics?.accountListLoading,
     account_list: state?.insightMetrics?.accountList,
     filter: state?.layout?.filter,
-    userDetail: state?.login?.userDetail,
     newSubscriptionLastUpdated: state?.subscription?.newSubscriptionLastUpdated,
     newSubscriptionData: state?.subscription?.newSubscriptionData,
     newSubscriptionDataLoading: state?.subscription?.newSubscriptionDataLoading,
   }));
 
   const [filteredData, setFilteredData] = useState();
-  const [barColor, setBarColor] = useState("");
   const [numberOfSeatsBar, setNumberOfSeatsBar] = useState("");
   const [accountGroupLegend, setAccountGroupLegend] = useState("");
-  const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
   const [accountTypeLegend, setAccountTypeLegend] = useState("");
   const [bdPersonLegend, setBdPersonLegend] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
@@ -117,7 +113,6 @@ const NewSubscription = () => {
     startDate: "",
     endDate: "",
   });
-  const [selectedId, setSelectedId] = useState([]);
   const [modal, setModal] = useState({
     show: false,
     id: null,
@@ -863,6 +858,9 @@ const NewSubscription = () => {
           columnWidth: "50%",
         },
       },
+      dataLabels: {
+        enabled: false,
+      },
     },
     series: [
       { name: "DTP Price", data: chartData.dtpData },
@@ -1038,7 +1036,6 @@ const NewSubscription = () => {
                   startDate: null,
                   endDate: null,
                 });
-                setBarColor("");
                 setDateRange([null, null]);
               }}
             >

@@ -2,6 +2,7 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   GET_EXPORT_OPPORTUNITIES,
+  GET_FUNNEL_DATA,
   GET_OPPORTUNITY_DETAIL,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -51,6 +52,19 @@ export const getOpportunityDetail = createAsyncThunk(
   }
 );
 
+export const getFunnelData = createAsyncThunk(
+  "opportunities/getFunnelData",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_FUNNEL_DATA);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const initialValue = {
   opportunityLoading: false,
   opportunityList: [],
@@ -60,6 +74,8 @@ const initialValue = {
   opportunityDetail: null,
   newOpportunityList: [],
   newOpportunityListLoading: false,
+  funnelData: [],
+  funnelDataLoading: false,
 };
 
 const opportunitySlice = createSlice({
@@ -104,6 +120,20 @@ const opportunitySlice = createSlice({
     builder.addCase(getOpportunityDetail.rejected, (state, action) => {
       state.opportunityDetailLoading = false;
       state.opportunityDetail = null;
+    });
+
+    // Get Funnel Data
+    builder.addCase(getFunnelData.pending, (state, action) => {
+      state.funnelDataLoading = true;
+      state.funnelData = [];
+    });
+    builder.addCase(getFunnelData.fulfilled, (state, action) => {
+      state.funnelDataLoading = false;
+      state.funnelData = action.payload.data;
+    });
+    builder.addCase(getFunnelData.rejected, (state, action) => {
+      state.funnelDataLoading = false;
+      state.funnelData = [];
     });
   },
 });
