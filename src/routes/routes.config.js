@@ -121,6 +121,7 @@ const routesConfig = {
       children: [
         { index: true, component: NewOpportunity },
         { path: "add_new_opportunity", component: AddNewOpportunity },
+        { path: ":opportunityId", component: AddNewOpportunity },
       ],
     },
     {

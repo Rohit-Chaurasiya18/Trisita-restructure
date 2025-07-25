@@ -96,6 +96,7 @@ export const GET_BRANCH_ACCOUNT_PRODUCTLINE =
 export const GET_LICENSE_OPTIMISATION =
   "/v1/api/get_account_optimization_list/";
 export const GET_NEW_QUOTATION = "/v1/product/get_new_quotation/";
+export const LOCK_UNLOCK_QUOTATION = "/v1/product/get_quotation_lock_unlock/";
 export const GET_ALL_BD_PERSON_BY_BRANCH = "/v1/api/get_branch_wise_bd_person/";
 export const GET_ALL_ACCOUNT_BY_BD_PERSON =
   "/v1/api/get_bd_person_wise_account/";
@@ -106,4 +107,4 @@ export const SEND_QUOTATION = "/v1/product/send_quotation_mail/";
 export const GET_PURCHASED_PAYMENT_TERMS = "/v1/product/get_payment_terms/";
 export const GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY =
   "/v1/api/get_subs_enddate_price/";
-export const GET_FUNNEL_DATA = "/v1/api/get_funnel_data/";
+export const GET_NEW_OPPORTUNITY_DATA = "/v1/api/get_new_opportunity/";

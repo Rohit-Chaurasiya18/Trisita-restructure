@@ -12,12 +12,14 @@ import { Tooltip } from "@mui/material";
 import {
   downloadQuotation,
   getNewQuotation,
+  lockUnlockQuotation,
   quotationTemplate,
 } from "../slice/quotationSlice";
 import { toast } from "react-toastify";
 import CommonModal from "@/components/common/modal/CommonModal";
 import SetTrigger from "@/modules/subscription/components/SetTrigger";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
+import { FaLock, FaUnlock } from "react-icons/fa";
 
 const NewQuotation = () => {
   const dispatch = useDispatch();
@@ -51,6 +53,19 @@ const NewQuotation = () => {
     dispatch(getAllBranch());
   }, []);
 
+  const handleLockUnlock = (row, is_locked) => {
+    dispatch(lockUnlockQuotation({ id: row?.id, status: !is_locked })).then(
+      (res) => {
+        if (res?.payload?.status === 200) {
+          dispatch(getNewQuotation());
+          toast.success(
+            `Quotation ${!is_locked ? "locked" : "unlocked"} successfully.`
+          );
+        }
+      }
+    );
+  };
+
   // Table column definitions
   const columns = useMemo(
     () => [
@@ -62,9 +77,17 @@ const NewQuotation = () => {
           <Tooltip title={params?.value || ""}>
             <button
               className={`text-red-600  border-0`}
-              onClick={() =>
-                navigate(routesConstants?.NEW_QUOTATION + `/${params?.row?.id}`)
-              }
+              onClick={() => {
+                if (params?.row.is_locked && params?.row.is_revise) {
+                  toast.error(
+                    "You can't update because quotation is already locked and revised."
+                  );
+                } else {
+                  navigate(
+                    routesConstants?.NEW_QUOTATION + `/${params?.row?.id}`
+                  );
+                }
+              }}
             >
               <span className="table-cell-truncate">{params.value}</span>
             </button>
@@ -82,6 +105,50 @@ const NewQuotation = () => {
         headerName: "Name",
         width: 150,
         renderCell: (params) => <span>{params?.value}</span>,
+      },
+      {
+        field: "locked",
+        headerName: "Lock / Unlock",
+        width: 150,
+        renderCell: (params) => (
+          <div className="flex items-center w-full justify-center">
+            {!params?.row.is_locked ? (
+              <button
+                onClick={() => {
+                  if (params?.row.is_locked && params?.row.is_revise) {
+                    toast.error(
+                      "You can't lock because quotation is already locked and revised."
+                    );
+                  } else {
+                    handleLockUnlock(params?.row, params?.row.is_locked);
+                  }
+                }}
+                className={
+                  "action-button bg-transparent text-center px-3 py-1 rounded border-0"
+                }
+              >
+                <FaUnlock color="rgb(34 197 94 / 1)" />
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  if (params?.row.is_locked && params?.row.is_revise) {
+                    toast.error(
+                      "You can't unlock because quotation is already locked and revised."
+                    );
+                  } else {
+                    handleLockUnlock(params?.row, params?.row.is_locked);
+                  }
+                }}
+                className={
+                  "action-button bg-transparent text-center px-3 py-1 rounded border-0"
+                }
+              >
+                <FaLock color="rgb(239 68 68 / 1)" />
+              </button>
+            )}
+          </div>
+        ),
       },
       {
         field: "sales_stage_name",
@@ -241,7 +308,6 @@ const NewQuotation = () => {
     ],
     []
   );
-
   useEffect(() => {
     setFilteredData(newQuotationList);
   }, [newQuotationList]);
@@ -282,7 +348,6 @@ const NewQuotation = () => {
     { field: "cgst_amount", headerName: "CGST Amount (per unit)" },
     { field: "igst_amount", headerName: "IGST Amount (per unit)" },
   ];
-
   return (
     <>
       <div className="new-opportunity-container">

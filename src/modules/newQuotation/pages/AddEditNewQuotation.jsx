@@ -6,13 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
 import {
-  addNewOpportunity,
+  addNewQuotation,
   addPurchasedPaymentTerms,
   addSalesStage,
   getPurchasedPaymentTerms,
   getQuotationById,
   getSalesStage,
-  updateNewOpportunity,
+  updateNewQuotation,
 } from "@/modules/newQuotation/slice/quotationSlice";
 import { useEffect, useRef, useState } from "react";
 import CommonButton from "@/components/common/buttons/CommonButton";
@@ -161,6 +161,7 @@ const AddEditNewQuotation = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRevised, setIsRevised] = useState(false);
   const [modal, setModal] = useState({
     isOpen: false,
     type: null,
@@ -212,6 +213,7 @@ const AddEditNewQuotation = () => {
     billingGSTNumber: "",
     shippingAddress: "",
     shippingGSTNumber: "",
+    is_revised: false,
   };
 
   const {
@@ -251,21 +253,37 @@ const AddEditNewQuotation = () => {
           remarks: item?.remarks,
           id: item?.product_detail_id ? item?.product_detail_id : "",
         })),
+        isRevised: isRevised,
+        quotation_id: quotationId,
       };
       setIsSubmitting(true);
       if (quotationId) {
-        dispatch(updateNewOpportunity({ ...payload, id: quotationId })).then(
-          (res) => {
+        if (isRevised) {
+          dispatch(addNewQuotation(payload)).then((res) => {
             if (res?.payload?.status === 200 || res?.payload?.status === 201) {
-              toast.success("New Quotation updated succesfully.");
+              toast.success("New Quotation revised succesfully.");
               navigate(routesConstants?.NEW_QUOTATION);
               resetForm();
             }
             setIsSubmitting(false);
-          }
-        );
+          });
+        } else {
+          dispatch(updateNewQuotation({ ...payload, id: quotationId })).then(
+            (res) => {
+              if (
+                res?.payload?.status === 200 ||
+                res?.payload?.status === 201
+              ) {
+                toast.success("New Quotation updated succesfully.");
+                navigate(routesConstants?.NEW_QUOTATION);
+                resetForm();
+              }
+              setIsSubmitting(false);
+            }
+          );
+        }
       } else {
-        dispatch(addNewOpportunity(payload)).then((res) => {
+        dispatch(addNewQuotation(payload)).then((res) => {
           if (res?.payload?.status === 200 || res?.payload?.status === 201) {
             toast.success("New Quotation created succesfully.");
             navigate(routesConstants?.NEW_QUOTATION);
@@ -411,6 +429,7 @@ const AddEditNewQuotation = () => {
           setFieldValue("shippingAddress", data?.shipping_address);
           setFieldValue("shippingGSTNumber", data?.shipping_gst_no);
           setFieldValue("remarks", data?.remarks);
+          setFieldValue("is_revised", data?.is_revise);
 
           handleBranchChange(data?.branch, data?.bd_person, true);
           handeleBdChange(data?.bd_person);
@@ -431,6 +450,15 @@ const AddEditNewQuotation = () => {
               <h5 className="commom-header-title mb-0">Manage New Quotation</h5>
               <span className="common-breadcrum-msg">Add new quotation</span>
             </div>
+            <CommonButton
+              onClick={() => {
+                navigate(routesConstants?.NEW_QUOTATION);
+              }}
+              type="button"
+              className="add-account-btn m-0 mt-3"
+            >
+              Back
+            </CommonButton>
             <div className="add-account-form">
               <h2 className="title">New Quotation Form</h2>
               <form>
@@ -775,14 +803,38 @@ const AddEditNewQuotation = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                 />
-                <CommonButton
-                  onClick={handleSubmit}
-                  type="button"
-                  className="add-account-btn"
-                  isDisabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting" : "Submit"}
-                </CommonButton>
+                <div className="quotation-form-btn">
+                  <CommonButton
+                    onClick={handleSubmit}
+                    type="button"
+                    className="add-account-btn"
+                    isDisabled={isSubmitting}
+                  >
+                    {quotationId
+                      ? isSubmitting
+                        ? "Updatting..."
+                        : "Update"
+                      : isSubmitting
+                      ? "Submitting..."
+                      : "Submit"}
+                  </CommonButton>
+                  {quotationId && (
+                    <>
+                      {!values?.is_revised && (
+                        <CommonButton
+                          onClick={() => {
+                            setIsRevised(true);
+                            handleSubmit();
+                          }}
+                          type="button"
+                          className="add-account-btn"
+                        >
+                          Revised Quotation
+                        </CommonButton>
+                      )}
+                    </>
+                  )}
+                </div>
               </form>
             </div>
           </div>

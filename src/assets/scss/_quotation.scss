@@ -46,3 +46,11 @@
     width: 100%;
   }
 }
+.quotation-form-btn {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  .add-account-btn {
+    margin: 0px;
+  }
+}

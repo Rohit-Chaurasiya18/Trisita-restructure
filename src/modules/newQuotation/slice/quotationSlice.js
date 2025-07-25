@@ -6,6 +6,7 @@ import {
   GET_NEW_QUOTATION,
   GET_PURCHASED_PAYMENT_TERMS,
   GET_QUOTATION_TEMPLATE,
+  LOCK_UNLOCK_QUOTATION,
   SEND_QUOTATION,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -82,7 +83,7 @@ export const downloadQuotation = createAsyncThunk(
       const response = await axiosReact.get(
         DOWNLOAD_PDF_QUOTATION + `${payload}/`,
         {
-          responseType: "blob", // 🔥 IMPORTANT
+          responseType: "blob",
         }
       );
       return response?.data;
@@ -118,7 +119,7 @@ export const handleSendQuotation = createAsyncThunk(
   }
 );
 export const getNewQuotation = createAsyncThunk(
-  "opportunities/getNewQuotation",
+  "quotation/getNewQuotation",
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.get(GET_NEW_QUOTATION);
@@ -129,11 +130,15 @@ export const getNewQuotation = createAsyncThunk(
     }
   }
 );
-export const addNewOpportunity = createAsyncThunk(
-  "opportunities/addNewOpportunity",
+export const addNewQuotation = createAsyncThunk(
+  "quotation/addNewQuotation",
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.post(GET_NEW_QUOTATION, payload);
+      let url = GET_NEW_QUOTATION;
+      if (payload?.isRevised) {
+        url = url + `?revise=${payload?.isRevised}`;
+      }
+      const response = await axiosReact.post(url, payload);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -142,8 +147,8 @@ export const addNewOpportunity = createAsyncThunk(
   }
 );
 
-export const updateNewOpportunity = createAsyncThunk(
-  "opportunities/updateNewOpportunity",
+export const updateNewQuotation = createAsyncThunk(
+  "quotation/updateNewQuotation",
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.put(
@@ -157,6 +162,24 @@ export const updateNewOpportunity = createAsyncThunk(
     }
   }
 );
+
+export const lockUnlockQuotation = createAsyncThunk(
+  "quotation/lockUnlockQuotation",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        LOCK_UNLOCK_QUOTATION +
+          `?id=${payload?.id}&is_locked=${payload?.status}`,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const initialValue = {
   salesStageLoading: false,
   salesStage: [],

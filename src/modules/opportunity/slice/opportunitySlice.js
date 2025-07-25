@@ -2,7 +2,7 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   GET_EXPORT_OPPORTUNITIES,
-  GET_FUNNEL_DATA,
+  GET_NEW_OPPORTUNITY_DATA,
   GET_OPPORTUNITY_DETAIL,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -52,11 +52,52 @@ export const getOpportunityDetail = createAsyncThunk(
   }
 );
 
-export const getFunnelData = createAsyncThunk(
-  "opportunities/getFunnelData",
+export const getNewOpportunityData = createAsyncThunk(
+  "opportunities/getNewOpportunityData",
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_FUNNEL_DATA);
+      const response = await axiosReact.get(GET_NEW_OPPORTUNITY_DATA);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const addNewOpportunityData = createAsyncThunk(
+  "opportunities/addNewOpportunityData",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_NEW_OPPORTUNITY_DATA, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const updateNewOpportunityData = createAsyncThunk(
+  "opportunities/updateNewOpportunityData",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        GET_NEW_OPPORTUNITY_DATA + `${payload?.id}/`,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const getNewOpportunityById = createAsyncThunk(
+  "opportunities/getNewOpportunityById",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_NEW_OPPORTUNITY_DATA + `${payload}/`
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -74,8 +115,8 @@ const initialValue = {
   opportunityDetail: null,
   newOpportunityList: [],
   newOpportunityListLoading: false,
-  funnelData: [],
-  funnelDataLoading: false,
+  newOpportunityData: [],
+  newOpportunityDataLoading: false,
 };
 
 const opportunitySlice = createSlice({
@@ -123,17 +164,17 @@ const opportunitySlice = createSlice({
     });
 
     // Get Funnel Data
-    builder.addCase(getFunnelData.pending, (state, action) => {
-      state.funnelDataLoading = true;
-      state.funnelData = [];
+    builder.addCase(getNewOpportunityData.pending, (state, action) => {
+      state.newOpportunityDataLoading = true;
+      state.newOpportunityData = [];
     });
-    builder.addCase(getFunnelData.fulfilled, (state, action) => {
-      state.funnelDataLoading = false;
-      state.funnelData = action.payload.data;
+    builder.addCase(getNewOpportunityData.fulfilled, (state, action) => {
+      state.newOpportunityDataLoading = false;
+      state.newOpportunityData = action.payload.data;
     });
-    builder.addCase(getFunnelData.rejected, (state, action) => {
-      state.funnelDataLoading = false;
-      state.funnelData = [];
+    builder.addCase(getNewOpportunityData.rejected, (state, action) => {
+      state.newOpportunityDataLoading = false;
+      state.newOpportunityData = [];
     });
   },
 });
