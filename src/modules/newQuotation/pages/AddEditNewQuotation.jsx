@@ -576,7 +576,7 @@ const AddEditNewQuotation = () => {
                     onChange={(selectedOption) => {
                       CustomSweetAlert(
                         "Account Selection?",
-                        "Do you confirm that Account CSN is selected correctly?",
+                        `Do you confirm that Account ${selectedOption?.label} is selected correctly?`,
                         "Warning",
                         true,
                         "Yes, Select account",

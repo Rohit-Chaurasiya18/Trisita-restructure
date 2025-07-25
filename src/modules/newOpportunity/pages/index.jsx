@@ -7,6 +7,7 @@ import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice
 import { getNewOpportunityData } from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
 import { Tooltip } from "@mui/material";
+import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -47,7 +48,7 @@ const NewOpportunity = () => {
     () => [
       {
         field: "contract_no",
-        headerName: "Proposal No",
+        headerName: "Opportunity No",
         width: 250,
         renderCell: (params) => (
           <Tooltip title={params?.value || ""}>
@@ -66,29 +67,29 @@ const NewOpportunity = () => {
       },
       {
         field: "contract_date",
-        headerName: "Proposal Date",
-        width: 200,
-        renderCell: (params) => <div>{params?.value}</div>,
-      },
-      {
-        field: "location",
-        headerName: "Location",
+        headerName: "Opportunity Date",
         width: 200,
         renderCell: (params) => <div>{params?.value}</div>,
       },
       { field: "branch_name", headerName: "Branch", width: 200 },
-      { field: "segment", headerName: "Segment", width: 250 },
       {
         field: "bd_person_details",
-        headerName: "Trisita Account Manager",
+        headerName: "BD Person",
         width: 200,
         renderCell: ({ value }) => {
           let Arr = value?.join(", ");
           return <div>{Arr}</div>;
         },
       },
+      { field: "account_name", headerName: "Account Name", width: 250 },
+      { field: "segment", headerName: "Account Group", width: 250 },
       { field: "customer_type", headerName: "Customer Type", width: 250 },
-      { field: "account_name", headerName: "End User", width: 250 },
+      {
+        field: "location",
+        headerName: "Location",
+        width: 200,
+        renderCell: (params) => <div>{params?.value}</div>,
+      },
       {
         field: "opportunity_category",
         headerName: "Opportunity Category",
@@ -96,7 +97,7 @@ const NewOpportunity = () => {
       },
       { field: "opportunity_type", headerName: "Opportunity Type", width: 250 },
       { field: "product_name", headerName: "Product", width: 250 },
-      { field: "industry_group", headerName: "Product Category", width: 250 },
+      { field: "industry_group", headerName: "Product Line Code", width: 250 },
       {
         field: "quantity",
         headerName: "Quantity",
@@ -176,9 +177,25 @@ const NewOpportunity = () => {
       },
       {
         field: "sales_update_date",
-        headerName: "Sales Update Date",
+        headerName: "Closure date",
         width: 200,
         renderCell: (params) => <div>{params?.value}</div>,
+      },
+      {
+        field: "created_at",
+        headerName: "Created At",
+        width: 200,
+        renderCell: (params) => (
+          <div>{moment(params?.value).format("DD MMM YYYY [at] hh:mm A")}</div>
+        ),
+      },
+      {
+        field: "updated_at",
+        headerName: "Updated At",
+        width: 200,
+        renderCell: (params) => (
+          <div>{moment(params?.value).format("DD MMM YYYY [at] hh:mm A")}</div>
+        ),
       },
     ],
     []

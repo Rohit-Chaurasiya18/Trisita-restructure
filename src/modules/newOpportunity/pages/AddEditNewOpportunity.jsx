@@ -106,6 +106,7 @@ const AddEditNewOpportunity = () => {
   const [bdOptions, setBdOptions] = useState([]);
   const [accountOption, setAccountOption] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreateNew, setIsCreateNew] = useState(false);
   const [modal, setModal] = useState({
     isOpen: false,
     type: null,
@@ -171,7 +172,8 @@ const AddEditNewOpportunity = () => {
         remarks: values?.remarks,
       };
       setIsSubmitting(true);
-      if (opportunityId) {
+      if (opportunityId && !isCreateNew) {
+        // If opportunityId exists and isCreateNew is false, update the existing opportunity
         dispatch(
           updateNewOpportunityData({ ...payload, id: opportunityId })
         ).then((res) => {
@@ -405,7 +407,7 @@ const AddEditNewOpportunity = () => {
               onChange={(selectedOption) => {
                 CustomSweetAlert(
                   "Account Selection?",
-                  "Do you confirm that Account CSN is selected correctly?",
+                  `Do you confirm that Account ${selectedOption?.label} is selected correctly?`,
                   "Warning",
                   true,
                   "Yes, Select account",
@@ -490,7 +492,7 @@ const AddEditNewOpportunity = () => {
             />
           </div>
           <CommonDatePicker
-            label="Sales Updated Date"
+            label="Closure Date"
             required
             name="salesUpdatedDate"
             value={values.salesUpdatedDate}
@@ -594,7 +596,7 @@ const AddEditNewOpportunity = () => {
             required
           />
           <CommonInputTextField
-            labelName="ACP Price"
+            labelName="ACV Price"
             className="input"
             mainDiv="form-group"
             type="number"
@@ -602,7 +604,7 @@ const AddEditNewOpportunity = () => {
             isDisabled
           />
           <CommonInputTextField
-            labelName="ACP Total"
+            labelName="ACV Total"
             className="input"
             mainDiv="form-group"
             type="number"
@@ -664,7 +666,10 @@ const AddEditNewOpportunity = () => {
           />
           <div className="quotation-form-btn">
             <CommonButton
-              onClick={handleSubmit}
+              onClick={() => {
+                setIsCreateNew(false);
+                handleSubmit();
+              }}
               type="button"
               className="add-account-btn"
               isDisabled={isSubmitting}
@@ -672,10 +677,21 @@ const AddEditNewOpportunity = () => {
               {opportunityId
                 ? isSubmitting
                   ? "Updatting..."
-                  : "Update"
+                  : "Update existing"
                 : isSubmitting
                 ? "Submitting..."
                 : "Submit"}
+            </CommonButton>
+            <CommonButton
+              onClick={() => {
+                setIsCreateNew(true);
+                handleSubmit();
+              }}
+              type="button"
+              className="add-account-btn"
+              isDisabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating New" : "Create New"}
             </CommonButton>
           </div>
         </form>

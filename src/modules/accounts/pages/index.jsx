@@ -227,6 +227,11 @@ const Account = () => {
       ),
     },
     {
+      field: "account_type",
+      headerName: "Acccount Type",
+      width: 130,
+    },
+    {
       field: "account_group",
       headerName: "Acccount Group",
       width: 130,
@@ -1131,19 +1136,19 @@ const Account = () => {
     setAccountType(viewType);
   };
 
-  // Total account as per Account Type
-  const [accountType_Type, setAccountType_Type] = useState("account");
-  const [accountTypeLegend, setAccountTypeLegend] = useState("");
+  // Total account as per Account Group
+  const [accountGroup_Type, setAccountGroup_Type] = useState("account");
+  const [accountGroupLegend, setAccountGroupLegend] = useState("");
 
-  const handleAccountTypeLegendClick = (data) => {
+  const handleAccountGroupLegendClick = (data) => {
     let allData;
-    const isSameColor = accountTypeLegend === data;
+    const isSameColor = accountGroupLegend === data;
     if (isSameColor) {
       allData = handleFilters();
     } else {
       allData = filteredData;
     }
-    setAccountTypeLegend(isSameColor ? "" : data);
+    setAccountGroupLegend(isSameColor ? "" : data);
     const updatedData = isSameColor
       ? allData
       : allData?.filter((item) => item?.account_group === data);
@@ -1151,13 +1156,216 @@ const Account = () => {
     setFilteredData(updatedData);
   };
 
+  const accountGroupPieChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.account_group || "Unknown";
+
+        // Initialize group if not exists
+        if (!accountGroups[group]) {
+          accountGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        accountGroups[group].count += 1;
+        accountGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        accountGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(accountGroups);
+      let series;
+
+      switch (accountGroup_Type) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(accountGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(accountGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "account":
+        default:
+          series = labels.map((group) => accountGroups[group].count);
+      }
+
+      // Optional: Sort data descending by value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleAccountGroupLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === accountGroupLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            bar: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, accountGroup_Type]);
+
+  const getAccountGroupTitle = () => {
+    switch (accountGroup_Type) {
+      case "dtp_price":
+        return "Total DTP Price as per Account Group";
+      case "acv_price":
+        return "Total ACV Price as per Account Group";
+      case "account":
+      default:
+        return "Total Accounts as per Account Group";
+    }
+  };
+
+  const handleAccountGroupChange = (viewType) => {
+    setAccountGroup_Type(viewType);
+  };
+
+  // Total Amount as per Months
+  const chartData = useMemo(() => {
+    const monthlyData = {};
+
+    // Determine base month (start from selected startDate if available, else current month)
+    const baseMonth = dayjs(); // fallback to current month
+
+    // Previous 12 months
+    for (let i = 0; i < 12; i++) {
+      const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
+      monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
+    }
+
+    // Aggregate DTP and ACV by endDate month
+    (totalAmountMonthThirdParty || []).forEach((sub) => {
+      const endMonth = dayjs(sub?.subsEndDate).format("YYYY-MM");
+      if (monthlyData[endMonth]) {
+        monthlyData[endMonth].dtp_total += Number(sub?.totalDTP) || 0;
+        monthlyData[endMonth].acv_total += Number(sub?.totalAcv) || 0;
+      }
+    });
+
+    const categories = Object.keys(monthlyData);
+    const dtpData = categories.map((month) =>
+      parseFloat(monthlyData[month].dtp_total.toFixed(2))
+    );
+    const acvData = categories.map((month) =>
+      parseFloat(monthlyData[month].acv_total.toFixed(2))
+    );
+
+    return { categories, dtpData, acvData };
+  }, [totalAmountMonthThirdParty]);
+
+  const amountPerMonth = {
+    options: {
+      chart: { height: 350, type: "bar" },
+      xaxis: {
+        categories: chartData.categories,
+        title: { text: "Months" },
+      },
+      yaxis: {
+        title: { text: "Price" },
+      },
+      colors: ["#007BFF", "#FF5733"],
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          columnWidth: "50%",
+        },
+      },
+    },
+    series: [
+      { name: "DTP Price", data: chartData.dtpData },
+      { name: "ACV Price", data: chartData.acvData },
+    ],
+  };
+
+  // Total Subscriptions as per Account Type
+  const [accountType_Type, setAccountType_Type] = useState("subscription");
+  const [accountTypeLegend, setAccountTypeLegend] = useState("");
+
+  const handleAccountTypeLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountGroupLegend === data;
+    if (isSameColor) {
+      allData = handleFilters();
+    } else {
+      allData = filteredData;
+    }
+    setAccountGroupLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item?.account_type === data);
+
+    setFilteredData(updatedData);
+  };
   const accountTypePieChart = useMemo(() => {
     if (filteredData?.length) {
       // Aggregate data by account_group based on selected type
       const accountTypeGroups = {};
 
       filteredData.forEach((item) => {
-        const group = item?.account_group || "Unknown";
+        const group = item?.account_type || "Unknown";
 
         // Initialize group if not exists
         if (!accountTypeGroups[group]) {
@@ -1189,7 +1397,7 @@ const Account = () => {
             parseFloat(accountTypeGroups[group].acv.toFixed(2))
           );
           break;
-        case "account":
+        case "subscription":
         default:
           series = labels.map((group) => accountTypeGroups[group].count);
       }
@@ -1268,73 +1476,15 @@ const Account = () => {
         return "Total DTP Price as per Account Type";
       case "acv_price":
         return "Total ACV Price as per Account Type";
-      case "account":
+      case "subscription":
       default:
-        return "Total Accounts as per Account Type";
+        return "Total Subscriptions as per Account Type";
     }
   };
 
   const handleAccountTypeChange = (viewType) => {
     setAccountType_Type(viewType);
   };
-
-  // Total Amount as per Months
-  const chartData = useMemo(() => {
-    const monthlyData = {};
-
-    // Determine base month (start from selected startDate if available, else current month)
-    const baseMonth = dayjs(); // fallback to current month
-
-    // Previous 12 months
-    for (let i = 0; i < 12; i++) {
-      const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
-      monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
-    }
-
-    // Aggregate DTP and ACV by endDate month
-    (totalAmountMonthThirdParty || []).forEach((sub) => {
-      const endMonth = dayjs(sub?.subsEndDate).format("YYYY-MM");
-      if (monthlyData[endMonth]) {
-        monthlyData[endMonth].dtp_total += Number(sub?.totalDTP) || 0;
-        monthlyData[endMonth].acv_total += Number(sub?.totalAcv) || 0;
-      }
-    });
-
-    const categories = Object.keys(monthlyData);
-    const dtpData = categories.map((month) =>
-      parseFloat(monthlyData[month].dtp_total.toFixed(2))
-    );
-    const acvData = categories.map((month) =>
-      parseFloat(monthlyData[month].acv_total.toFixed(2))
-    );
-
-    return { categories, dtpData, acvData };
-  }, [totalAmountMonthThirdParty]);
-
-  const amountPerMonth = {
-    options: {
-      chart: { height: 350, type: "bar" },
-      xaxis: {
-        categories: chartData.categories,
-        title: { text: "Months" },
-      },
-      yaxis: {
-        title: { text: "Price" },
-      },
-      colors: ["#007BFF", "#FF5733"],
-      plotOptions: {
-        bar: {
-          borderRadius: 5,
-          columnWidth: "50%",
-        },
-      },
-    },
-    series: [
-      { name: "DTP Price", data: chartData.dtpData },
-      { name: "ACV Price", data: chartData.acvData },
-    ],
-  };
-
   return (
     <>
       <div className="account">
@@ -1425,30 +1575,6 @@ const Account = () => {
             />
           )}
         </div>
-
-        <div className="subscription-chart number-of-seasts-chart">
-          {exportedAccountDataLoading ? (
-            <SkeletonLoader />
-          ) : (
-            <CommonChart
-              title={
-                accountType === "industry"
-                  ? "Total account by industry"
-                  : accountType === "segment"
-                  ? "Total account by segment"
-                  : "Total account by sub-segment"
-              }
-              options={accountTypeChart?.options}
-              series={accountTypeChart?.series}
-              subCategory={["Industry", "Segment", "Sub-Segment"]}
-              onSubCategoryClick={(index) => {
-                if (index === 0) handleAccountChange("industry");
-                if (index === 1) handleAccountChange("segment");
-                if (index === 2) handleAccountChange("subSegment");
-              }}
-            />
-          )}
-        </div>
         {isThirdPartyAccount && (
           <div className="subscription-chart number-of-seasts-chart">
             {exportedAccountDataLoading ? (
@@ -1489,6 +1615,43 @@ const Account = () => {
         ) : (
           <div className="opportunity-retention-account subscription-chart">
             <CommonChart
+              title={
+                accountType === "industry"
+                  ? "Total account by industry"
+                  : accountType === "segment"
+                  ? "Total account by segment"
+                  : "Total account by sub-segment"
+              }
+              options={accountTypeChart?.options}
+              series={accountTypeChart?.series}
+              subCategory={["Industry", "Segment", "Sub-Segment"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleAccountChange("industry");
+                if (index === 1) handleAccountChange("segment");
+                if (index === 2) handleAccountChange("subSegment");
+              }}
+            />
+
+            <CommonChart
+              title={getAccountTypeTitle()}
+              options={accountTypePieChart?.options}
+              series={accountTypePieChart?.series}
+              className="chart-data-2"
+              subCategory={["Account", "DTP", "ACV"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleAccountTypeChange("account");
+                if (index === 1) handleAccountTypeChange("dtp_price");
+                if (index === 2) handleAccountTypeChange("acv_price");
+              }}
+            />
+          </div>
+        )}
+
+        {exportedAccountDataLoading ? (
+          <SkeletonLoader />
+        ) : (
+          <div className="opportunity-retention-account subscription-chart">
+            <CommonChart
               title={getBdPersonTitle()}
               options={bdPersonPieChart?.options}
               series={bdPersonPieChart?.series}
@@ -1501,15 +1664,15 @@ const Account = () => {
               }}
             />
             <CommonChart
-              title={getAccountTypeTitle()}
-              options={accountTypePieChart?.options}
-              series={accountTypePieChart?.series}
+              title={getAccountGroupTitle()}
+              options={accountGroupPieChart?.options}
+              series={accountGroupPieChart?.series}
               className="chart-data-2"
               subCategory={["Account", "DTP", "ACV"]}
               onSubCategoryClick={(index) => {
-                if (index === 0) handleAccountTypeChange("account");
-                if (index === 1) handleAccountTypeChange("dtp_price");
-                if (index === 2) handleAccountTypeChange("acv_price");
+                if (index === 0) handleAccountGroupChange("account");
+                if (index === 1) handleAccountGroupChange("dtp_price");
+                if (index === 2) handleAccountGroupChange("acv_price");
               }}
             />
             <CommonChart

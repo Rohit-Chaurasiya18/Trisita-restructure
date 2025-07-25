@@ -297,7 +297,7 @@ const Opportunity = () => {
     const accountNameCounts = {};
 
     // Use filters.to_date or default to current month
-    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs();
+    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs().add(3, "month");
 
     // Step 1: Generate exactly 12 months (YYYY-MM → label)
     const last12Months = [];
