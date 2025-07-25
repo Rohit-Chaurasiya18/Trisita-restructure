@@ -436,7 +436,7 @@ const Opportunity = () => {
             highlightDataSeries: true, // Highlight the hovered series
           },
           formatter: (seriesName, opts) => {
-            const isHighlighted = seriesName === accountGroupLegend;
+            const isHighlighted = seriesName === accountNameLegend;
             const count = opts.w.globals.series[opts.seriesIndex];
             return `<span style="color: ${
               isHighlighted ? "black" : "black"

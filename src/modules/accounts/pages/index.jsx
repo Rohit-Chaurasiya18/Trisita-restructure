@@ -1095,7 +1095,7 @@ const Account = () => {
               },
             },
             type: "bar",
-            height: 350,
+            height: 480,
             width: "100%",
           },
           xaxis: {
@@ -1125,7 +1125,7 @@ const Account = () => {
             position: "top",
           },
         },
-        series: [{ name: "seats", data: seriesData }],
+        series: [{ name: "accounts", data: seriesData }],
       };
     } else {
       return getEmptyBarChartConfig();
@@ -1417,7 +1417,7 @@ const Account = () => {
         options: {
           chart: {
             type: "pie",
-            height: 350,
+            height: 480,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];

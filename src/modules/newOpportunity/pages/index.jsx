@@ -1,14 +1,17 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
+import CommonChart from "@/components/common/chart/CommonChart";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import { getEmptyPieChartConfig } from "@/constants";
 import useDebounce from "@/hooks/useDebounce";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
 import { getNewOpportunityData } from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
 import { Tooltip } from "@mui/material";
+import dayjs from "dayjs";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +39,9 @@ const NewOpportunity = () => {
 
   const [filteredData, setFilteredData] = useState([]);
   const [dateRange, setDateRange] = useState([null, null]);
+  const [opportunityBarChart, SetOpportunityBarChart] = useState([]);
+  const [opportunityAccountDataSecondGraph, SetOpportunityDataSecondGraph] =
+    useState([]);
 
   const [filters, setFilters] = useState({
     branch: null,
@@ -123,6 +129,11 @@ const NewOpportunity = () => {
       },
       { field: "account_name", headerName: "Account Name", width: 250 },
       { field: "segment", headerName: "Account Group", width: 250 },
+      {
+        field: "ews_retention_health",
+        headerName: "Retention Health",
+        width: 250,
+      },
       { field: "customer_type", headerName: "Customer Type", width: 250 },
       {
         field: "location",
@@ -241,6 +252,347 @@ const NewOpportunity = () => {
     []
   );
 
+  useEffect(() => {
+    if (filteredData) {
+      processChartData(filteredData);
+    }
+  }, [filteredData]);
+
+  const processChartData = (data) => {
+    const accountNameCounts = {};
+  
+    const hasToDate = !!filters?.to_date;
+    const baseMonth = hasToDate ? dayjs(filters.to_date) : dayjs();
+  
+    const last12Months = [];
+    const monthlyOpportunityCountMap = {};
+  
+    if (hasToDate) {
+      // If end date is present: show previous 12 months ending with to_date
+      for (let i = 11; i >= 0; i--) {
+        const month = baseMonth.subtract(i, "month");
+        const monthKey = month.format("YYYY-MM");
+        const monthLabel = month.format("MMM YYYY");
+        last12Months.push({ key: monthKey, label: monthLabel });
+        monthlyOpportunityCountMap[monthKey] = 0;
+      }
+    } else {
+      // No end date: center current month (5 before, 6 after)
+      for (let i = -5; i <= 6; i++) {
+        const month = baseMonth.add(i, "month");
+        const monthKey = month.format("YYYY-MM");
+        const monthLabel = month.format("MMM YYYY");
+        last12Months.push({ key: monthKey, label: monthLabel });
+        monthlyOpportunityCountMap[monthKey] = 0;
+      }
+    }
+  
+    // Count opportunities per month
+    data.forEach((item) => {
+      const contractMonth = dayjs(item.contract_date).format("YYYY-MM");
+  
+      if (monthlyOpportunityCountMap.hasOwnProperty(contractMonth)) {
+        monthlyOpportunityCountMap[contractMonth] += 1;
+      }
+  
+      if (item?.account_name) {
+        accountNameCounts[item.account_name] =
+          (accountNameCounts[item.account_name] || 0) + 1;
+      }
+    });
+  
+    // Final chart data
+    const modifiedData = last12Months.map((month) => ({
+      label: month.label,
+      value: monthlyOpportunityCountMap[month.key],
+    }));
+  
+    SetOpportunityBarChart(modifiedData);
+  
+    // Top 25 accounts
+    const top25 = Object.entries(accountNameCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 25);
+  
+    SetOpportunityDataSecondGraph(Object.fromEntries(top25));
+  };
+  
+  
+
+  // All Opportunity data
+  const categories = useMemo(
+    () => opportunityBarChart?.map((item) => item.label) || [],
+    [opportunityBarChart]
+  );
+
+  const dataValues = useMemo(
+    () => opportunityBarChart?.map((item) => item.value) || [],
+    [opportunityBarChart]
+  );
+  const LineChartData = useMemo(
+    () => ({
+      series: [
+        {
+          name: "Opportunity Count",
+          data: dataValues,
+        },
+      ],
+      options: {
+        chart: {
+          type: "line",
+          width: "100%",
+          zoom: {
+            enabled: false,
+          },
+          height: 350,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          curve: "straight",
+        },
+        title: {
+          text: "",
+          align: "left",
+        },
+        grid: {
+          row: {
+            colors: ["#f3f3f3", "transparent"],
+            opacity: 0.5,
+          },
+        },
+        xaxis: {
+          categories: categories,
+        },
+      },
+    }),
+    [dataValues, categories]
+  );
+
+  const secondgraphdata = Object.values(opportunityAccountDataSecondGraph);
+  const secondgraphlabel = Object.keys(opportunityAccountDataSecondGraph);
+  const [accountNameLegend, setAccountNameLegend] = useState("");
+
+  const handleAccountNameLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountNameLegend === data;
+    if (isSameColor) {
+      allData = newOpportunityData;
+    } else {
+      allData = filteredData;
+    }
+    setAccountNameLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown" ? item?.account_name === data : !item?.account_name
+        );
+
+    setFilteredData(updatedData);
+  };
+
+  const AccountDataChart = useMemo(
+    () => ({
+      options: {
+        chart: {
+          type: "pie",
+          height: 350,
+          events: {
+            legendClick: (chartContext, seriesIndex) => {
+              const clickedLegend = secondgraphlabel[seriesIndex];
+              if (clickedLegend) {
+                handleAccountNameLegendClick(clickedLegend);
+              }
+            },
+          },
+        },
+        labels: secondgraphlabel,
+        legend: {
+          position: "bottom",
+          onItemClick: {
+            toggleDataSeries: true, // Enable toggling of data series
+          },
+          onItemHover: {
+            highlightDataSeries: true, // Highlight the hovered series
+          },
+          formatter: (seriesName, opts) => {
+            const isHighlighted = seriesName === accountNameLegend;
+            const count = opts.w.globals.series[opts.seriesIndex];
+            return `<span style="color: ${
+              isHighlighted ? "red" : "black"
+            };">${seriesName} - ${count}</span>`;
+          },
+        },
+        plotOptions: {
+          bar: {
+            distributed: true, // Distribute colors across bars
+          },
+        },
+        responsive: [
+          {
+            breakpoint: 2260,
+            options: {
+              legend: {
+                position: "bottom",
+              },
+              chart: {
+                height: 500,
+              },
+            },
+          },
+        ],
+      },
+      series: secondgraphdata,
+    }),
+    [secondgraphlabel]
+  );
+
+  // Retention Risk shows summary of the renewal risk for the subscription contract
+  const [retentionRiskType, setRetentionRiskType] = useState("subscription");
+  const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
+
+  const handleRiskRetentionLegendClick = (data) => {
+    let allData;
+    const isSameColor = retentionRiskLegend === data;
+    if (isSameColor) {
+      allData = newOpportunityData;
+    } else {
+      allData = filteredData;
+    }
+    setRetentionRiskLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown"
+            ? item?.ews_retention_health === data
+            : !item?.ews_retention_health
+        );
+
+    setFilteredData(updatedData);
+  };
+  const retentionRiskBarChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const retentionRiskGroups = {};
+      filteredData.forEach((item) => {
+        const group = item?.ews_retention_health || "Unknown";
+        // Initialize group if not exists
+        if (!retentionRiskGroups[group]) {
+          retentionRiskGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+        // Aggregate values
+        retentionRiskGroups[group].count += 1;
+        retentionRiskGroups[group].dtp += parseFloat(item.dtp_total) || 0;
+        retentionRiskGroups[group].acv += parseFloat(item.acv_total) || 0;
+      });
+      // Convert to arrays for the chart
+      const labels = Object.keys(retentionRiskGroups);
+      let series;
+
+      switch (retentionRiskType) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(retentionRiskGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(retentionRiskGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => retentionRiskGroups[group].count);
+      }
+
+      // Optional: sort labels and series based on value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleRiskRetentionLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === retentionRiskLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, retentionRiskType]);
+
+  const getRetentionRiskTitle = () => {
+    switch (retentionRiskType) {
+      case "dtp_price":
+        return "Oppen. Retention Risk shows summary of the renewal risk for the dtp price";
+      case "acv_price":
+        return "Oppen. Retention Risk shows summary of the renewal risk for the acv price";
+      case "subscription":
+      default:
+        return "Oppen. Retention Risk shows summary of the renewal risk for the subscription contract";
+    }
+  };
+
+  const handleRetentionRiskChange = (viewType) => {
+    setRetentionRiskType(viewType);
+  };
+
   return (
     <>
       <div className="quotation-header mb-5">
@@ -320,6 +672,40 @@ const NewOpportunity = () => {
           />
         </div>
       </div>
+
+      {newOpportunityDataLoading ? (
+        <div className="mt-2">
+          <SkeletonLoader />
+        </div>
+      ) : (
+        <div className="opportunity-chart-section">
+          <CommonChart
+            title="All Opportunity data"
+            options={LineChartData.options}
+            series={LineChartData.series}
+          />
+          <div className="opportunity-retention-account subscription-chart">
+            <CommonChart
+              title={getRetentionRiskTitle()}
+              options={retentionRiskBarChart?.options}
+              series={retentionRiskBarChart?.series}
+              className="chart-data-2"
+              subCategory={["Opportunity", "DTP", "ACV"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleRetentionRiskChange("subscription");
+                if (index === 1) handleRetentionRiskChange("dtp_price");
+                if (index === 2) handleRetentionRiskChange("acv_price");
+              }}
+            />
+            <CommonChart
+              title="Oppen. by Account name (Top 25)"
+              options={AccountDataChart.options}
+              series={AccountDataChart.series}
+            />
+          </div>
+        </div>
+      )}
+
       {newOpportunityDataLoading ? (
         <SkeletonLoader />
       ) : (
