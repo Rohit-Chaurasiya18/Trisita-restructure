@@ -56,7 +56,20 @@ export const getNewOpportunityData = createAsyncThunk(
   "opportunities/getNewOpportunityData",
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_NEW_OPPORTUNITY_DATA);
+      const params = new URLSearchParams();
+      if (payload?.branch) {
+        params.append("branch", encodeURIComponent(payload?.branch));
+      }
+      if (payload?.salesStage) {
+        params.append("salesStage_id", encodeURIComponent(payload?.salesStage));
+      }
+      if (payload?.from_date && payload?.to_date) {
+        params.append("start_date", encodeURIComponent(payload?.from_date));
+        params.append("end_date", encodeURIComponent(payload?.to_date));
+      }
+      const response = await axiosReact.get(
+        GET_NEW_OPPORTUNITY_DATA + `?${params.toString()}`
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

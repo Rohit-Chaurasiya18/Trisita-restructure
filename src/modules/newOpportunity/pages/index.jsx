@@ -1,9 +1,11 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
+import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
-import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import useDebounce from "@/hooks/useDebounce";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import { getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
 import { getNewOpportunityData } from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
 import { Tooltip } from "@mui/material";
@@ -21,27 +23,65 @@ const NewOpportunity = () => {
     newOpportunityDataLoading,
     branch_list,
     branchListLoading,
+    salesStageList,
+    salesStageListLoading,
   } = useSelector((state) => ({
     newOpportunityData: state?.opportunity?.newOpportunityData,
     newOpportunityDataLoading: state?.opportunity?.newOpportunityDataLoading,
     branch_list: state?.insightMetrics?.branchList,
     branchListLoading: state?.insightMetrics?.branchListLoading,
+    salesStageList: state?.quotation?.salesStage,
+    salesStageListLoading: state?.quotation?.salesStageLoading,
   }));
 
   const [filteredData, setFilteredData] = useState([]);
+  const [dateRange, setDateRange] = useState([null, null]);
+
   const [filters, setFilters] = useState({
     branch: null,
-    status: "All Status",
+    salesStage: null,
+    from_date: "",
+    to_date: "",
   });
+
+  const handleDateChange = (newValue) => {
+    const [start, end] = newValue;
+    setFilters((prev) => ({
+      ...prev,
+      from_date: start?.format("YYYY-MM-DD") || null,
+      to_date: end ? end.format("YYYY-MM-DD") : "",
+    }));
+
+    setDateRange(newValue);
+  };
 
   useEffect(() => {
     setFilteredData(newOpportunityData);
   }, [newOpportunityData]);
 
   useEffect(() => {
-    dispatch(getNewOpportunityData());
     dispatch(getAllBranch());
+    dispatch(getSalesStage());
   }, []);
+
+  const debounce = useDebounce(filters?.to_date, 500);
+
+  useEffect(() => {
+    const payload = {
+      branch: filters?.branch?.value,
+      salesStage: filters?.salesStage?.value,
+      ...(debounce
+        ? {
+            from_date: filters?.from_date,
+            to_date: debounce,
+          }
+        : {
+            from_date: null,
+            to_date: null,
+          }),
+    };
+    dispatch(getNewOpportunityData(payload));
+  }, [filters?.branch, filters?.salesStage, debounce]);
 
   // Table column definitions
   const columns = useMemo(
@@ -225,8 +265,48 @@ const NewOpportunity = () => {
           >
             Add New Opportunity
           </CommonButton>
-
-          {/* <CommonAutocomplete
+        </div>
+      </div>
+      <div className="subscription-header mb-4 opportunity-filter">
+        <div className="subscription-filter">
+          <CommonButton
+            className="common-green-btn"
+            onClick={() => {
+              setFilters({
+                branch: null,
+                from_date: null,
+                to_date: null,
+                salesStage: null,
+              });
+              setDateRange([null, null]);
+            }}
+          >
+            All
+          </CommonButton>
+          <CommonDateRangePicker
+            value={dateRange}
+            onChange={handleDateChange}
+            width="180px"
+            placeholderStart="Start date"
+            placeholderEnd="End date"
+            disabled={newOpportunityDataLoading}
+          />
+          <CommonAutocomplete
+            onChange={(event, newValue) => {
+              setFilters((prev) => ({
+                ...prev,
+                salesStage: newValue,
+              }));
+            }}
+            options={salesStageList?.map((item) => ({
+              label: item?.name,
+              value: item?.id,
+            }))}
+            label="Select a Sales Stage"
+            loading={salesStageListLoading}
+            value={filters?.salesStage}
+          />
+          <CommonAutocomplete
             onChange={(event, newValue) => {
               setFilters((prev) => ({
                 ...prev,
@@ -237,7 +317,7 @@ const NewOpportunity = () => {
             label="Select a Branch"
             loading={branchListLoading}
             value={filters?.branch}
-          /> */}
+          />
         </div>
       </div>
       {newOpportunityDataLoading ? (
