@@ -253,11 +253,15 @@ const Opportunity = () => {
       field: "acv_price",
       headerName: "Total ACV Price",
       width: 220,
+      renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
     },
     {
       field: "dtp_price",
       headerName: "Total DTP Price",
       width: 220,
+      renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
     },
   ];
 
@@ -297,7 +301,9 @@ const Opportunity = () => {
     const accountNameCounts = {};
 
     // Use filters.to_date or default to current month
-    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs().add(3, "month");
+    const baseMonth = filters?.to_date
+      ? dayjs(filters.to_date)
+      : dayjs().add(3, "month");
 
     // Step 1: Generate exactly 12 months (YYYY-MM → label)
     const last12Months = [];
@@ -524,8 +530,8 @@ const Opportunity = () => {
     ],
   };
 
-  // Total Subscriptions as per Account Group
-  const [accountGroupType, setAccountGroupType] = useState("subscription");
+  // Total Opportunity as per Account Group
+  const [accountGroupType, setAccountGroupType] = useState("opportunity");
   const [accountGroupLegend, setAccountGroupLegend] = useState("");
 
   const handleAccountGroupLegendClick = (data) => {
@@ -586,7 +592,7 @@ const Opportunity = () => {
         case "acv_price":
           sortKey = "acv";
           break;
-        case "subscription":
+        case "opportunity":
         default:
           sortKey = "count";
       }
@@ -662,9 +668,9 @@ const Opportunity = () => {
         return "Total DTP Price as per Account Group";
       case "acv_price":
         return "Total ACV Price as per Account Group";
-      case "subscription":
+      case "opportunity":
       default:
-        return "Total Subscriptions as per Account Group";
+        return "Total Opportunity as per Account Group";
     }
   };
 
@@ -672,8 +678,8 @@ const Opportunity = () => {
     setAccountGroupType(viewType);
   };
 
-  // Total Subscriptions as per Account Type
-  const [accountType_Type, setAccountType_Type] = useState("subscription");
+  // Total Opportunity as per Account Type
+  const [accountType_Type, setAccountType_Type] = useState("opportunity");
   const [accountTypeLegend, setAccountTypeLegend] = useState("");
 
   const handleAccountTypeLegendClick = (data) => {
@@ -731,7 +737,7 @@ const Opportunity = () => {
             parseFloat(accountTypeGroups[group].acv.toFixed(2))
           );
           break;
-        case "subscription":
+        case "opportunity":
         default:
           series = labels.map((group) => accountTypeGroups[group].count);
       }
@@ -810,9 +816,9 @@ const Opportunity = () => {
         return "Total DTP Price as per Account Type";
       case "acv_price":
         return "Total ACV Price as per Account Type";
-      case "subscription":
+      case "opportunity":
       default:
-        return "Total Subscriptions as per Account Type";
+        return "Total Opportunity as per Account Type";
     }
   };
 
@@ -820,8 +826,8 @@ const Opportunity = () => {
     setAccountType_Type(viewType);
   };
 
-  // Total Subscriptions as per BD Person
-  const [bdPersonType, setBdPersonType] = useState("subscription");
+  // Total Opportunity as per BD Person
+  const [bdPersonType, setBdPersonType] = useState("opportunity");
   const [bdPersonLegend, setBdPersonLegend] = useState("");
 
   const handleBDPersonLegendClick = (data) => {
@@ -885,7 +891,7 @@ const Opportunity = () => {
         case "acv_price":
           series = groupValues.map((group) => parseFloat(group.acv.toFixed(2)));
           break;
-        case "subscription":
+        case "opportunity":
         default:
           series = groupValues.map((group) => group.count);
       }
@@ -966,9 +972,9 @@ const Opportunity = () => {
         return "Total DTP Price as per BD Person";
       case "acv_price":
         return "Total ACV Price as per BD Person";
-      case "subscription":
+      case "opportunity":
       default:
-        return "Total Subscriptions as per BD Person";
+        return "Total Opportunity as per BD Person";
     }
   };
 
@@ -977,7 +983,7 @@ const Opportunity = () => {
   };
 
   // Retention Risk shows summary of the renewal risk for the subscription contract
-  const [retentionRiskType, setRetentionRiskType] = useState("subscription");
+  const [retentionRiskType, setRetentionRiskType] = useState("opportunity");
   const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
 
   const handleRiskRetentionLegendClick = (data) => {
@@ -1033,7 +1039,7 @@ const Opportunity = () => {
             parseFloat(retentionRiskGroups[group].acv.toFixed(2))
           );
           break;
-        case "subscription":
+        case "opportunity":
         default:
           series = labels.map((group) => retentionRiskGroups[group].count);
       }
@@ -1111,7 +1117,7 @@ const Opportunity = () => {
         return "Oppen. Retention Risk shows summary of the renewal risk for the dtp price";
       case "acv_price":
         return "Oppen. Retention Risk shows summary of the renewal risk for the acv price";
-      case "subscription":
+      case "opportunity":
       default:
         return "Oppen. Retention Risk shows summary of the renewal risk for the subscription contract";
     }
@@ -1219,9 +1225,9 @@ const Opportunity = () => {
                 options={retentionRiskBarChart?.options}
                 series={retentionRiskBarChart?.series}
                 className="chart-data-2"
-                subCategory={["Subscription", "DTP", "ACV"]}
+                subCategory={["Opportunity", "DTP", "ACV"]}
                 onSubCategoryClick={(index) => {
-                  if (index === 0) handleRetentionRiskChange("subscription");
+                  if (index === 0) handleRetentionRiskChange("opportunity");
                   if (index === 1) handleRetentionRiskChange("dtp_price");
                   if (index === 2) handleRetentionRiskChange("acv_price");
                 }}
@@ -1256,9 +1262,9 @@ const Opportunity = () => {
               options={accountGroupBarChart?.options}
               series={accountGroupBarChart?.series}
               className="chart-data-1"
-              subCategory={["Subscription", "DTP", "ACV"]}
+              subCategory={["Opportunity", "DTP", "ACV"]}
               onSubCategoryClick={(index) => {
-                if (index === 0) handleAccountGroupChange("subscription");
+                if (index === 0) handleAccountGroupChange("opportunity");
                 if (index === 1) handleAccountGroupChange("dtp_price");
                 if (index === 2) handleAccountGroupChange("acv_price");
               }}
@@ -1269,9 +1275,9 @@ const Opportunity = () => {
                 options={bdPersonPieChart?.options}
                 series={bdPersonPieChart?.series}
                 className="chart-data-2"
-                subCategory={["Subscription", "DTP", "ACV"]}
+                subCategory={["Opportunity", "DTP", "ACV"]}
                 onSubCategoryClick={(index) => {
-                  if (index === 0) handleBdPersonChange("subscription");
+                  if (index === 0) handleBdPersonChange("opportunity");
                   if (index === 1) handleBdPersonChange("dtp_price");
                   if (index === 2) handleBdPersonChange("acv_price");
                 }}
@@ -1281,9 +1287,9 @@ const Opportunity = () => {
                 options={accountTypePieChart?.options}
                 series={accountTypePieChart?.series}
                 className="chart-data-2"
-                subCategory={["Subscription", "DTP", "ACV"]}
+                subCategory={["Opportunity", "DTP", "ACV"]}
                 onSubCategoryClick={(index) => {
-                  if (index === 0) handleAccountTypeChange("subscription");
+                  if (index === 0) handleAccountTypeChange("opportunity");
                   if (index === 1) handleAccountTypeChange("dtp_price");
                   if (index === 2) handleAccountTypeChange("acv_price");
                 }}

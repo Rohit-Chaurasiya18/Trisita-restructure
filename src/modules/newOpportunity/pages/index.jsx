@@ -129,6 +129,7 @@ const NewOpportunity = () => {
       },
       { field: "account_name", headerName: "Account Name", width: 250 },
       { field: "segment", headerName: "Account Group", width: 250 },
+      { field: "account_type", headerName: "Account Type", width: 250 },
       {
         field: "ews_retention_health",
         headerName: "Retention Health",
@@ -260,13 +261,13 @@ const NewOpportunity = () => {
 
   const processChartData = (data) => {
     const accountNameCounts = {};
-  
+
     const hasToDate = !!filters?.to_date;
     const baseMonth = hasToDate ? dayjs(filters.to_date) : dayjs();
-  
+
     const last12Months = [];
     const monthlyOpportunityCountMap = {};
-  
+
     if (hasToDate) {
       // If end date is present: show previous 12 months ending with to_date
       for (let i = 11; i >= 0; i--) {
@@ -286,38 +287,36 @@ const NewOpportunity = () => {
         monthlyOpportunityCountMap[monthKey] = 0;
       }
     }
-  
+
     // Count opportunities per month
     data.forEach((item) => {
       const contractMonth = dayjs(item.contract_date).format("YYYY-MM");
-  
+
       if (monthlyOpportunityCountMap.hasOwnProperty(contractMonth)) {
         monthlyOpportunityCountMap[contractMonth] += 1;
       }
-  
+
       if (item?.account_name) {
         accountNameCounts[item.account_name] =
           (accountNameCounts[item.account_name] || 0) + 1;
       }
     });
-  
+
     // Final chart data
     const modifiedData = last12Months.map((month) => ({
       label: month.label,
       value: monthlyOpportunityCountMap[month.key],
     }));
-  
+
     SetOpportunityBarChart(modifiedData);
-  
+
     // Top 25 accounts
     const top25 = Object.entries(accountNameCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 25);
-  
+
     SetOpportunityDataSecondGraph(Object.fromEntries(top25));
   };
-  
-  
 
   // All Opportunity data
   const categories = useMemo(
@@ -449,7 +448,7 @@ const NewOpportunity = () => {
   );
 
   // Retention Risk shows summary of the renewal risk for the subscription contract
-  const [retentionRiskType, setRetentionRiskType] = useState("subscription");
+  const [retentionRiskType, setRetentionRiskType] = useState("opportunity");
   const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
 
   const handleRiskRetentionLegendClick = (data) => {
@@ -505,7 +504,7 @@ const NewOpportunity = () => {
             parseFloat(retentionRiskGroups[group].acv.toFixed(2))
           );
           break;
-        case "subscription":
+        case "opportunity":
         default:
           series = labels.map((group) => retentionRiskGroups[group].count);
       }
@@ -583,7 +582,7 @@ const NewOpportunity = () => {
         return "Oppen. Retention Risk shows summary of the renewal risk for the dtp price";
       case "acv_price":
         return "Oppen. Retention Risk shows summary of the renewal risk for the acv price";
-      case "subscription":
+      case "opportunity":
       default:
         return "Oppen. Retention Risk shows summary of the renewal risk for the subscription contract";
     }
@@ -591,6 +590,516 @@ const NewOpportunity = () => {
 
   const handleRetentionRiskChange = (viewType) => {
     setRetentionRiskType(viewType);
+  };
+
+  // Total Amount as per Months
+  const chartData = useMemo(() => {
+    const monthlyData = {};
+
+    // Determine base month (start from selected startDate if available, else current month)
+    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs(); // fallback to current month
+
+    // Previous 12 months
+    for (let i = 11; i >= 0; i--) {
+      const monthKey = baseMonth.subtract(i, "month").format("YYYY-MM");
+      monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
+    }
+
+    // Aggregate DTP and ACV by endDate month
+    (filteredData || []).forEach((sub) => {
+      const endMonth = dayjs(sub?.contract_date).format("YYYY-MM");
+      if (monthlyData[endMonth]) {
+        monthlyData[endMonth].dtp_total += Number(sub?.acv_total) || 0;
+        monthlyData[endMonth].acv_total += Number(sub?.dtp_total) || 0;
+      }
+    });
+
+    const categories = Object.keys(monthlyData);
+    const dtpData = categories.map((month) =>
+      parseFloat(monthlyData[month].dtp_total.toFixed(2))
+    );
+    const acvData = categories.map((month) =>
+      parseFloat(monthlyData[month].acv_total.toFixed(2))
+    );
+
+    return { categories, dtpData, acvData };
+  }, [filteredData, filters?.startDate]);
+
+  const amountPerMonth = {
+    options: {
+      chart: { height: 350, type: "bar" },
+      xaxis: {
+        categories: chartData.categories,
+        title: { text: "Months" },
+      },
+      yaxis: {
+        title: { text: "Price" },
+      },
+      colors: ["#007BFF", "#FF5733"],
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          columnWidth: "50%",
+        },
+      },
+    },
+    series: [
+      { name: "DTP Price", data: chartData.dtpData },
+      { name: "ACV Price", data: chartData.acvData },
+    ],
+  };
+
+  // Total Opportunity as per Account Group
+  const [accountGroupType, setAccountGroupType] = useState("opportunity");
+  const [accountGroupLegend, setAccountGroupLegend] = useState("");
+
+  const handleAccountGroupLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountGroupLegend === data;
+    if (isSameColor) {
+      allData = newOpportunityData;
+    } else {
+      allData = filteredData;
+    }
+    setAccountGroupLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown" ? item?.segment === data : !item?.segment
+        );
+
+    setFilteredData(updatedData);
+  };
+  const accountGroupBarChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.segment || "Unknown";
+
+        // Initialize group if not exists
+        if (!accountGroups[group]) {
+          accountGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        accountGroups[group].count += 1;
+        accountGroups[group].dtp += parseFloat(item.dtp_total) || 0;
+        accountGroups[group].acv += parseFloat(item.acv_total) || 0;
+      });
+
+      // Convert to array for sorting
+      const groupsArray = Object.entries(accountGroups).map(
+        ([group, values]) => ({
+          group,
+          ...values,
+        })
+      );
+      // Determine the key to sort by based on the selected view
+      let sortKey;
+      switch (accountGroupType) {
+        case "dtp_price":
+          sortKey = "dtp";
+          break;
+        case "acv_price":
+          sortKey = "acv";
+          break;
+        case "opportunity":
+        default:
+          sortKey = "count";
+      }
+
+      // Sort in descending order by the selected key
+      groupsArray.sort((a, b) => b[sortKey] - a[sortKey]);
+
+      // Extract labels and series from the sorted array
+      const labels = groupsArray.map((item) => item.group);
+      const series = groupsArray.map((item) =>
+        parseFloat(item[sortKey].toFixed(2))
+      );
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = labels[seriesIndex];
+                if (clickedLegend) {
+                  handleAccountGroupLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: labels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === accountGroupLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            bar: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: "100%",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: series,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, accountGroupType]);
+
+  const getAccountGroupTitle = () => {
+    switch (accountGroupType) {
+      case "dtp_price":
+        return "Total DTP Price as per Account Group";
+      case "acv_price":
+        return "Total ACV Price as per Account Group";
+      case "opportunity":
+      default:
+        return "Total Opportunity as per Account Group";
+    }
+  };
+
+  const handleAccountGroupChange = (viewType) => {
+    setAccountGroupType(viewType);
+  };
+
+  // Total Opportunity as per BD Person
+  const [bdPersonType, setBdPersonType] = useState("opportunity");
+  const [bdPersonLegend, setBdPersonLegend] = useState("");
+
+  const handleBDPersonLegendClick = (data) => {
+    let allData;
+    const isSameColor = bdPersonLegend === data;
+    if (isSameColor) {
+      allData = newOpportunityData;
+    } else {
+      allData = filteredData;
+    }
+    setBdPersonLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown"
+            ? item?.bd_person_details?.includes(data)
+            : item?.bd_person_details?.length === 0
+        );
+
+    setFilteredData(updatedData);
+  };
+
+  const bdPersonPieChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by BD person based on selected type
+      const bdPersonGroups = {};
+
+      filteredData.forEach((item) => {
+        const bdPersons =
+          item?.bd_person_details?.length > 0
+            ? item?.bd_person_details
+            : ["Unknown"]; // Treat empty array as "Unknown"
+
+        bdPersons.forEach((person) => {
+          const normalizedPerson = person.trim().toLowerCase(); // Normalize names to avoid duplicates due to case sensitivity
+
+          // Initialize group if not exists
+          if (!bdPersonGroups[normalizedPerson]) {
+            bdPersonGroups[normalizedPerson] = {
+              name: person, // Keep original name for display
+              count: 0,
+              dtp: 0,
+              acv: 0,
+            };
+          }
+
+          // Aggregate values
+          bdPersonGroups[normalizedPerson].count += 1;
+          bdPersonGroups[normalizedPerson].dtp +=
+            parseFloat(item.dtp_total) || 0;
+          bdPersonGroups[normalizedPerson].acv +=
+            parseFloat(item.acv_total) || 0;
+        });
+      });
+
+      // Convert to arrays for the chart
+      const groupValues = Object.values(bdPersonGroups);
+
+      let series;
+      switch (bdPersonType) {
+        case "dtp_price":
+          series = groupValues.map((group) => parseFloat(group.dtp.toFixed(2)));
+          break;
+        case "acv_price":
+          series = groupValues.map((group) => parseFloat(group.acv.toFixed(2)));
+          break;
+        case "opportunity":
+        default:
+          series = groupValues.map((group) => group.count);
+      }
+
+      const labels = groupValues.map((group) => group.name);
+
+      // Sort labels and series by value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  // Handle legend click if needed
+                  handleBDPersonLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const count = opts.w.globals.series[opts.seriesIndex];
+              const isHighlighted = seriesName === bdPersonLegend;
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across slices
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: "100%",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, bdPersonType]);
+
+  const getBdPersonTitle = () => {
+    switch (bdPersonType) {
+      case "dtp_price":
+        return "Total DTP Price as per BD Person";
+      case "acv_price":
+        return "Total ACV Price as per BD Person";
+      case "opportunity":
+      default:
+        return "Total Opportunity as per BD Person";
+    }
+  };
+
+  const handleBdPersonChange = (viewType) => {
+    setBdPersonType(viewType);
+  };
+
+  // Total Opportunity as per Account Type
+  const [accountType_Type, setAccountType_Type] = useState("opportunity");
+  const [accountTypeLegend, setAccountTypeLegend] = useState("");
+
+  const handleAccountTypeLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountTypeLegend === data;
+    if (isSameColor) {
+      allData = newOpportunityData;
+    } else {
+      allData = filteredData;
+    }
+    setAccountTypeLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown" ? item?.account_type === data : !item?.account_type
+        );
+
+    setFilteredData(updatedData);
+  };
+  const accountTypePieChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountTypeGroups = {};
+
+      filteredData.forEach((item) => {
+        const group = item?.account_type || "Unknown";
+
+        // Initialize group if not exists
+        if (!accountTypeGroups[group]) {
+          accountTypeGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+
+        // Aggregate values
+        accountTypeGroups[group].count += 1;
+        accountTypeGroups[group].dtp += parseFloat(item.dtp_total) || 0;
+        accountTypeGroups[group].acv += parseFloat(item.acv_total) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(accountTypeGroups);
+      let series;
+
+      switch (accountType_Type) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(accountTypeGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(accountTypeGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "opportunity":
+        default:
+          series = labels.map((group) => accountTypeGroups[group].count);
+      }
+
+      // Optional: Sort data descending by value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleAccountTypeLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === accountTypeLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            bar: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, accountType_Type]);
+
+  const getAccountTypeTitle = () => {
+    switch (accountType_Type) {
+      case "dtp_price":
+        return "Total DTP Price as per Account Type";
+      case "acv_price":
+        return "Total ACV Price as per Account Type";
+      case "opportunity":
+      default:
+        return "Total Opportunity as per Account Type";
+    }
+  };
+
+  const handleAccountTypeChange = (viewType) => {
+    setAccountType_Type(viewType);
   };
 
   return (
@@ -692,7 +1201,7 @@ const NewOpportunity = () => {
               className="chart-data-2"
               subCategory={["Opportunity", "DTP", "ACV"]}
               onSubCategoryClick={(index) => {
-                if (index === 0) handleRetentionRiskChange("subscription");
+                if (index === 0) handleRetentionRiskChange("opportunity");
                 if (index === 1) handleRetentionRiskChange("dtp_price");
                 if (index === 2) handleRetentionRiskChange("acv_price");
               }}
@@ -701,6 +1210,63 @@ const NewOpportunity = () => {
               title="Oppen. by Account name (Top 25)"
               options={AccountDataChart.options}
               series={AccountDataChart.series}
+            />
+          </div>
+        </div>
+      )}
+      {newOpportunityDataLoading ? (
+        <SkeletonLoader />
+      ) : (
+        <div className="account-industry-chart-2 mt-4 new-subs-amountPerMonth">
+          <CommonChart
+            title="Total Amount as per Months"
+            options={amountPerMonth.options}
+            series={amountPerMonth.series}
+            className="chart-data-2"
+          />
+        </div>
+      )}
+
+      {newOpportunityDataLoading ? (
+        <SkeletonLoader />
+      ) : (
+        <div className="account-industry-chart-2 mt-4 subscription-chart">
+          <CommonChart
+            title={getAccountGroupTitle()}
+            options={accountGroupBarChart?.options}
+            series={accountGroupBarChart?.series}
+            className="chart-data-1"
+            subCategory={["Opportunity", "DTP", "ACV"]}
+            onSubCategoryClick={(index) => {
+              if (index === 0) handleAccountGroupChange("opportunity");
+              if (index === 1) handleAccountGroupChange("dtp_price");
+              if (index === 2) handleAccountGroupChange("acv_price");
+            }}
+          />
+          <div className="chart-section">
+            <CommonChart
+              title={getBdPersonTitle()}
+              options={bdPersonPieChart?.options}
+              series={bdPersonPieChart?.series}
+              className="chart-data-2"
+              subCategory={["Opportunity", "DTP", "ACV"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleBdPersonChange("opportunity");
+                if (index === 1) handleBdPersonChange("dtp_price");
+                if (index === 2) handleBdPersonChange("acv_price");
+              }}
+            />
+            <CommonChart
+              title={getAccountTypeTitle()}
+              options={accountTypePieChart?.options}
+              series={accountTypePieChart?.series}
+              className="chart-data-2"
+              subCategory={["Subscription", "DTP", "ACV"]}
+              onSubCategoryClick={(index) => {
+                if (index === 0) handleAccountTypeChange("opportunity");
+                if (index === 1) handleAccountTypeChange("dtp_price");
+                if (index === 2) handleAccountTypeChange("acv_price");
+              }}
             />
           </div>
         </div>
