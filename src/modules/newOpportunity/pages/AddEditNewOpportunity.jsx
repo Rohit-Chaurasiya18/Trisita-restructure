@@ -56,7 +56,7 @@ const weeksChoice = [
 ];
 
 const validationSchema = Yup.object({
-  proposalDate: Yup.string().required("Proposal date is required."),
+  opportunityDate: Yup.string().required("Proposal date is required."),
   branch: Yup.string().required("Branch is required."),
   account: Yup.string().required("Account is required."),
   opportunityCategory: Yup.string().required(
@@ -119,7 +119,7 @@ const AddEditNewOpportunity = () => {
   }, []);
 
   const initialValues = {
-    proposalDate: "",
+    opportunityDate: "",
     branch: "",
     bdPerson: [],
     account: "",
@@ -155,7 +155,7 @@ const AddEditNewOpportunity = () => {
     validationSchema,
     onSubmit: (values) => {
       let payload = {
-        contract_date: values?.proposalDate,
+        contract_date: values?.opportunityDate,
         branch: values?.branch,
         bd_person: values?.bdPerson,
         account: values?.account,
@@ -269,7 +269,7 @@ const AddEditNewOpportunity = () => {
       dispatch(getNewOpportunityById(opportunityId)).then((res) => {
         if (res?.payload?.data) {
           let opportunityData = res?.payload?.data;
-          setFieldValue("proposalDate", opportunityData?.contract_date);
+          setFieldValue("opportunityDate", opportunityData?.contract_date);
           setFieldValue("branch", opportunityData?.branch);
           setFieldValue("bdPerson", opportunityData?.bd_person_ids);
           setFieldValue("account", opportunityData?.account);
@@ -312,13 +312,13 @@ const AddEditNewOpportunity = () => {
         <h2 className="title">New Opportunity Form</h2>
         <form>
           <CommonDatePicker
-            label="Proposal Date"
+            label="Opportunity Date"
             required
-            name="proposalDate"
-            value={values.proposalDate}
-            onChange={(date) => setFieldValue("proposalDate", date)}
-            error={touched.proposalDate && !!errors.proposalDate}
-            errorText={errors.proposalDate}
+            name="opportunityDate"
+            value={values.opportunityDate}
+            onChange={(date) => setFieldValue("opportunityDate", date)}
+            error={touched.opportunityDate && !!errors.opportunityDate}
+            errorText={errors.opportunityDate}
           />
           <CustomSelect
             label="Branch"
@@ -682,7 +682,7 @@ const AddEditNewOpportunity = () => {
                 ? "Submitting..."
                 : "Submit"}
             </CommonButton>
-            <CommonButton
+            {opportunityId && <CommonButton
               onClick={() => {
                 setIsCreateNew(true);
                 handleSubmit();
@@ -692,7 +692,7 @@ const AddEditNewOpportunity = () => {
               isDisabled={isSubmitting}
             >
               {isSubmitting ? "Creating New" : "Create New"}
-            </CommonButton>
+            </CommonButton>}
           </div>
         </form>
       </div>
