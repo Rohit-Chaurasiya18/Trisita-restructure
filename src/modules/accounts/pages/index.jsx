@@ -1417,7 +1417,7 @@ const Account = () => {
         options: {
           chart: {
             type: "pie",
-            height: 480,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];

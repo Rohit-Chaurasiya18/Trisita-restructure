@@ -430,13 +430,13 @@ const NewOpportunity = () => {
         },
         responsive: [
           {
-            breakpoint: 2260,
+            breakpoint: 480,
             options: {
+              chart: {
+                width: 200,
+              },
               legend: {
                 position: "bottom",
-              },
-              chart: {
-                height: 500,
               },
             },
           },
@@ -1103,7 +1103,7 @@ const NewOpportunity = () => {
   };
 
   return (
-    <>
+    <div className="opportunity-container">
       <div className="quotation-header mb-5">
         <div>
           <h5 className="commom-header-title mb-0">New Opportunity</h5>
@@ -1286,7 +1286,7 @@ const NewOpportunity = () => {
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 export default NewOpportunity;

@@ -41,6 +41,25 @@
       }
     }
   }
+  @media (max-width: 1024px) {
+    .subscription-chart {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 10px;
+      .chart-data-1 {
+        width: 100%;
+      }
+      .chart-section {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+        width: 100%;
+        .chart-data-2 {
+          width: 100%;
+        }
+      }
+    }
+  }
 }
 .opportunity-card-section {
   display: flex;
