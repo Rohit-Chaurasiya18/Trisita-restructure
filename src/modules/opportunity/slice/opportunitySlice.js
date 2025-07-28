@@ -130,6 +130,7 @@ const initialValue = {
   newOpportunityListLoading: false,
   newOpportunityData: [],
   newOpportunityDataLoading: false,
+  newOpportunityDataLastUpdated: "",
 };
 
 const opportunitySlice = createSlice({
@@ -183,7 +184,8 @@ const opportunitySlice = createSlice({
     });
     builder.addCase(getNewOpportunityData.fulfilled, (state, action) => {
       state.newOpportunityDataLoading = false;
-      state.newOpportunityData = action.payload.data;
+      state.newOpportunityData = action.payload.data?.data;
+      state.newOpportunityDataLastUpdated = action.payload.data?.last_updated;
     });
     builder.addCase(getNewOpportunityData.rejected, (state, action) => {
       state.newOpportunityDataLoading = false;

@@ -28,6 +28,7 @@ const NewOpportunity = () => {
     branchListLoading,
     salesStageList,
     salesStageListLoading,
+    last_updated,
   } = useSelector((state) => ({
     newOpportunityData: state?.opportunity?.newOpportunityData,
     newOpportunityDataLoading: state?.opportunity?.newOpportunityDataLoading,
@@ -35,6 +36,7 @@ const NewOpportunity = () => {
     branchListLoading: state?.insightMetrics?.branchListLoading,
     salesStageList: state?.quotation?.salesStage,
     salesStageListLoading: state?.quotation?.salesStageLoading,
+    last_updated: state?.opportunity?.newOpportunityDataLastUpdated,
   }));
 
   const [filteredData, setFilteredData] = useState([]);
@@ -1130,6 +1132,12 @@ const NewOpportunity = () => {
       </div>
       <div className="subscription-header mb-4 opportunity-filter">
         <div className="subscription-filter">
+          <Tooltip
+            title={moment(last_updated).format("MMMM D, YYYY [at] h:mm:ss A")}
+            placement="top"
+          >
+            <span>Last Updated</span>
+          </Tooltip>
           <CommonButton
             className="common-green-btn"
             onClick={() => {

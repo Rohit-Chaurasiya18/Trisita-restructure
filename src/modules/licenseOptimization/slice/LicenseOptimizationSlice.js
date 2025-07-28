@@ -2,6 +2,7 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   GET_ALL_ACCOUNT_BY_BD_PERSON,
+  GET_ALL_ACCOUNT_BY_BRANCH,
   GET_ALL_BD_PERSON_BY_BRANCH,
   GET_BRANCH_ACCOUNT_PRODUCTLINE,
   GET_LICENSE_OPTIMISATION,
@@ -24,6 +25,22 @@ export const getAllBdPersonByBranchId = createAsyncThunk(
     }
   }
 );
+
+export const getAllAccountByBranchId = createAsyncThunk(
+  `LicenseOptimization/getAllAccountByBranchId`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_ALL_ACCOUNT_BY_BRANCH + `?branch_id=${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 export const getAllAccountByBdPersonIds = createAsyncThunk(
   `LicenseOptimization/getAllAccountByBdPersonIds`,
   async (payload, thunkAPI) => {
