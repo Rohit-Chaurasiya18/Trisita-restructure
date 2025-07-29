@@ -32,7 +32,7 @@ const opportunityCategoryList = [
   { value: "LC", label: "LC" },
   { value: "ROR", label: "ROR" },
 ];
-const opportunityTypeList = [
+export const opportunityTypeList = [
   { value: "New", label: "New" },
   { value: "Renewal", label: "Renewal" },
   { value: "Non ROR renewal", label: "Non ROR renewal" },

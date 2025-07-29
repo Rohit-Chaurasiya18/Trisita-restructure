@@ -29,6 +29,7 @@ import ProductDetailModal from "@/modules/orderLoadingApi/pages/orderLoadingHO/c
 import AddProductDetail from "@/modules/orderLoadingApi/pages/orderLoadingHO/component/AddProductDetail";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
+import { opportunityTypeList } from "@/modules/newOpportunity/pages/AddEditNewOpportunity";
 
 const validationSchema = Yup.object({
   quotationDate: Yup.string().required("Quotation date is required."),
@@ -37,6 +38,7 @@ const validationSchema = Yup.object({
     "Purchase payment terms is required."
   ),
   salesStage: Yup.string().required("Sales stage is required."),
+  opportunityType: Yup.string().required("Opportunity type is required."),
   branch: Yup.string().required("Branch is required."),
   account: Yup.string().required("Account is required."),
   bdPerson: Yup.array()
@@ -204,6 +206,7 @@ const AddEditNewQuotation = () => {
     account: "",
     purchasePaymentTerms: null,
     salesStage: null,
+    opportunityType: "",
     opportunity: "",
     billingContact: "",
     validUntil: "",
@@ -237,6 +240,7 @@ const AddEditNewQuotation = () => {
         account: values?.account,
         opportunity: values?.opportunity,
         sales_stage: values?.salesStage,
+        opportunity_type: values?.opportunityType,
         billing_contact: values?.billingContact,
         valid_until: values?.validUntil,
         billing_address: values?.billingAddress,
@@ -414,6 +418,7 @@ const AddEditNewQuotation = () => {
           setFieldValue("account", data?.account);
           setFieldValue("purchasePaymentTerms", data?.purchase_payment_terms);
           setFieldValue("salesStage", data?.sales_stage);
+          setFieldValue("opportunityType", data?.opportunity_type);
           setFieldValue("opportunity", data?.opportunity);
           setFieldValue("billingContact", data?.billing_contact);
           setFieldValue("validUntil", data?.valid_until);
@@ -665,6 +670,21 @@ const AddEditNewQuotation = () => {
                     }}
                   />
                 </div>
+                <CustomSelect
+                  label="Opportunity Type"
+                  required
+                  name="opportunityType"
+                  value={opportunityTypeList?.filter(
+                    (item) => item?.value === values?.opportunityType
+                  )}
+                  onChange={(selectedOption) => {
+                    setFieldValue("opportunityType", selectedOption?.value);
+                  }}
+                  options={opportunityTypeList}
+                  placeholder="Select a Opportunity Type"
+                  error={errors?.opportunityType && touched?.opportunityType}
+                  errorText={errors?.opportunityType}
+                />
                 <CommonInputTextField
                   labelName="Opportunity name"
                   id="opportunity"

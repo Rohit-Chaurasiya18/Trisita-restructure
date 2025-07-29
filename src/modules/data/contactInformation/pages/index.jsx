@@ -38,7 +38,6 @@ const ContactInformation = () => {
       dispatch(getContactInformation(newValues?.value));
     }
   };
-  console.log(selectedValue);
   return (
     <>
       <div className="alert-subscription">
@@ -117,9 +116,7 @@ const ContactInformation = () => {
                   <div className="mb-4">
                     <div className="col-12">
                       <div className="col-2">Name</div>
-                      <div className="col-10">
-                        {item?.first_name + item?.last_name || "N/A"}
-                      </div>
+                      <div className="col-10">{item?.first_name || "N/A"}</div>
                     </div>
                     <div className="col-12">
                       <div className="col-2">Email</div>
@@ -176,7 +173,7 @@ const ContactInformation = () => {
                     <div className="col-12">
                       <div className="col-2">Name</div>
                       <div className="col-10">
-                        {item?.first_name + item?.last_name || "N/A"}
+                        {item?.first_name || "N/A"}
                       </div>
                     </div>
                     <div className="col-12">
