@@ -131,6 +131,16 @@ const AddProductDetail = forwardRef((props, ref) => {
       setFieldValue("remarks", productDetails?.remarks);
       setFieldValue("totalACVAmount", productDetails?.total_acv_amount_exc_gst);
     }
+    if (data?.selectedProduct?.product_master) {
+      dispatch(getProductMasterById(data?.selectedProduct?.product_master)).then((res) => {
+        if (res?.payload?.data?.product_master) {
+          let acvPrice = res?.payload?.data?.product_master?.acv_price_decimal
+            ? res?.payload?.data?.product_master?.acv_price_decimal
+            : res?.payload?.data?.product_master?.acv_price;
+          setFieldValue("totalACVAmount", Number(acvPrice));
+        }
+      });
+    }
   }, [data?.selectedProduct]);
 
   // Expose submit function to parent using ref

@@ -1,6 +1,7 @@
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  GENERATE_QUOTATION,
   GET_EXPORT_OPPORTUNITIES,
   GET_NEW_OPPORTUNITY_DATA,
   GET_OPPORTUNITY_DETAIL,
@@ -119,6 +120,18 @@ export const getNewOpportunityById = createAsyncThunk(
   }
 );
 
+export const generateQuotation = createAsyncThunk(
+  "opportunities/generateQuotation",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GENERATE_QUOTATION, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 const initialValue = {
   opportunityLoading: false,
   opportunityList: [],

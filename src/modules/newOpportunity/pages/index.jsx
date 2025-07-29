@@ -8,7 +8,7 @@ import { getEmptyPieChartConfig } from "@/constants";
 import useDebounce from "@/hooks/useDebounce";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
-import { getNewOpportunityData } from "@/modules/opportunity/slice/opportunitySlice";
+import { generateQuotation, getNewOpportunityData } from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
 import { Tooltip } from "@mui/material";
 import dayjs from "dayjs";
@@ -16,6 +16,7 @@ import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const NewOpportunity = () => {
   const dispatch = useDispatch();
@@ -50,6 +51,10 @@ const NewOpportunity = () => {
     salesStage: null,
     from_date: "",
     to_date: "",
+  });
+  const [generateQuotationItem, setGenerateItemQuotation] = useState({
+    loading: false,
+    id: null,
   });
 
   const handleDateChange = (newValue) => {
@@ -249,6 +254,47 @@ const NewOpportunity = () => {
         width: 200,
         renderCell: (params) => (
           <div>{moment(params?.value).format("DD MMM YYYY [at] hh:mm A")}</div>
+        ),
+      },
+      {
+        field: "action",
+        headerName: "Action",
+        width: 180,
+        renderCell: (params, index) => (
+          <span
+            onClick={() => {
+              setGenerateItemQuotation({
+                loading: true,
+                id: params?.row?.opportunity_number,
+              });
+              let payload = {
+                branch: params?.row?.branch,
+                bd_person: params?.row?.bd_person_ids,
+                account: params?.row?.account,
+                opportunity_type: params?.row?.opportunity_type,
+                product_master_ids: [params?.row?.product_master],
+              };
+              dispatch(generateQuotation(payload)).then((res) => {
+                if (
+                  res?.payload?.status === 201 ||
+                  res?.payload?.status === 200
+                ) {
+                  toast.success("New quotation generated successfully");
+                }
+                setGenerateItemQuotation({ loading: false, id: null });
+              });
+            }}
+            className="assign-button text-black px-3 py-1 rounded border-0"
+            aria-disabled={
+              generateQuotationItem?.loading &&
+              generateQuotationItem?.id === params?.row?.opportunity_number
+            }
+          >
+            {generateQuotationItem?.loading &&
+            generateQuotationItem?.id === params?.row?.opportunity_number
+              ? "Generating..."
+              : "Generate Quotation"}
+          </span>
         ),
       },
     ],

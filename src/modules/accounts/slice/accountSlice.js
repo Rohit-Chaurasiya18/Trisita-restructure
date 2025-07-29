@@ -238,7 +238,8 @@ export const getTotalAmountPerMonthChart = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.get(
-        GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY
+        GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY +
+          `?branch_id=${payload?.branch}&status=${payload?.status}`
       );
       return response;
     } catch (err) {

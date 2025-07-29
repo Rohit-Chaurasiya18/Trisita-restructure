@@ -6,7 +6,10 @@ import ReactApexChart from "react-apexcharts";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { getExportedOpportunities } from "../slice/opportunitySlice";
+import {
+  generateQuotation,
+  getExportedOpportunities,
+} from "../slice/opportunitySlice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import moment from "moment";
 import CommonModal from "@/components/common/modal/CommonModal";
@@ -18,6 +21,7 @@ import dayjs from "dayjs";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import CommonChart from "@/components/common/chart/CommonChart";
 import { getEmptyPieChartConfig } from "@/constants";
+import { toast } from "react-toastify";
 
 const CommonCard = ({
   title,
@@ -69,7 +73,6 @@ const Opportunity = () => {
   });
 
   const [opportunityBarChart, SetOpportunityBarChart] = useState([]);
-
   const [opportunityAccountDataSecondGraph, SetOpportunityDataSecondGraph] =
     useState([]);
   const [modal, setModal] = useState({
@@ -77,6 +80,10 @@ const Opportunity = () => {
     opportunity_number: "",
   });
   const [selectedId, setSelectedId] = useState([]);
+  const [generateQuotationItem, setGenerateItemQuotation] = useState({
+    loading: false,
+    id: null,
+  });
 
   const cardData = useMemo(
     () => [
@@ -262,6 +269,47 @@ const Opportunity = () => {
       width: 220,
       renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
       sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 180,
+      renderCell: (params, index) => (
+        <span
+          onClick={() => {
+            setGenerateItemQuotation({
+              loading: true,
+              id: params?.row?.opportunity_number,
+            });
+            let payload = {
+              branch: params?.row?.branch_id,
+              bd_person: params?.row?.bd_persons_id,
+              account: params?.row?.account_id,
+              opportunity_type: params?.row?.opportunity_type,
+              product_master_ids: params?.row?.product_master_ids,
+            };
+            dispatch(generateQuotation(payload)).then((res) => {
+              if (
+                res?.payload?.status === 201 ||
+                res?.payload?.status === 200
+              ) {
+                toast.success("New quotation generated successfully");
+              }
+              setGenerateItemQuotation({ loading: false, id: null });
+            });
+          }}
+          className="assign-button text-black px-3 py-1 rounded border-0"
+          aria-disabled={
+            generateQuotationItem?.loading &&
+            generateQuotationItem?.id === params?.row?.opportunity_number
+          }
+        >
+          {generateQuotationItem?.loading &&
+          generateQuotationItem?.id === params?.row?.opportunity_number
+            ? "Generating..."
+            : "Generate Quotation"}
+        </span>
+      ),
     },
   ];
 

@@ -108,10 +108,18 @@ const Account = () => {
   useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllUser());
-    if (isThirdPartyAccount) {
-      dispatch(getTotalAmountPerMonthChart());
-    }
   }, [isThirdPartyAccount]);
+
+  useEffect(() => {
+    if (isThirdPartyAccount) {
+      dispatch(
+        getTotalAmountPerMonthChart({
+          branch: filters?.branch?.value ? filters?.branch?.value : null,
+          status: filters?.status === "All Status" ? null : filters?.status,
+        })
+      );
+    }
+  }, [filters?.branch, filters?.status, isThirdPartyAccount]);
 
   useEffect(() => {
     let payload = {

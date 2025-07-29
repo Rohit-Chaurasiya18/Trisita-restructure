@@ -137,30 +137,28 @@ const ContactInformation = () => {
 
             <div className="contact-manager-info">
               <label>Contract Manager</label>
-              <div>
-                <div className="col-12">
-                  <div className="col-2">Name</div>
-                  <div className="col-10">
-                    {contract_manager?.endCustomer_contractManager?.first +
-                      contract_manager?.endCustomer_contractManager?.last ||
-                      "N/A"}
+              {account?.contract_manager?.length > 0 ? (
+                account?.contract_manager?.map((item) => (
+                  <div className="mb-4">
+                    <div className="col-12">
+                      <div className="col-2">Name</div>
+                      <div className="col-10">{item?.first_name || "N/A"}</div>
+                    </div>
+                    <div className="col-12">
+                      <div className="col-2">Email</div>
+                      <div className="col-10">{item?.email || "N/A"}</div>
+                    </div>
+                    <div className="col-12">
+                      <div className="col-2">Phone</div>
+                      <div className="col-10">{item?.phone || "N/A"}</div>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center">
+                  <p>No data found!</p>
                 </div>
-                <div className="col-12">
-                  <div className="col-2">Email</div>
-                  <div className="col-10">
-                    {contract_manager?.endCustomer_contractManager?.email ||
-                      "N/A"}
-                  </div>
-                </div>
-                <div className="col-12">
-                  <div className="col-2">Phone</div>
-                  <div className="col-10">
-                    {contract_manager?.endCustomer_contractManager?.phone ||
-                      "N/A"}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 

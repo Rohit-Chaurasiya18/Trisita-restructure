@@ -109,3 +109,4 @@ export const GET_PURCHASED_PAYMENT_TERMS = "/v1/product/get_payment_terms/";
 export const GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY =
   "/v1/api/get_subs_enddate_price/";
 export const GET_NEW_OPPORTUNITY_DATA = "/v1/api/get_new_opportunity/";
+export const GENERATE_QUOTATION = "/v1/product/get_genrate_quotation/";
