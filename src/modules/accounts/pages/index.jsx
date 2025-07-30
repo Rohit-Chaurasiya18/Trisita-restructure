@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import {
   getAccount,
+  getAllOemManager,
   getAllUser,
   getContracts,
   getEndCustomerAccount,
@@ -108,6 +109,7 @@ const Account = () => {
   useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllUser());
+    dispatch(getAllOemManager());
   }, [isThirdPartyAccount]);
 
   useEffect(() => {

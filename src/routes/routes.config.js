@@ -44,6 +44,8 @@ import {
   NewQuotaion,
   NewOpportunity,
   AddNewOpportunity,
+  CampaignHistory,
+  RunCampaign,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -223,15 +225,11 @@ const routesConfig = {
     },
     {
       path: routesConstants.RUN_CAMPAIGN,
-      component: Get_usage,
+      component: RunCampaign,
     },
     {
       path: routesConstants.CAMPAIGN_HISTORY,
-      component: Get_usage,
-    },
-    {
-      path: routesConstants.CAMPAIGN_HISTORY,
-      component: Get_usage,
+      component: CampaignHistory,
     },
     {
       path: routesConstants.CONTACT_INFORMATION,

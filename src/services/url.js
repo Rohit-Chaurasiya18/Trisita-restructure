@@ -14,12 +14,15 @@ export const INSIGHT_METRICS_CUSTOMER_V2 =
 export const ALERT_SUBSCRIPTION = "/v1/api/new_get_ror_lop_data/";
 export const GET_ALERT_SUBSCRIPTION = "/v1/api/get_alert_subscription/";
 export const GET_ALL_USER = "/v1/get_user/";
+export const GET_ALL_OEM_MANAGER = "/v1/api/get_oem_manager/";
 export const GET_EXPORTED_ACCOUNTS_DATA = "/v1/api/get_export_accounts/";
 export const GET_ACCOUNT = "/v1/api/get_account/";
 export const INSIGHT_METRICS_CSN = "/v1/api/get_insights_metrics_csn/";
 export const GET_CONTRACTS = "/v1/api/get_contracts/";
 export const END_CUSTOMER_ACCOUNT = "/v1/api/get_endcustomer_account/";
 export const GET_ACCOUNT_INFORMATION = "/v1/api/account";
+export const GET_NEW_ACCOUNT_INFORMATION = "/v1/api/newaccount";
+
 export const GET_BD_RENEWAL_PERSON =
   "/v1/api/get_bd_and_renewal_person_by_branch";
 export const GET_ACCOUNT_BY_BDPERSON =
@@ -110,3 +113,5 @@ export const GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY =
   "/v1/api/get_subs_enddate_price/";
 export const GET_NEW_OPPORTUNITY_DATA = "/v1/api/get_new_opportunity/";
 export const GENERATE_QUOTATION = "/v1/product/get_genrate_quotation/";
+export const GET_CAMPAIGN_HISTORY = "/v1/api/campaign_list/";
+export const GET_ALL_PRODCUT_LINE = "/v1/api/get_all_product_line/";

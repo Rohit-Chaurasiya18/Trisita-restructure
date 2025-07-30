@@ -6,10 +6,12 @@ import {
   GET_ACCOUNT,
   GET_ACCOUNT_BY_BDPERSON,
   GET_ACCOUNT_INFORMATION,
+  GET_ALL_OEM_MANAGER,
   GET_ALL_USER,
   GET_BD_RENEWAL_PERSON,
   GET_CONTRACTS,
   GET_EXPORTED_ACCOUNTS_DATA,
+  GET_NEW_ACCOUNT_INFORMATION,
   GET_SUBS_BY_THIRD_PARTY,
   GET_THIRD_PARTY_ACCOUNT,
   GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY,
@@ -32,6 +34,18 @@ export const getAllUser = createAsyncThunk(
   }
 );
 
+export const getAllOemManager = createAsyncThunk(
+  `account/getAllOemManager`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_ALL_OEM_MANAGER);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 // Get Exported Account
 export const getExportedAccount = createAsyncThunk(
   `account/getExportedAccount`,
@@ -142,12 +156,12 @@ export const getAccountInformation = createAsyncThunk(
       let response;
       if (payload?.isUpdate) {
         response = await axiosReact.put(
-          GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`,
+          GET_NEW_ACCOUNT_INFORMATION + `/${payload?.accountId}`,
           payload?.requestBody
         );
       } else {
         response = await axiosReact.get(
-          GET_ACCOUNT_INFORMATION + `/${payload?.accountId}`
+          GET_NEW_ACCOUNT_INFORMATION + `/${payload?.accountId}`
         );
       }
       return response;
@@ -251,6 +265,7 @@ export const getTotalAmountPerMonthChart = createAsyncThunk(
 
 const accountState = {
   allUserData: null,
+  allOemManager: [],
   last_updated: "",
   thirdPartyLast_updated: "",
   exportedAccountDataLoading: false,
@@ -278,6 +293,20 @@ const accountSlice = createSlice({
   initialState: accountState,
   reducers: {},
   extraReducers: (builder) => {
+    //getAllOemManager
+    builder.addCase(getAllOemManager.pending, (state) => {
+      state.allOemManager = [];
+    });
+    builder.addCase(getAllOemManager.fulfilled, (state, action) => {
+      state.allOemManager = action.payload.data?.map((i) => ({
+        value: i?.id,
+        label: i?.full_name,
+      }));
+    });
+    builder.addCase(getAllOemManager.rejected, (state) => {
+      state.allOemManager = [];
+    });
+
     // getAllUser
     builder.addCase(getAllUser.pending, (state) => {
       state.allUserData = null;

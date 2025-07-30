@@ -8,6 +8,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Autocomplete, TextField, Tooltip, Zoom } from "@mui/material";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 // Reusable Autocomplete Field
 export const AutocompleteField = ({
@@ -46,14 +47,20 @@ export const AutocompleteField = ({
 
 const AssignUserBranch = ({ id, handleCallback }) => {
   const dispatch = useDispatch();
-  const { accountInformation, allUserData, allClientData, branch_list } =
-    useSelector((state) => ({
-      accountInformation: state?.account?.accountInformation,
-      allUserData: state?.account?.allUserData?.User || [],
-      allClientData: state?.account?.allUserData?.Client || [],
-      branch_list: state?.insightMetrics?.branchList || [],
-    }));
-  const [associateAccount, setAssociateAccount] = useState([]);
+  const location = useLocation();
+  const {
+    accountInformation,
+    allUserData,
+    allClientData,
+    branch_list,
+    allOemManager,
+  } = useSelector((state) => ({
+    accountInformation: state?.account?.accountInformation,
+    allUserData: state?.account?.allUserData?.User || [],
+    allOemManager: state?.account?.allOemManager || [],
+    allClientData: state?.account?.allUserData?.Client || [],
+    branch_list: state?.insightMetrics?.branchList || [],
+  }));
 
   useEffect(() => {
     if (id) {
@@ -61,19 +68,10 @@ const AssignUserBranch = ({ id, handleCallback }) => {
     }
   }, [id, dispatch]);
 
-  useEffect(() => {
-    if (accountInformation?.user_assign?.length > 0) {
-      let bdIds = accountInformation?.user_assign?.map((item) => item?.id);
-      dispatch(getAccountByBdPerson(bdIds)).then((res) => {
-        setAssociateAccount(
-          res?.payload?.data?.map((item) => ({
-            label: `${item?.name} - (${item?.csn})`,
-            value: item?.id,
-          }))
-        );
-      });
-    }
-  }, [accountInformation?.user_assign]);
+  const isThirdPartyAccount = useMemo(
+    () => location.pathname.startsWith("/third_party_account"),
+    [location?.pathname]
+  );
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -85,6 +83,12 @@ const AssignUserBranch = ({ id, handleCallback }) => {
         : null,
       renewalPerson: accountInformation?.renewal_person ?? [],
       client: accountInformation?.client ?? [],
+      oemManager: accountInformation?.oem_account_manager?.id
+        ? allOemManager?.find(
+            (item) =>
+              item?.value === accountInformation?.oem_account_manager?.id
+          )
+        : "",
     },
     onSubmit: (values) => {
       // Submit your API call here
@@ -93,6 +97,7 @@ const AssignUserBranch = ({ id, handleCallback }) => {
         branch: values?.branch?.value || null,
         renewal_person: values?.renewalPerson?.map((user) => user?.id),
         client: values?.client?.map((user) => user?.id),
+        oem_account_manager: values?.oemManager?.value,
       };
       dispatch(
         getAccountInformation({ accountId: id, isUpdate: true, requestBody })
@@ -158,13 +163,15 @@ const AssignUserBranch = ({ id, handleCallback }) => {
         }
         formik={formik}
       />
-      {/* <AutocompleteField
-        label="Associate Account"
-        name="associateAccount"
-        options={associateAccount}
-        multiple
-        formik={formik}
-      /> */}
+
+      {!isThirdPartyAccount && (
+        <AutocompleteField
+          label="OEM Manager"
+          name="oemManager"
+          options={allOemManager}
+          formik={formik}
+        />
+      )}
 
       <div className="form-group col-12 justify-content-center mt-4">
         <Tooltip

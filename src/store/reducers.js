@@ -19,6 +19,7 @@ import orderLoadingApiReducer from "@/modules/orderLoadingApi/slice/OrderLoading
 import RaOrderReducer from "@/modules/orderLoadingApi/pages/RAOrder/slice/RAOrderSlice";
 import ContactInformationReducer from "@/modules/data/contactInformation/slice/ContactInfoSlice";
 import LicenseOptimizationReducer from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
+import CampaignReducer from "@/modules/data/campaign/slice/CampaignSlice";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -41,5 +42,6 @@ const reducer = combineReducers({
   RaOrder: RaOrderReducer,
   ContactInformation: ContactInformationReducer,
   LicenseOptimization: LicenseOptimizationReducer,
+  Campaign: CampaignReducer,
 });
 export default reducer;
