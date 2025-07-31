@@ -9,7 +9,9 @@ export const getManageTemplate = createAsyncThunk(
   `manageTemplate/getManageTemplate`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(MANAGE_TEMPLATE_URL);
+      const response = await axiosReact.get(
+        MANAGE_TEMPLATE_URL + `?isDays=${payload?.isDays}`
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

@@ -46,6 +46,8 @@ import {
   AddNewOpportunity,
   CampaignHistory,
   RunCampaign,
+  SelectCampaignAudience,
+  FinalCampaign,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -226,6 +228,14 @@ const routesConfig = {
     {
       path: routesConstants.RUN_CAMPAIGN,
       component: RunCampaign,
+    },
+    {
+      path: routesConstants?.CAMPAIGN_AUDIENCE,
+      component: SelectCampaignAudience,
+    },
+    {
+      path: routesConstants?.FINAL_CAMPAIGN,
+      component: FinalCampaign,
     },
     {
       path: routesConstants.CAMPAIGN_HISTORY,

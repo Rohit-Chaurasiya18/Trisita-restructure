@@ -1,16 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCampaignHistory } from "../slice/CampaignSlice";
+import {
+  getCampaignHistory,
+  getCampaignHistoryById,
+} from "../slice/CampaignSlice";
 import CommonTable from "@/components/common/dataTable/CommonTable";
+import moment from "moment";
+import CommonModal from "@/components/common/modal/CommonModal";
 
 const CampaignHistory = () => {
   const dispatch = useDispatch();
-  const { CampaignHistoryList, CampaignHistoryLoading } = useSelector(
-    (state) => ({
-      CampaignHistoryList: state.Campaign.CampaignHistoryListList,
-      CampaignHistoryLoading: state.Campaign.CampaignHistoryListLoading,
-    })
-  );
+  const {
+    CampaignHistoryList,
+    CampaignHistoryLoading,
+    campaignHistoryById,
+    campaignHistoryByIdLoading,
+  } = useSelector((state) => ({
+    CampaignHistoryList: state.Campaign.CampaignHistoryListList,
+    CampaignHistoryLoading: state.Campaign.CampaignHistoryListLoading,
+    campaignHistoryById: state.Campaign.campaignHistoryById,
+    campaignHistoryByIdLoading: state.Campaign.campaignHistoryByIdLoading,
+  }));
+  const [modal, setModal] = useState(false);
 
   useEffect(() => {
     dispatch(getCampaignHistory());
@@ -20,6 +31,10 @@ const CampaignHistory = () => {
     const formattedDate = moment(value).format("MMMM DD, YYYY hh:mm:ss A");
     return <div>{formattedDate}</div>;
   };
+  const HandleViewDetails = (id) => {
+    setModal(true);
+    dispatch(getCampaignHistoryById(id));
+  };
 
   const columns = [
     {
@@ -27,14 +42,12 @@ const CampaignHistory = () => {
       headerName: "#Subscriptionr",
       width: 180,
       renderCell: (params, index) => (
-        <div>
-          <button
-            onClick={() => handleOpenModel(params?.row.subscription_id)}
-            className="action-button bg-white text-black px-3 py-1 rounded"
-          >
-            {params.value}
-          </button>
-        </div>
+        <span
+          // onClick={() => handleOpenModel(params?.row.subscription_id)}
+          className="action-button bg-white text-black px-3 py-1 rounded border-0"
+        >
+          {params.value}
+        </span>
       ),
     },
     {
@@ -99,18 +112,16 @@ const CampaignHistory = () => {
     },
     { field: "status", headerName: "Message Status", width: 140 },
     {
-      field: "",
+      field: "action",
       headerName: "Action",
       width: 150,
       renderCell: (params, index) => (
-        <div className="flex items-center w-full justify-center">
-          <button
-            // onClick={() => HandleViewDetails(params?.row.id)}
-            className="action-button bg-[#8dbe86] text-black px-3 py-1 rounded"
-          >
-            View Details
-          </button>
-        </div>
+        <span
+          onClick={() => HandleViewDetails(params?.row.id)}
+          className="assign-button text-black px-3 py-1 rounded border-0"
+        >
+          View Details
+        </span>
       ),
     },
   ];
@@ -130,9 +141,43 @@ const CampaignHistory = () => {
             columns={columns}
             getRowId={(row) => row?.id}
             toolbar
+            disableSelection
           />
         </div>
       </div>
+      <CommonModal
+        isOpen={modal}
+        title={"Campaign detail"}
+        handleClose={() => setModal(false)}
+      >
+        <div className="final-campaign-data">
+          {[
+            {
+              key: "Recipient",
+              value: campaignHistoryById?.recipient || "N/A",
+            },
+            {
+              key: "Subject",
+              value: campaignHistoryById?.subject || "N/A",
+            },
+            {
+              key: "Message",
+              value: campaignHistoryById?.message_body || "N/A",
+            },
+            {
+              key: "Status",
+              value: campaignHistoryById?.status || "N/A",
+            },
+          ]?.map((item) => (
+            <div className="selected-data-item">
+              <span className="selected-data-label">{item?.key}:</span>
+              <span className="selected-data-value">
+                {item?.value || "N/A"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </CommonModal>
     </>
   );
 };

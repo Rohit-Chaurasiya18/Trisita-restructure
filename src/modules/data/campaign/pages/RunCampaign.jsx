@@ -4,11 +4,15 @@ import CustomSelect from "@/components/common/dropdown/CustomSelect";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
-import { useFormik } from "formik";
 import { getAllProductLine } from "../slice/CampaignSlice";
+import CommonButton from "@/components/common/buttons/CommonButton";
+import { useNavigate } from "react-router-dom";
+import routesConstants from "@/routes/routesConstants";
 
 const RunCampaign = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [list, setList] = useState({
     branchList: [],
     accountGroupList: [],
@@ -241,6 +245,27 @@ const RunCampaign = () => {
                 }));
               }}
             />
+            <div className="d-flex justify-content-center">
+              <CommonButton
+                className="py-2 px-4 rounded-md mr-3 w-auto run-campaign-btn"
+                onClick={() => {
+                  navigate(routesConstants?.CAMPAIGN_AUDIENCE, {
+                    state: {
+                      branch: values?.branch?.value,
+                      accountGroup: values?.accountGroup?.value,
+                      pcsn: "",
+                      industryGroup: values?.industryGroup?.value,
+                      segmentGroup: values?.segmentGroup?.value,
+                      subSegmentGroup: values?.subSegmentGroup?.value,
+                      productLine: values?.productLine?.value,
+                      status: values?.status?.value,
+                    },
+                  });
+                }}
+              >
+                Select Campaign Audience
+              </CommonButton>
+            </div>
           </div>
           <div className="manage-template-accordion">
             {accordionData?.map((item) => (

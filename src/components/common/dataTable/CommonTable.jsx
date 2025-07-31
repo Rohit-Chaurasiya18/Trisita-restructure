@@ -20,6 +20,53 @@ const CommonTable = ({
 }) => {
   const currDate = new Date().toLocaleDateString();
   const currTime = new Date().toLocaleTimeString();
+  const dataGridProps = {
+    rows,
+    columns,
+    getRowId,
+    checkboxSelection,
+    onRowSelectionModelChange: handleRowSelection,
+    disableRowSelectionOnClick: disableSelection,
+    showToolbar: toolbar,
+    sx: {
+      "& .MuiDataGrid-root": {
+        border: "none",
+      },
+      "& .MuiDataGrid-cell": {
+        borderBottom: "none",
+      },
+      "& .MuiDataGrid-columnHeaders": {
+        backgroundColor: "#1976d2",
+        color: "#fff",
+        fontWeight: "bold",
+      },
+      "& .MuiDataGrid-virtualScroller": {
+        backgroundColor: "#f2f0f0",
+      },
+      "& .MuiDataGrid-footerContainer": {
+        backgroundColor: "#1976d2",
+        color: "#fff",
+        borderTop: "none",
+      },
+      "& .MuiCheckbox-root": {
+        color: "#66bb6a !important", // Customize as needed
+      },
+      "& .MuiTablePagination-toolbar": {
+        alignItems: "baseline !important", // Customize as needed
+        paddingTop: "10px !important",
+      },
+      ...sx,
+    },
+    slotProps: {
+      toolbar: {
+        csvOptions: {
+          fileName: `${exportFileName}_${currDate}_${currTime}`,
+          fields: columns.map((col) => col?.field),
+        },
+      },
+    },
+  };
+
   return (
     <div style={{ height, width: "100%" }} className="data-grid-wrapper">
       {loading ? (
@@ -28,52 +75,7 @@ const CommonTable = ({
         <p>{error}</p>
       ) : (
         <>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            getRowId={getRowId}
-            checkboxSelection={checkboxSelection}
-            onRowSelectionModelChange={handleRowSelection}
-            disableRowSelectionOnClick={disableSelection}
-            showToolbar={toolbar}
-            slotProps={{
-              toolbar: {
-                csvOptions: {
-                  fileName: `${exportFileName}_${currDate}_${currTime}`,
-                  fields: columns.map((col) => col?.field),
-                },
-              },
-            }}
-            sx={{
-              "& .MuiDataGrid-root": {
-                border: "none",
-              },
-              "& .MuiDataGrid-cell": {
-                borderBottom: "none",
-              },
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#1976d2",
-                color: "#fff",
-                fontWeight: "bold",
-              },
-              "& .MuiDataGrid-virtualScroller": {
-                backgroundColor: "#f2f0f0",
-              },
-              "& .MuiDataGrid-footerContainer": {
-                backgroundColor: "#1976d2",
-                color: "#fff",
-                borderTop: "none",
-              },
-              "& .MuiCheckbox-root": {
-                color: "#66bb6a !important", // Customize as needed
-              },
-              "& .MuiTablePagination-toolbar": {
-                alignItems: "baseline !important", // Customize as needed
-                paddingTop: "10px !important",
-              },
-              ...sx,
-            }}
-          />
+          <DataGrid {...dataGridProps} />
           {additionalToolbar && (
             <div style={{ marginTop: "10px" }}>{additionalToolbar}</div>
           )}

@@ -126,6 +126,12 @@ export const CampaignHistory = lazy(() =>
 export const RunCampaign = lazy(() =>
   import("@/modules/data/campaign/pages/RunCampaign")
 );
+export const SelectCampaignAudience = lazy(() =>
+  import("@/modules/data/campaign/pages/SelectCampaignAudience")
+);
+export const FinalCampaign = lazy(() =>
+  import("@/modules/data/campaign/pages/FinalCampaign")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));

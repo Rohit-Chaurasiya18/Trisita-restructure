@@ -28,7 +28,7 @@ const ManageTemplate = () => {
   });
 
   useEffect(() => {
-    dispatch(getManageTemplate());
+    dispatch(getManageTemplate({ isDays: false }));
   }, []);
 
   const handleSave = () => {

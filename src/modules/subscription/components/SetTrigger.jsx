@@ -55,7 +55,7 @@ const SetTrigger = ({ modal, handleClose, isQuotation = false }) => {
     if (isQuotation) {
       dispatch(quotationTemplate());
     } else {
-      dispatch(getManageTemplate());
+      dispatch(getManageTemplate({ isDays: true }));
       dispatch(getTriggeredTemplate(modal?.id));
     }
   }, [dispatch, modal?.id, isQuotation]);

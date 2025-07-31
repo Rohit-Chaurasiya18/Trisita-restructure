@@ -115,3 +115,6 @@ export const GET_NEW_OPPORTUNITY_DATA = "/v1/api/get_new_opportunity/";
 export const GENERATE_QUOTATION = "/v1/product/get_genrate_quotation/";
 export const GET_CAMPAIGN_HISTORY = "/v1/api/campaign_list/";
 export const GET_ALL_PRODCUT_LINE = "/v1/api/get_all_product_line/";
+export const CAMPAIGN_AUDIENCE_LIST = "/v1/api/get_campaign_audience_list/";
+export const CAMPAIGN_SEND = "/v1/api/campaign_send/";
+export const GET_CAMPAIGN = "/v1/api/campaign/";

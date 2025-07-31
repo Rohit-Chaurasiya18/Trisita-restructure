@@ -234,3 +234,25 @@
     }
   }
 }
+
+.run-campaign-btn {
+  background-color: rgb(59, 130, 246);
+  &:hover {
+    background-color: rgb(59, 130, 246);
+  }
+}
+
+.final-campaign-data {
+  .selected-data-item {
+    display: flex;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    .selected-data-label {
+      font-weight: bold;
+      width: 50%;
+    }
+    .selected-data-value {
+      width: 50%;
+    }
+  }
+}
