@@ -103,6 +103,15 @@ export const getCampaignAudience = createAsyncThunk(
           encodeURIComponent(payload?.subSegmentGroup)
         );
       }
+      if (payload?.status) {
+        params.append("status", encodeURIComponent(payload?.status));
+      }
+      if (payload?.productLine) {
+        params.append(
+          "product_line_code",
+          encodeURIComponent(payload?.productLine)
+        );
+      }
       const response = await axiosReact.get(
         CAMPAIGN_AUDIENCE_LIST + `?${params.toString()}`
       );

@@ -46,14 +46,13 @@ const SelectCampaignAudience = () => {
   const columns = [
     {
       field: "subscriptionReferenceNumber",
-      headerName: "subscription",
+      headerName: "Subscription",
       width: 150,
-      renderCell: (params, index) => (
-        <div>
-          <button className="action-button bg-white text-black px-3 py-1 rounded">
-            {params.value}
-          </button>
-        </div>
+
+      renderCell: (params) => (
+        <span className="action-button bg-white text-black px-3 py-1 rounded border-0">
+          {params?.value}
+        </span>
       ),
     },
     {
@@ -62,13 +61,7 @@ const SelectCampaignAudience = () => {
       width: 200,
       renderCell: (params) => {
         const { value: account } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {account?.length > maxChars ? account : account?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{account}</div>;
       },
     },
     {
@@ -103,7 +96,7 @@ const SelectCampaignAudience = () => {
 
     {
       field: "retention_health_riskBand",
-      headerName: "Retention health riskBand",
+      headerName: "Retention Risk",
       width: 100,
     },
 
@@ -156,15 +149,7 @@ const SelectCampaignAudience = () => {
       width: 250,
       renderCell: (params) => {
         const { value: productLine } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {productLine?.length > maxChars
-              ? productLine
-              : productLine?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{productLine}</div>;
       },
     },
     {
@@ -172,28 +157,53 @@ const SelectCampaignAudience = () => {
       headerName: "Set Contact",
       width: 150,
       renderCell: (params, index) => (
-        <div className="flex items-center w-full justify-center">
-          <button
-            onClick={() => handleAccountContactModel(params?.row.account_id)}
-            className="action-button bg-[#8dbe86] text-black px-3 py-1 rounded"
-          >
-            Assign Contact
-          </button>
-        </div>
+        <span
+          // onClick={() => handleAccountContactModel(params?.row.account_id)}
+          className="assign-button text-black px-3 py-1 rounded border-0"
+        >
+          Assign Contact
+        </span>
       ),
     },
   ];
-  console.log(state);
+
   return (
     <div>
       <div className="manage-teams-container">
-        <div className="manage-team-header">
-          <div className="commom-header-title mb-0">
-            Select Campaign Audience
+        <div className="manage-team-header d-flex flex-wrap justify-content-between">
+          <div>
+            <div className="commom-header-title mb-0">
+              Select Campaign Audience
+            </div>
+            <span className="common-breadcrum-msg">
+              Welcome to you campaign audience
+            </span>
           </div>
-          <span className="common-breadcrum-msg">
-            Welcome to you campaign audience
-          </span>
+          {selectedId?.length > 0 && (
+            <div className="d-flex justify-content-start">
+              <CommonButton
+                className="run-campaign-btn"
+                onClick={() => {
+                  let payload = {
+                    selected_rows: selectedId,
+                    branch: state?.branch,
+                    accountGroup: state?.accountGroup,
+                    pcsn: "",
+                    industryGroup: state?.industryGroup,
+                    segmentGroup: state?.segmentGroup,
+                    subSegmentGroup: state?.subSegmentGroup,
+                    productLine: state?.productLine,
+                    status: state?.status,
+                  };
+                  navigate(routesConstants?.FINAL_CAMPAIGN, {
+                    state: payload,
+                  });
+                }}
+              >
+                Select Campaign Audience
+              </CommonButton>
+            </div>
+          )}
         </div>
         {loading ? (
           <SkeletonLoader />
@@ -207,31 +217,6 @@ const SelectCampaignAudience = () => {
               checkboxSelection
               handleRowSelection={handleSelectionChange}
             />
-          </div>
-        )}
-        {selectedId?.length > 0 && (
-          <div className="d-flex justify-content-start">
-            <CommonButton
-              className="py-2 px-4 rounded-md mr-3 w-auto run-campaign-btn"
-              onClick={() => {
-                let payload = {
-                  selected_rows: selectedId,
-                  branch: state?.branch,
-                  accountGroup: state?.accountGroup,
-                  pcsn: "",
-                  industryGroup: state?.industryGroup,
-                  segmentGroup: state?.segmentGroup,
-                  subSegmentGroup: state?.subSegmentGroup,
-                  productLine: state?.productLine,
-                  status: state?.status,
-                };
-                navigate(routesConstants?.FINAL_CAMPAIGN, {
-                  state: payload,
-                });
-              }}
-            >
-              Select Campaign Audience
-            </CommonButton>
           </div>
         )}
       </div>

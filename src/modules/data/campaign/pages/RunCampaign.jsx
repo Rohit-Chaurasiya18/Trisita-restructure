@@ -32,7 +32,7 @@ const RunCampaign = () => {
     industryGroup: "",
     segmentGroup: "",
     subSegmentGroup: "",
-    status: "",
+    status:  { label: "All Status", value: "All Status" },
     productLine: "",
   });
 
@@ -65,7 +65,6 @@ const RunCampaign = () => {
         industryGroup: values?.industryGroup?.value,
         segmentGroup: values?.segmentGroup?.value,
         subSegmentGroup: values?.subSegmentGroup?.value,
-        productLine: values?.productLine?.value,
       };
       dispatch(getAllProductLine(payload)).then((res) => {
         let Arr = res?.payload?.data?.data;

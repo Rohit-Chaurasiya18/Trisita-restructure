@@ -14,11 +14,15 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import { campaignSend } from "../slice/CampaignSlice";
 import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 import routesConstants from "@/routes/routesConstants";
+import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 
 const FinalCampaign = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { branch_list } = useSelector((state) => ({
+    branch_list: state?.insightMetrics?.branchList,
+  }));
 
   const [templateList, setTemplateList] = useState([]);
   const [modal, setModal] = useState({
@@ -80,6 +84,7 @@ const FinalCampaign = () => {
     validationSchema,
     onSubmit,
   });
+
   const handleTemplateList = () => {
     dispatch(getManageTemplate({ isDays: false })).then((res) => {
       let arr = res?.payload?.data;
@@ -100,6 +105,7 @@ const FinalCampaign = () => {
 
   useEffect(() => {
     handleTemplateList();
+    dispatch(getAllBranch());
   }, []);
 
   return (
@@ -122,7 +128,9 @@ const FinalCampaign = () => {
                 },
                 {
                   key: "Branch",
-                  value: state?.branch || "N/A",
+                  value:
+                    branch_list?.find((i) => i?.value === state?.branch)
+                      ?.label || "N/A",
                 },
                 {
                   key: "Account Group",
@@ -157,6 +165,26 @@ const FinalCampaign = () => {
                 </div>
               ))}
             </div>
+            <CommonButton
+              className="py-2 px-4 rounded-md mr-3 w-auto run-campaign-btn mt-4"
+              onClick={() => {
+                navigate(routesConstants?.CAMPAIGN_AUDIENCE, {
+                  state: {
+                    branch: state?.branch,
+                    accountGroup: state?.accountGroup,
+                    pcsn: "",
+                    industryGroup: state?.industryGroup,
+                    segmentGroup: state?.segmentGroup,
+                    subSegmentGroup: state?.subSegmentGroup,
+                    productLine: state?.productLine,
+                    status: state?.status,
+                    selected_rows: state?.selected_rows,
+                  },
+                });
+              }}
+            >
+              Back to Campaign Audience
+            </CommonButton>
           </div>
           <div className="manage-template-form">
             <h4>Run Campaign</h4>
