@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import AddIcon from "@mui/icons-material/Add";
+import PreviewIcon from "@mui/icons-material/Preview";
 import {
   addNewQuotation,
   addPurchasedPaymentTerms,
@@ -68,8 +69,8 @@ export const AddSalesStage = ({ setModal, modal }) => {
             : Yup.string().notRequired(),
         purchasedPaymentTerms:
           modal?.type === 2
-            ? Yup.number().required("Purchased payment terms is required.")
-            : Yup.number().notRequired(),
+            ? Yup.string().required("Purchased payment terms is required.")
+            : Yup.string().notRequired(),
       }),
       onSubmit: (values) => {
         setIsSubmitting(true);
@@ -125,7 +126,6 @@ export const AddSalesStage = ({ setModal, modal }) => {
           name="purchasedPaymentTerms"
           className="input"
           required
-          type="number"
           min={1}
           mainDiv="form-group"
           labelClass="label"
@@ -465,7 +465,9 @@ const AddEditNewQuotation = () => {
               Back
             </CommonButton>
             <div className="add-account-form">
-              <h2 className="title">New Quotation Form</h2>
+              <h2 className="title">
+                {quotationId ? "Update" : "New"} Quotation Form
+              </h2>
               <form>
                 <CommonDatePicker
                   label="Quotation Date"
@@ -793,22 +795,41 @@ const AddEditNewQuotation = () => {
                     Product Details
                   </label>
                   <div style={{ cursor: "pointer" }}>
-                    <AddIcon
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        if (!values?.branch) {
-                          toast.error("Please select branch");
-                        } else if (!values?.billingGSTNumber) {
-                          toast.error("Please provide billing gst number");
-                        } else {
-                          setModal((prev) => ({
-                            ...prev,
-                            isOpen: true,
-                            type: 3,
-                          }));
-                        }
-                      }}
-                    />
+                    {quotationId ? (
+                      <PreviewIcon
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          if (!values?.branch) {
+                            toast.error("Please select branch");
+                          } else if (!values?.billingGSTNumber) {
+                            toast.error("Please provide billing gst number");
+                          } else {
+                            setModal((prev) => ({
+                              ...prev,
+                              isOpen: true,
+                              type: 3,
+                            }));
+                          }
+                        }}
+                      />
+                    ) : (
+                      <AddIcon
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          if (!values?.branch) {
+                            toast.error("Please select branch");
+                          } else if (!values?.billingGSTNumber) {
+                            toast.error("Please provide billing gst number");
+                          } else {
+                            setModal((prev) => ({
+                              ...prev,
+                              isOpen: true,
+                              type: 3,
+                            }));
+                          }
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
                 <CommonInputTextField

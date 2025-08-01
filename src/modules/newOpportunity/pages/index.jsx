@@ -1,5 +1,6 @@
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonChart from "@/components/common/chart/CommonChart";
+import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
@@ -8,7 +9,10 @@ import { getEmptyPieChartConfig } from "@/constants";
 import useDebounce from "@/hooks/useDebounce";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
-import { generateQuotation, getNewOpportunityData } from "@/modules/opportunity/slice/opportunitySlice";
+import {
+  generateQuotation,
+  getNewOpportunityData,
+} from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
 import { Tooltip } from "@mui/material";
 import dayjs from "dayjs";
@@ -79,7 +83,7 @@ const NewOpportunity = () => {
 
   const debounce = useDebounce(filters?.to_date, 500);
 
-  useEffect(() => {
+  const handleFetchData = () => {
     const payload = {
       branch: filters?.branch?.value,
       salesStage: filters?.salesStage?.value,
@@ -94,6 +98,10 @@ const NewOpportunity = () => {
           }),
     };
     dispatch(getNewOpportunityData(payload));
+  };
+
+  useEffect(() => {
+    handleFetchData();
   }, [filters?.branch, filters?.salesStage, debounce]);
 
   // Table column definitions
@@ -261,40 +269,71 @@ const NewOpportunity = () => {
         headerName: "Action",
         width: 180,
         renderCell: (params, index) => (
-          <span
-            onClick={() => {
-              setGenerateItemQuotation({
-                loading: true,
-                id: params?.row?.opportunity_number,
-              });
-              let payload = {
-                branch: params?.row?.branch,
-                bd_person: params?.row?.bd_person_ids,
-                account: params?.row?.account,
-                opportunity_type: params?.row?.opportunity_type,
-                product_master_ids: [params?.row?.product_master],
-              };
-              dispatch(generateQuotation(payload)).then((res) => {
-                if (
-                  res?.payload?.status === 201 ||
-                  res?.payload?.status === 200
-                ) {
-                  toast.success("New quotation generated successfully");
+          <>
+            {params?.row?.opportunity_type !== "Renewal" && (
+              <span
+                onClick={() => {
+                  if (params?.row?.is_genrated_quota) {
+                    return;
+                  } else {
+                    CustomSweetAlert(
+                      "Generate Quotation?",
+                      "Are you sure you want to generate quotation for this opportunity?",
+                      "Warning",
+                      true,
+                      "Yes, Generate Quotation",
+                      "Cancel",
+                      (result) => {
+                        if (result.isConfirmed) {
+                          setGenerateItemQuotation({
+                            loading: true,
+                            id: params?.row?.opportunity_number,
+                          });
+                          let payload = {
+                            id: params?.row?.id,
+                            branch: params?.row?.branch,
+                            bd_person: params?.row?.bd_person_ids,
+                            account: params?.row?.account,
+                            opportunity_type: params?.row?.opportunity_type,
+                            product_master_ids: [params?.row?.product_master],
+                          };
+                          dispatch(generateQuotation(payload)).then((res) => {
+                            if (
+                              res?.payload?.status === 201 ||
+                              res?.payload?.status === 200
+                            ) {
+                              toast.success(
+                                "New quotation generated successfully"
+                              );
+                              handleFetchData();
+                            }
+                            setGenerateItemQuotation({
+                              loading: false,
+                              id: null,
+                            });
+                          });
+                        }
+                      }
+                    );
+                  }
+                }}
+                className={`assign-button text-black px-3 py-1 rounded border-0 ${
+                  params?.row?.is_genrated_quota && "cursor-not-allowed"
+                }`}
+                aria-disabled={
+                  (generateQuotationItem?.loading &&
+                    generateQuotationItem?.id ===
+                      params?.row?.opportunity_number) ||
+                  params?.row?.is_genrated_quota
                 }
-                setGenerateItemQuotation({ loading: false, id: null });
-              });
-            }}
-            className="assign-button text-black px-3 py-1 rounded border-0"
-            aria-disabled={
-              generateQuotationItem?.loading &&
-              generateQuotationItem?.id === params?.row?.opportunity_number
-            }
-          >
-            {generateQuotationItem?.loading &&
-            generateQuotationItem?.id === params?.row?.opportunity_number
-              ? "Generating..."
-              : "Generate Quotation"}
-          </span>
+              >
+                {generateQuotationItem?.loading &&
+                generateQuotationItem?.id === params?.row?.opportunity_number
+                  ? "Generating..."
+                  : "Generate Quotation"}
+              </span>
+            )}
+          </>
         ),
       },
     ],
