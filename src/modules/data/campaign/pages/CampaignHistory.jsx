@@ -7,6 +7,8 @@ import {
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import moment from "moment";
 import CommonModal from "@/components/common/modal/CommonModal";
+import { getBackupSubscriptionDetail } from "@/modules/subscription/slice/subscriptionSlice";
+import SubscriptionDetail from "@/modules/subscription/components/SubscriptionDetail";
 
 const CampaignHistory = () => {
   const dispatch = useDispatch();
@@ -21,7 +23,7 @@ const CampaignHistory = () => {
     campaignHistoryById: state.Campaign.campaignHistoryById,
     campaignHistoryByIdLoading: state.Campaign.campaignHistoryByIdLoading,
   }));
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = useState({ show: false, type: null });
 
   useEffect(() => {
     dispatch(getCampaignHistory());
@@ -32,18 +34,25 @@ const CampaignHistory = () => {
     return <div>{formattedDate}</div>;
   };
   const HandleViewDetails = (id) => {
-    setModal(true);
+    setModal({ show: true, type: 1 });
     dispatch(getCampaignHistoryById(id));
+  };
+
+  const handleOpenModel = (subscriptionId) => {
+    setModal({ show: true, type: 2 });
+    dispatch(
+      getBackupSubscriptionDetail({ id: subscriptionId, isSubscription: true })
+    );
   };
 
   const columns = [
     {
       field: "subscription",
-      headerName: "#Subscriptionr",
+      headerName: "Subscription",
       width: 180,
       renderCell: (params, index) => (
         <span
-          // onClick={() => handleOpenModel(params?.row.subscription_id)}
+          onClick={() => handleOpenModel(params?.row.subscription_id)}
           className="action-button bg-white text-black px-3 py-1 rounded border-0"
         >
           {params.value}
@@ -70,13 +79,7 @@ const CampaignHistory = () => {
       width: 250,
       renderCell: (params) => {
         const { value: Account } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "300px" }}>
-            {Account?.length > maxChars ? Account : Account?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{Account}</div>;
       },
     },
     {
@@ -146,37 +149,41 @@ const CampaignHistory = () => {
         </div>
       </div>
       <CommonModal
-        isOpen={modal}
-        title={"Campaign detail"}
-        handleClose={() => setModal(false)}
+        isOpen={modal?.show}
+        title={modal?.type === 1 ? "Campaign detail" : "Subscription Detail"}
+        handleClose={() => setModal({ show: false, type: null })}
       >
-        <div className="final-campaign-data">
-          {[
-            {
-              key: "Recipient",
-              value: campaignHistoryById?.recipient || "N/A",
-            },
-            {
-              key: "Subject",
-              value: campaignHistoryById?.subject || "N/A",
-            },
-            {
-              key: "Message",
-              value: campaignHistoryById?.message_body || "N/A",
-            },
-            {
-              key: "Status",
-              value: campaignHistoryById?.status || "N/A",
-            },
-          ]?.map((item) => (
-            <div className="selected-data-item">
-              <span className="selected-data-label">{item?.key}:</span>
-              <span className="selected-data-value">
-                {item?.value || "N/A"}
-              </span>
-            </div>
-          ))}
-        </div>
+        {modal?.type === 1 ? (
+          <div className="final-campaign-data">
+            {[
+              {
+                key: "Recipient",
+                value: campaignHistoryById?.recipient || "N/A",
+              },
+              {
+                key: "Subject",
+                value: campaignHistoryById?.subject || "N/A",
+              },
+              {
+                key: "Message",
+                value: campaignHistoryById?.message_body || "N/A",
+              },
+              {
+                key: "Status",
+                value: campaignHistoryById?.status || "N/A",
+              },
+            ]?.map((item) => (
+              <div className="selected-data-item">
+                <span className="selected-data-label">{item?.key}:</span>
+                <span className="selected-data-value">
+                  {item?.value || "N/A"}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <SubscriptionDetail />
+        )}
       </CommonModal>
     </>
   );

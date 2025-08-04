@@ -270,35 +270,21 @@ const Account = () => {
     {
       field: "industrySegment",
       headerName: "Segment",
-      width: 160,
+      width: 250,
       renderCell: (params) => {
         const { value: industrySegment } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {industrySegment?.length > maxChars
-              ? industrySegment
-              : industrySegment?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{industrySegment}</div>;
       },
     },
     {
       field: "industrySubSegment",
       headerName: "Sub Segment",
-      width: 160,
+      width: 250,
       renderCell: (params) => {
         const { value: industrySubSegment } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {industrySubSegment?.length > maxChars
-              ? industrySubSegment
-              : industrySubSegment?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{industrySubSegment}</div>;
       },
     },
     {
@@ -307,15 +293,8 @@ const Account = () => {
       width: 160,
       renderCell: (params) => {
         const { value: address1 } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {address1?.length > maxChars
-              ? address1
-              : address1?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{address1}</div>;
       },
     },
     { field: "city", headerName: "City", width: 150 },
@@ -474,7 +453,7 @@ const Account = () => {
     setFilteredData(data);
   };
 
-  const generateCityBarChartData = () => {
+  const generateCityBarChartData = useMemo(() => {
     const cityCounts = {};
 
     filteredData.forEach((item) => {
@@ -545,7 +524,7 @@ const Account = () => {
               { name: "Expired", data: expiredData },
             ],
     };
-  };
+  }, [filteredData]);
 
   // BD Person Graph
   const [bdPersonType, setBdPersonType] = useState("account");
@@ -1687,9 +1666,9 @@ const Account = () => {
             />
             <CommonChart
               title="Top 12 cities by number of account trend showing between active and inactive"
-              options={generateCityBarChartData().options}
+              options={generateCityBarChartData?.options}
+              series={generateCityBarChartData?.series}
               className="chart-data-2"
-              series={generateCityBarChartData().series}
             />
           </div>
         )}

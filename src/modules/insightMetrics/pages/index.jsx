@@ -481,13 +481,8 @@ const InsightMetrics = () => {
       width: 200,
       renderCell: (params) => {
         const { value: Account } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {Account?.length > maxChars ? Account : Account?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{Account}</div>;
       },
     },
     {

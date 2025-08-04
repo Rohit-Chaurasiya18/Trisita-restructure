@@ -188,16 +188,11 @@ const Subscription = () => {
     {
       field: "account_name",
       headerName: "Account Name",
-      width: 200,
+      width: 250,
       renderCell: (params) => {
         const { value: account } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {account?.length > maxChars ? account : account?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{account}</div>;
       },
     },
     {
@@ -206,15 +201,7 @@ const Subscription = () => {
       width: 200,
       renderCell: (params) => {
         const { value: third_party_name } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {third_party_name?.length > maxChars
-              ? third_party_name
-              : third_party_name?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{third_party_name}</div>;
       },
     },
     { field: "part_number", headerName: "Part Number", width: 200 },
@@ -272,13 +259,7 @@ const Subscription = () => {
       width: 200,
       renderCell: (params) => {
         const { value: email } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {email?.length > maxChars ? email : email?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{email}</div>;
       },
     },
     { field: "account_type", headerName: "Account Type", width: 130 },

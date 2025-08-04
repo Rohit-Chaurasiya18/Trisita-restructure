@@ -32,7 +32,7 @@ const RunCampaign = () => {
     industryGroup: "",
     segmentGroup: "",
     subSegmentGroup: "",
-    status:  { label: "All Status", value: "All Status" },
+    status: { label: "All Status", value: "All Status" },
     productLine: "",
   });
 
@@ -68,77 +68,28 @@ const RunCampaign = () => {
       };
       dispatch(getAllProductLine(payload)).then((res) => {
         let Arr = res?.payload?.data?.data;
-        const setData = new Set(Arr?.map(JSON.stringify));
-        const uniqueArray = Array.from(setData).map(JSON.parse);
-
-        const data = uniqueArray.map((item) => {
-          const name = item.productLineCode;
-          return {
-            label: name,
-            value: name,
-          };
-        });
-        const industrydata = uniqueArray?.map((item) => {
-          const name = item.industry;
-          return {
-            label: name,
-            value: name,
-          };
-        });
-        const setindustryData = new Set(industrydata.map(JSON.stringify));
-        const uniqueIndustrydArray = Array.from(setindustryData).map(
-          JSON.parse
-        );
-
-        const accountGroupdata = uniqueArray?.map((item) => {
-          const name = item.account_group;
-          return {
-            label: name,
-            value: name,
-          };
-        });
-        const setaccountGroupData = new Set(
-          accountGroupdata.map(JSON.stringify)
-        );
-        const uniqueaccountGroupdArray = Array.from(setaccountGroupData).map(
-          JSON.parse
-        );
-
-        const segmentdata = uniqueArray?.map((item) => {
-          const name = item.segment;
-          return {
-            label: name,
-            value: name,
-          };
-        });
-        const setsegmentData = new Set(segmentdata.map(JSON.stringify));
-        const uniqueSegmentArray = Array.from(setsegmentData).map(JSON.parse);
-        const subsegmentdata = uniqueArray?.map((item) => {
-          const name = item.subsegment;
-          return {
-            label: name,
-            value: name,
-          };
-        });
-        const setsubsegmentData = new Set(subsegmentdata.map(JSON.stringify));
-        const uniqueSubSegmentArray = Array.from(setsubsegmentData).map(
-          JSON.parse
-        );
         setList((prev) => ({
           ...prev,
-          accountGroupList: uniqueaccountGroupdArray?.filter(
-            (i) => i?.value !== null
-          ),
-          industryGroupList: uniqueIndustrydArray?.filter(
-            (i) => i?.value !== null
-          ),
-          segmentGroupList: uniqueSegmentArray?.filter(
-            (i) => i?.value !== null
-          ),
-          subSegmentGroupList: uniqueSubSegmentArray?.filter(
-            (i) => i?.value !== null
-          ),
-          productLineList: data?.filter((i) => i?.value !== null),
+          accountGroupList: Arr?.account_group?.map((i) => ({
+            value: i,
+            label: i,
+          })),
+          industryGroupList: Arr?.industry?.map((i) => ({
+            value: i,
+            label: i,
+          })),
+          segmentGroupList: Arr?.segment?.map((i) => ({
+            value: i,
+            label: i,
+          })),
+          subSegmentGroupList: Arr?.subsegment?.map((i) => ({
+            value: i,
+            label: i,
+          })),
+          productLineList: Arr?.productLineCode?.map((i) => ({
+            value: i,
+            label: i,
+          })),
         }));
       });
     }
@@ -166,6 +117,7 @@ const RunCampaign = () => {
                   branch: selectedOption,
                 }));
               }}
+              isClearable={true}
             />
             <CustomSelect
               label="Account Group"

@@ -129,11 +129,7 @@ const AlertSubscription = () => {
       <span style={{ color: "red" }}>{fallback}</span>
     );
 
-  const renderLimitedText = (value, maxChars = 20) => (
-    <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-      {value?.length > maxChars ? value : value?.slice(0, maxChars)}
-    </div>
-  );
+  const renderLimitedText = (value) => <div>{value}</div>;
 
   const columns = [
     {
@@ -371,7 +367,7 @@ const AlertSubscription = () => {
       let groupKey;
       let truncateLabels = false;
       let rotateLabels = false;
-      let sortDescending
+      let sortDescending;
 
       // Determine grouping key based on chart view type
       if (chartViewType === "byAccountName") {

@@ -27,16 +27,11 @@ const SubscriptionDetail = () => {
     {
       field: "account_name",
       headerName: "Account Name",
-      width: 200,
+      width: 250,
       renderCell: (params) => {
         const { value: account } = params;
-        const maxChars = 20;
 
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {account?.length > maxChars ? account : account?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{account}</div>;
       },
     },
     { field: "part_number", headerName: "Part Number", width: 200 },
@@ -94,13 +89,7 @@ const SubscriptionDetail = () => {
       width: 200,
       renderCell: (params) => {
         const { value: email } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {email?.length > maxChars ? email : email?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{email}</div>;
       },
     },
     { field: "account_type", headerName: "Account Type", width: 130 },

@@ -22,7 +22,10 @@ const DetailRow = ({ label, value }) => (
 const useContractData = () => {
   const location = useLocation();
   const isSubscription = useMemo(
-    () => location.pathname.startsWith(routesConstants?.SUBSCRIPTION),
+    () =>
+      location.pathname.startsWith(routesConstants?.SUBSCRIPTION) ||
+      location.pathname.startsWith(routesConstants?.CAMPAIGN_HISTORY) ||
+      location.pathname.startsWith(routesConstants?.CAMPAIGN_AUDIENCE),
     [location?.pathname]
   );
   const isNewSubscription = useMemo(

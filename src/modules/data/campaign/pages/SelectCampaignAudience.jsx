@@ -6,6 +6,10 @@ import CommonTable from "@/components/common/dataTable/CommonTable";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import routesConstants from "@/routes/routesConstants";
+import { getBackupSubscriptionDetail } from "@/modules/subscription/slice/subscriptionSlice";
+import CommonModal from "@/components/common/modal/CommonModal";
+import SubscriptionDetail from "@/modules/subscription/components/SubscriptionDetail";
+import SetContent from "../components/SetContent";
 
 const SelectCampaignAudience = () => {
   const dispatch = useDispatch();
@@ -15,6 +19,7 @@ const SelectCampaignAudience = () => {
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedId, setSelectedId] = useState([]);
+  const [modal, setModal] = useState({ show: false, type: null });
 
   const handleSelectionChange = (selectedRows) => {
     const idArray = [...selectedRows?.ids];
@@ -43,6 +48,13 @@ const SelectCampaignAudience = () => {
     });
   }, [state]);
 
+  const handleOpenModel = (subscription_id) => {
+    setModal({ show: true, type: 1 });
+    dispatch(
+      getBackupSubscriptionDetail({ id: subscription_id, isSubscription: true })
+    );
+  };
+
   const columns = [
     {
       field: "subscriptionReferenceNumber",
@@ -50,7 +62,10 @@ const SelectCampaignAudience = () => {
       width: 150,
 
       renderCell: (params) => (
-        <span className="action-button bg-white text-black px-3 py-1 rounded border-0">
+        <span
+          onClick={() => handleOpenModel(params?.row.id)}
+          className="action-button bg-white text-black px-3 py-1 rounded border-0"
+        >
           {params?.value}
         </span>
       ),
@@ -70,7 +85,7 @@ const SelectCampaignAudience = () => {
       width: 200,
       renderCell: (params) => (
         <div>
-          {params.value && params.value ? (
+          {params.length && params.value ? (
             params.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
@@ -84,7 +99,7 @@ const SelectCampaignAudience = () => {
       width: 200,
       renderCell: (params) => (
         <div>
-          {params.value && params.value ? (
+          {params.length && params.value ? (
             params.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
@@ -121,13 +136,7 @@ const SelectCampaignAudience = () => {
       width: 200,
       renderCell: (params) => {
         const { value: email } = params;
-        const maxChars = 20;
-
-        return (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
-            {email?.length > maxChars ? email : email?.slice(0, maxChars)}
-          </div>
-        );
+        return <div>{email}</div>;
       },
     },
     { field: "seats", headerName: "Seats", width: 70 },
@@ -158,7 +167,12 @@ const SelectCampaignAudience = () => {
       width: 150,
       renderCell: (params, index) => (
         <span
-          // onClick={() => handleAccountContactModel(params?.row.account_id)}
+          onClick={() =>
+            setModal({
+              show: true,
+              type: 2,
+            })
+          }
           className="assign-button text-black px-3 py-1 rounded border-0"
         >
           Assign Contact
@@ -220,6 +234,13 @@ const SelectCampaignAudience = () => {
           </div>
         )}
       </div>
+      <CommonModal
+        isOpen={modal?.show}
+        title={modal?.type === 1 ? "Subscription Detail" : "Set Content"}
+        handleClose={() => setModal({ show: false, type: null })}
+      >
+        {modal?.type === 1 ? <SubscriptionDetail /> : <SetContent />}
+      </CommonModal>
     </div>
   );
 };
