@@ -118,3 +118,5 @@ export const GET_ALL_PRODCUT_LINE = "/v1/api/get_new_all_product_line/";
 export const CAMPAIGN_AUDIENCE_LIST = "/v1/api/get_campaign_audience_list/";
 export const CAMPAIGN_SEND = "/v1/api/campaign_send/";
 export const GET_CAMPAIGN = "/v1/api/campaign/";
+export const GET_CAMPAIGN_SUBSCRIPTION_CONTACT =
+  "/v1/api/get_campaign_subscription_contact/";

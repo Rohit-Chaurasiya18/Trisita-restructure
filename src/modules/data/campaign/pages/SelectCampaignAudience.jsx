@@ -19,7 +19,12 @@ const SelectCampaignAudience = () => {
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedId, setSelectedId] = useState([]);
-  const [modal, setModal] = useState({ show: false, type: null });
+  const [modal, setModal] = useState({
+    show: false,
+    type: null,
+    id: null,
+    data: null,
+  });
 
   const handleSelectionChange = (selectedRows) => {
     const idArray = [...selectedRows?.ids];
@@ -42,14 +47,19 @@ const SelectCampaignAudience = () => {
     };
     setLoading(true);
     dispatch(getCampaignAudience(payload)).then((res) => {
-      const rows = res?.payload?.data?.data || [];
+      const rows =
+        res?.payload?.data?.data?.map((item) => ({
+          ...item,
+          bd_person_label: item?.bd_person?.join(", "),
+          renewal_person_label: item?.renewal_person?.join(", "),
+        })) || [];
       setFilteredData(rows);
       setLoading(false);
     });
   }, [state]);
 
   const handleOpenModel = (subscription_id) => {
-    setModal({ show: true, type: 1 });
+    setModal({ show: true, type: 1, id: subscription_id });
     dispatch(
       getBackupSubscriptionDetail({ id: subscription_id, isSubscription: true })
     );
@@ -80,12 +90,12 @@ const SelectCampaignAudience = () => {
       },
     },
     {
-      field: "bd_person",
+      field: "bd_person_label",
       headerName: "BD Person Name",
       width: 200,
       renderCell: (params) => (
         <div>
-          {params.length && params.value ? (
+          {params.value ? (
             params.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
@@ -94,12 +104,12 @@ const SelectCampaignAudience = () => {
       ),
     },
     {
-      field: "renewal_person",
+      field: "renewal_person_label",
       headerName: "Renewal Person Name",
       width: 200,
       renderCell: (params) => (
         <div>
-          {params.length && params.value ? (
+          {params.value ? (
             params.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
@@ -171,6 +181,8 @@ const SelectCampaignAudience = () => {
             setModal({
               show: true,
               type: 2,
+              id: params?.row?.id,
+              data: params?.row,
             })
           }
           className="assign-button text-black px-3 py-1 rounded border-0"
@@ -180,7 +192,6 @@ const SelectCampaignAudience = () => {
       ),
     },
   ];
-
   return (
     <div>
       <div className="manage-teams-container">
@@ -237,9 +248,18 @@ const SelectCampaignAudience = () => {
       <CommonModal
         isOpen={modal?.show}
         title={modal?.type === 1 ? "Subscription Detail" : "Set Content"}
-        handleClose={() => setModal({ show: false, type: null })}
+        handleClose={() => setModal({ show: false, type: null, id: null })}
       >
-        {modal?.type === 1 ? <SubscriptionDetail /> : <SetContent />}
+        {modal?.type === 1 ? (
+          <SubscriptionDetail />
+        ) : (
+          <SetContent
+            modal={modal}
+            handleClose={() => {
+              setModal({ data: null, id: null, show: false, type: null });
+            }}
+          />
+        )}
       </CommonModal>
     </div>
   );

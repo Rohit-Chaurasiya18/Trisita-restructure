@@ -6,6 +6,7 @@ import {
   GET_ALL_PRODCUT_LINE,
   GET_CAMPAIGN,
   GET_CAMPAIGN_HISTORY,
+  GET_CAMPAIGN_SUBSCRIPTION_CONTACT,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -128,6 +129,22 @@ export const campaignSend = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.post(CAMPAIGN_SEND, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const addSetContent = createAsyncThunk(
+  `Campaign/addSetContent`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        GET_CAMPAIGN_SUBSCRIPTION_CONTACT,
+        payload
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

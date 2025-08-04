@@ -1,13 +1,15 @@
-import CommonAccordion from "@/components/common/CommonAccordion";
-import { accordionData } from "../../manageTemplate/constants";
-import CustomSelect from "@/components/common/dropdown/CustomSelect";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import CommonAccordion from "@/components/common/CommonAccordion";
+import CustomSelect from "@/components/common/dropdown/CustomSelect";
+import CommonButton from "@/components/common/buttons/CommonButton";
+import routesConstants from "@/routes/routesConstants";
+
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { getAllProductLine } from "../slice/CampaignSlice";
-import CommonButton from "@/components/common/buttons/CommonButton";
-import { useNavigate } from "react-router-dom";
-import routesConstants from "@/routes/routesConstants";
+import { accordionData } from "../../manageTemplate/constants";
 
 const RunCampaign = () => {
   const dispatch = useDispatch();
@@ -19,218 +21,149 @@ const RunCampaign = () => {
     industryGroupList: [],
     segmentGroupList: [],
     subSegmentGroupList: [],
+    productLineList: [],
     statusList: [
       { label: "All Status", value: "All Status" },
       { label: "Active", value: "Active" },
       { label: "Expired", value: "Expired" },
     ],
-    productLineList: [],
   });
+
   const [values, setValues] = useState({
     branch: "",
     accountGroup: "",
     industryGroup: "",
     segmentGroup: "",
     subSegmentGroup: "",
-    status: { label: "All Status", value: "All Status" },
     productLine: "",
+    status: { label: "All Status", value: "All Status" },
   });
 
+  // Load all branches
   useEffect(() => {
     dispatch(getAllBranch()).then((res) => {
-      let data = res?.payload?.data?.Branch;
-      if (data?.length > 0) {
-        const Arr = data?.map((item) => {
-          const name = item.branch_name;
-          const value = item.id;
-          return {
-            label: name,
-            value: value,
-          };
-        });
-        Arr.push({ label: "All Branch", value: "all" });
-        setList((prev) => ({ ...prev, branchList: Arr }));
-      } else {
-        setList((prev) => ({ ...prev, branchList: [] }));
-      }
+      const data = res?.payload?.data?.Branch || [];
+      const branchOptions = data.map(({ branch_name, id }) => ({
+        label: branch_name,
+        value: id,
+      }));
+      branchOptions.push({ label: "All Branch", value: "all" });
+
+      setList((prev) => ({ ...prev, branchList: branchOptions }));
     });
   }, []);
 
+  // Load product line and related filters when branch/account group changes
   useEffect(() => {
-    if (values?.branch?.value || values?.accountGroup?.value) {
-      let payload = {
-        branch: values?.branch?.value,
-        accountGroup: values?.accountGroup?.value,
+    const { branch, accountGroup, industryGroup, segmentGroup, subSegmentGroup } = values;
+
+    if (branch?.value || accountGroup?.value) {
+      const payload = {
+        branch: branch?.value,
+        accountGroup: accountGroup?.value,
         pcsn: "",
-        industryGroup: values?.industryGroup?.value,
-        segmentGroup: values?.segmentGroup?.value,
-        subSegmentGroup: values?.subSegmentGroup?.value,
+        industryGroup: industryGroup?.value,
+        segmentGroup: segmentGroup?.value,
+        subSegmentGroup: subSegmentGroup?.value,
       };
+
       dispatch(getAllProductLine(payload)).then((res) => {
-        let Arr = res?.payload?.data?.data;
+        const data = res?.payload?.data?.data || {};
+
         setList((prev) => ({
           ...prev,
-          accountGroupList: Arr?.account_group?.map((i) => ({
-            value: i,
-            label: i,
-          })),
-          industryGroupList: Arr?.industry?.map((i) => ({
-            value: i,
-            label: i,
-          })),
-          segmentGroupList: Arr?.segment?.map((i) => ({
-            value: i,
-            label: i,
-          })),
-          subSegmentGroupList: Arr?.subsegment?.map((i) => ({
-            value: i,
-            label: i,
-          })),
-          productLineList: Arr?.productLineCode?.map((i) => ({
-            value: i,
-            label: i,
-          })),
+          accountGroupList: data.account_group?.map((i) => ({ label: i, value: i })) || [],
+          industryGroupList: data.industry?.map((i) => ({ label: i, value: i })) || [],
+          segmentGroupList: data.segment?.map((i) => ({ label: i, value: i })) || [],
+          subSegmentGroupList: data.subsegment?.map((i) => ({ label: i, value: i })) || [],
+          productLineList: data.productLineCode?.map((i) => ({ label: i, value: i })) || [],
         }));
       });
     }
-  }, [values]);
+  }, [values.branch, values.accountGroup, values.industryGroup, values.segmentGroup, values.subSegmentGroup]);
+
+  // Utility to render dropdowns
+  const renderSelect = (label, key, options, isClearable = true) => (
+    <CustomSelect
+      label={label}
+      placeholder={`Select a ${label}`}
+      options={options}
+      value={values[key]}
+      isClearable={isClearable}
+      onChange={(selectedOption) =>
+        setValues((prev) => ({ ...prev, [key]: selectedOption }))
+      }
+    />
+  );
+
+  // Handle navigation
+  const handleAudienceNavigation = () => {
+    const {
+      branch,
+      accountGroup,
+      industryGroup,
+      segmentGroup,
+      subSegmentGroup,
+      productLine,
+      status,
+    } = values;
+
+    navigate(routesConstants?.CAMPAIGN_AUDIENCE, {
+      state: {
+        branch: branch?.value,
+        accountGroup: accountGroup?.value,
+        pcsn: "",
+        industryGroup: industryGroup?.value,
+        segmentGroup: segmentGroup?.value,
+        subSegmentGroup: subSegmentGroup?.value,
+        productLine: productLine?.value,
+        status: status?.value,
+      },
+    });
+  };
 
   return (
-    <>
-      <div className="manage-template-container">
-        <div className="manage-team-header">
-          <div className="commom-header-title mb-0">Campaign Page</div>
-          <span className="common-breadcrum-msg">
-            Welcome to you campaign page
-          </span>
+    <div className="manage-template-container">
+      <div className="manage-team-header">
+        <div className="commom-header-title mb-0">Campaign Page</div>
+        <span className="common-breadcrum-msg">
+          Welcome to your campaign page
+        </span>
+      </div>
+
+      <div className="manage-template-detail">
+        <div className="manage-template-form">
+          {renderSelect("Branch", "branch", list.branchList)}
+          {renderSelect("Account Group", "accountGroup", list.accountGroupList)}
+          {renderSelect("Industry Group", "industryGroup", list.industryGroupList)}
+          {renderSelect("Segment Group", "segmentGroup", list.segmentGroupList)}
+          {renderSelect("Sub Segment Group", "subSegmentGroup", list.subSegmentGroupList)}
+          {renderSelect("Status", "status", list.statusList, false)}
+          {renderSelect("Product Line Code", "productLine", list.productLineList)}
+
+          <div className="d-flex justify-content-center">
+            <CommonButton
+              className="py-2 px-4 rounded-md mr-3 w-auto run-campaign-btn"
+              onClick={handleAudienceNavigation}
+            >
+              Select Campaign Audience
+            </CommonButton>
+          </div>
         </div>
-        <div className="manage-template-detail">
-          <div className="manage-template-form">
-            <CustomSelect
-              label="Branch"
-              placeholder="Select a Branch"
-              options={list?.branchList}
-              value={values?.branch}
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  branch: selectedOption,
-                }));
-              }}
-              isClearable={true}
+
+        <div className="manage-template-accordion">
+          {accordionData?.map((item) => (
+            <CommonAccordion
+              key={item.id}
+              title={item.title}
+              content={item.content}
+              mainDiv="manage-template-acc-table"
             />
-            <CustomSelect
-              label="Account Group"
-              placeholder="Select a Account Group"
-              options={list?.accountGroupList}
-              value={values?.accountGroup}
-              isClearable
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  accountGroup: selectedOption,
-                }));
-              }}
-            />
-            <CustomSelect
-              label="Industry Group"
-              placeholder="Select a Industry Group"
-              options={list?.industryGroupList}
-              value={values?.industryGroup}
-              isClearable
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  industryGroup: selectedOption,
-                }));
-              }}
-            />
-            <CustomSelect
-              label="Segment Group"
-              placeholder="Select a Segment Group"
-              options={list?.segmentGroupList}
-              value={values?.segmentGroup}
-              isClearable
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  segmentGroup: selectedOption,
-                }));
-              }}
-            />
-            <CustomSelect
-              label="Sub Segment Group"
-              placeholder="Select a Sub Segment Group"
-              options={list?.subSegmentGroupList}
-              isClearable
-              value={values?.subSegmentGroup}
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  subSegmentGroup: selectedOption,
-                }));
-              }}
-            />
-            <CustomSelect
-              label="Status"
-              placeholder="Select a Status"
-              options={list?.statusList}
-              value={values?.status}
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  status: selectedOption,
-                }));
-              }}
-            />
-            <CustomSelect
-              label="Product Line Code"
-              placeholder="Select a Product Line Code"
-              options={list?.productLineList}
-              isClearable
-              value={values?.productLine}
-              onChange={(selectedOption) => {
-                setValues((prev) => ({
-                  ...prev,
-                  productLine: selectedOption,
-                }));
-              }}
-            />
-            <div className="d-flex justify-content-center">
-              <CommonButton
-                className="py-2 px-4 rounded-md mr-3 w-auto run-campaign-btn"
-                onClick={() => {
-                  navigate(routesConstants?.CAMPAIGN_AUDIENCE, {
-                    state: {
-                      branch: values?.branch?.value,
-                      accountGroup: values?.accountGroup?.value,
-                      pcsn: "",
-                      industryGroup: values?.industryGroup?.value,
-                      segmentGroup: values?.segmentGroup?.value,
-                      subSegmentGroup: values?.subSegmentGroup?.value,
-                      productLine: values?.productLine?.value,
-                      status: values?.status?.value,
-                    },
-                  });
-                }}
-              >
-                Select Campaign Audience
-              </CommonButton>
-            </div>
-          </div>
-          <div className="manage-template-accordion">
-            {accordionData?.map((item) => (
-              <CommonAccordion
-                key={item.id}
-                title={item.title}
-                content={item.content}
-                mainDiv="manage-template-acc-table"
-              />
-            ))}
-          </div>
+          ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
+
 export default RunCampaign;
