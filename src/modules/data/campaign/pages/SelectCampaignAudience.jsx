@@ -34,7 +34,7 @@ const SelectCampaignAudience = () => {
     setRowSelectionModel(selectedRows);
   };
 
-  useEffect(() => {
+  const handleData = () => {
     let payload = {
       branch: state?.branch,
       accountGroup: state?.accountGroup,
@@ -67,6 +67,10 @@ const SelectCampaignAudience = () => {
       setFilteredData(rows);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    handleData();
   }, [state]);
 
   const handleOpenModel = (subscription_id) => {
@@ -270,6 +274,7 @@ const SelectCampaignAudience = () => {
             modal={modal}
             handleClose={() => {
               setModal({ data: null, id: null, show: false, type: null });
+              handleData();
             }}
           />
         )}

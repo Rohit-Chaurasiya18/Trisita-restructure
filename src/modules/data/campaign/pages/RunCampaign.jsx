@@ -10,6 +10,7 @@ import routesConstants from "@/routes/routesConstants";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { getAllProductLine } from "../slice/CampaignSlice";
 import { accordionData } from "../../manageTemplate/constants";
+import { toast } from "react-toastify";
 
 const RunCampaign = () => {
   const dispatch = useDispatch();
@@ -184,7 +185,13 @@ const RunCampaign = () => {
           <div className="d-flex justify-content-center">
             <CommonButton
               className="py-2 px-4 rounded-md mr-3 w-auto run-campaign-btn"
-              onClick={handleAudienceNavigation}
+              onClick={() => {
+                if (!values?.branch?.value) {
+                  toast.error("Please select branch.");
+                } else {
+                  handleAudienceNavigation();
+                }
+              }}
             >
               Select Campaign Audience
             </CommonButton>

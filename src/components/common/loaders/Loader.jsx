@@ -1,4 +1,3 @@
-import { Trisita_Logo } from "@/constants/images";
 import React from "react";
 
 const Loader = () => {

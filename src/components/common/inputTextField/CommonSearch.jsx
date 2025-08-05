@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { TextField, Typography, Box, CircularProgress } from "@mui/material";
+import { TextField, Box, CircularProgress } from "@mui/material";
 import debounce from "lodash/debounce";
 
 const CommonSearchInput = ({
