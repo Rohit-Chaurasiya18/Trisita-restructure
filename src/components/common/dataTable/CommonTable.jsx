@@ -15,8 +15,10 @@ const CommonTable = ({
   additionalToolbar = null,
   checkboxSelection = false,
   disableSelection = false,
+  isCustomRowSelection = false,
   handleRowSelection,
   sx = {},
+  rowSelectionModel,
 }) => {
   const currDate = new Date().toLocaleDateString();
   const currTime = new Date().toLocaleTimeString();
@@ -66,6 +68,10 @@ const CommonTable = ({
       },
     },
   };
+
+  if (isCustomRowSelection) {
+    dataGridProps.rowSelectionModel = rowSelectionModel;
+  }
 
   return (
     <div style={{ height, width: "100%" }} className="data-grid-wrapper">

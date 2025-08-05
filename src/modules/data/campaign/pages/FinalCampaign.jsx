@@ -130,31 +130,40 @@ const FinalCampaign = () => {
                   key: "Branch",
                   value:
                     branch_list?.find((i) => i?.value === state?.branch)
-                      ?.label || "N/A",
+                      ?.label || "All",
                 },
                 {
                   key: "Account Group",
-                  value: state?.accountGroup || "N/A",
+                  value:
+                    state?.accountGroup === "all" ? "All" : state?.accountGroup,
                 },
                 {
                   key: "Industry",
-                  value: state?.industryGroup || "N/A",
+                  value:
+                    state?.industryGroup === "all"
+                      ? "All"
+                      : state?.industryGroup,
                 },
                 {
                   key: "Segment",
-                  value: state?.segmentGroup || "N/A",
+                  value:
+                    state?.segmentGroup === "all" ? "All" : state?.segmentGroup,
                 },
                 {
                   key: "Sub-Segment",
-                  value: state?.subSegmentGroup || "N/A",
+                  value:
+                    state?.subSegmentGroup === "all"
+                      ? "All"
+                      : state?.subSegmentGroup,
                 },
                 {
                   key: "Product Line Code",
-                  value: state?.productLine || "N/A",
+                  value:
+                    state?.productLine === "all" ? "All" : state?.productLine,
                 },
                 {
                   key: "Status",
-                  value: state?.status || "N/A",
+                  value: state?.status === "all" ? "All" : state?.status,
                 },
               ]?.map((item) => (
                 <div className="selected-data-item">

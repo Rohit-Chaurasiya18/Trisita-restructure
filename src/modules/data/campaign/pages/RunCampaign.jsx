@@ -23,7 +23,7 @@ const RunCampaign = () => {
     subSegmentGroupList: [],
     productLineList: [],
     statusList: [
-      { label: "All Status", value: "All Status" },
+      { label: "All Status", value: "all" },
       { label: "Active", value: "Active" },
       { label: "Expired", value: "Expired" },
     ],
@@ -36,7 +36,7 @@ const RunCampaign = () => {
     segmentGroup: "",
     subSegmentGroup: "",
     productLine: "",
-    status: { label: "All Status", value: "All Status" },
+    status: { label: "All Status", value: "all" },
   });
 
   // Load all branches
@@ -55,7 +55,13 @@ const RunCampaign = () => {
 
   // Load product line and related filters when branch/account group changes
   useEffect(() => {
-    const { branch, accountGroup, industryGroup, segmentGroup, subSegmentGroup } = values;
+    const {
+      branch,
+      accountGroup,
+      industryGroup,
+      segmentGroup,
+      subSegmentGroup,
+    } = values;
 
     if (branch?.value || accountGroup?.value) {
       const payload = {
@@ -72,15 +78,37 @@ const RunCampaign = () => {
 
         setList((prev) => ({
           ...prev,
-          accountGroupList: data.account_group?.map((i) => ({ label: i, value: i })) || [],
-          industryGroupList: data.industry?.map((i) => ({ label: i, value: i })) || [],
-          segmentGroupList: data.segment?.map((i) => ({ label: i, value: i })) || [],
-          subSegmentGroupList: data.subsegment?.map((i) => ({ label: i, value: i })) || [],
-          productLineList: data.productLineCode?.map((i) => ({ label: i, value: i })) || [],
+          accountGroupList: [
+            ...(data.account_group?.map((i) => ({ label: i, value: i })) || []),
+            { label: "All Account Group", value: "all" },
+          ],
+          industryGroupList: [
+            ...(data.industry?.map((i) => ({ label: i, value: i })) || []),
+            { label: "All Industry Group", value: "all" },
+          ],
+          segmentGroupList: [
+            ...(data.segment?.map((i) => ({ label: i, value: i })) || []),
+            { label: "All Segment Group", value: "all" },
+          ],
+          subSegmentGroupList: [
+            ...(data.subsegment?.map((i) => ({ label: i, value: i })) || []),
+            { label: "All Sub Segment Group", value: "all" },
+          ],
+          productLineList: [
+            ...(data.productLineCode?.map((i) => ({ label: i, value: i })) ||
+              []),
+            { label: "All Product Line", value: "all" },
+          ],
         }));
       });
     }
-  }, [values.branch, values.accountGroup, values.industryGroup, values.segmentGroup, values.subSegmentGroup]);
+  }, [
+    values.branch,
+    values.accountGroup,
+    values.industryGroup,
+    values.segmentGroup,
+    values.subSegmentGroup,
+  ]);
 
   // Utility to render dropdowns
   const renderSelect = (label, key, options, isClearable = true) => (
@@ -135,11 +163,23 @@ const RunCampaign = () => {
         <div className="manage-template-form">
           {renderSelect("Branch", "branch", list.branchList)}
           {renderSelect("Account Group", "accountGroup", list.accountGroupList)}
-          {renderSelect("Industry Group", "industryGroup", list.industryGroupList)}
+          {renderSelect(
+            "Industry Group",
+            "industryGroup",
+            list.industryGroupList
+          )}
           {renderSelect("Segment Group", "segmentGroup", list.segmentGroupList)}
-          {renderSelect("Sub Segment Group", "subSegmentGroup", list.subSegmentGroupList)}
+          {renderSelect(
+            "Sub Segment Group",
+            "subSegmentGroup",
+            list.subSegmentGroupList
+          )}
           {renderSelect("Status", "status", list.statusList, false)}
-          {renderSelect("Product Line Code", "productLine", list.productLineList)}
+          {renderSelect(
+            "Product Line Code",
+            "productLine",
+            list.productLineList
+          )}
 
           <div className="d-flex justify-content-center">
             <CommonButton

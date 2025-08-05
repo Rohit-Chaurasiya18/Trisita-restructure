@@ -18,7 +18,6 @@ const SelectCampaignAudience = () => {
   const { state } = useLocation();
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [selectedId, setSelectedId] = useState([]);
   const [modal, setModal] = useState({
     show: false,
     type: null,
@@ -26,14 +25,15 @@ const SelectCampaignAudience = () => {
     data: null,
   });
 
+  const [rowSelectionModel, setRowSelectionModel] = useState({
+    type: "include",
+    ids: new Set(),
+  });
+
   const handleSelectionChange = (selectedRows) => {
-    const idArray = [...selectedRows?.ids];
-    if (idArray?.length > 0) {
-      setSelectedId(idArray);
-    } else {
-      setSelectedId([]);
-    }
+    setRowSelectionModel(selectedRows);
   };
+
   useEffect(() => {
     let payload = {
       branch: state?.branch,
@@ -53,6 +53,17 @@ const SelectCampaignAudience = () => {
           bd_person_label: item?.bd_person?.join(", "),
           renewal_person_label: item?.renewal_person?.join(", "),
         })) || [];
+      if (state?.selected_rows) {
+        setRowSelectionModel((prev) => ({
+          ...prev,
+          ids: new Set(state?.selected_rows),
+        }));
+      } else {
+        setRowSelectionModel((prev) => ({
+          ...prev,
+          ids: new Set(rows?.map((i) => i?.id)),
+        }));
+      }
       setFilteredData(rows);
       setLoading(false);
     });
@@ -204,13 +215,13 @@ const SelectCampaignAudience = () => {
               Welcome to you campaign audience
             </span>
           </div>
-          {selectedId?.length > 0 && (
+          {rowSelectionModel?.ids?.size > 0 && (
             <div className="d-flex justify-content-start">
               <CommonButton
                 className="run-campaign-btn"
                 onClick={() => {
                   let payload = {
-                    selected_rows: selectedId,
+                    selected_rows: [...rowSelectionModel?.ids],
                     branch: state?.branch,
                     accountGroup: state?.accountGroup,
                     pcsn: "",
@@ -241,6 +252,8 @@ const SelectCampaignAudience = () => {
               toolbar
               checkboxSelection
               handleRowSelection={handleSelectionChange}
+              isCustomRowSelection={true}
+              rowSelectionModel={rowSelectionModel}
             />
           </div>
         )}
