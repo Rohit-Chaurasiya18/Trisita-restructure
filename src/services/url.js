@@ -120,3 +120,4 @@ export const CAMPAIGN_SEND = "/v1/api/campaign_send/";
 export const GET_CAMPAIGN = "/v1/api/campaign/";
 export const GET_CAMPAIGN_SUBSCRIPTION_CONTACT =
   "/v1/api/get_campaign_subscription_contact/";
+export const GET_NEW_SUBS_BY_THIRDPARTY = "/v1/api/new_get_subs_by_thirdparty/";

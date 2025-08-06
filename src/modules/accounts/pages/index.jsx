@@ -16,9 +16,9 @@ import {
   getEndCustomerAccount,
   getExportedAccount,
   getInsightMetricsCsn,
+  getNewSubsByThirdPartyAccount,
   getSubscriptionByThirdParty,
   getThirdPartyExportedAccount,
-  getTotalAmountPerMonthChart,
 } from "../slice/accountSlice";
 import { Tooltip } from "@mui/material";
 import CommonModal from "@/components/common/modal/CommonModal";
@@ -40,6 +40,8 @@ const Account = () => {
     status: "All Status",
   });
   const [filteredData, setFilteredData] = useState([]);
+  const [subsFilteredData, setSubsFilteredData] = useState([]);
+
   const [modal, setModal] = useState({
     isOpen: false,
     id: "",
@@ -73,8 +75,8 @@ const Account = () => {
     accountInformation,
     userDetail,
     dashboardStatus,
-    totalAmountMonthThirdParty,
-    totalAmountMonthThirdPartyLoading,
+    SubsByThirdPartyAccount,
+    SubsByThirdPartyAccountLoading,
   } = useSelector((state) => ({
     branchListLoading: state?.insightMetrics?.branchListLoading,
     branch_list: state?.insightMetrics?.branchList,
@@ -91,9 +93,9 @@ const Account = () => {
     accountInformation: state?.account?.accountInformation,
     userDetail: state?.login?.userDetail,
     dashboardStatus: state?.dashboard?.dashboardStatus,
-    totalAmountMonthThirdParty: state?.account?.totalAmountMonthThirdParty,
-    totalAmountMonthThirdPartyLoading:
-      state?.account?.totalAmountMonthThirdPartyLoading,
+    SubsByThirdPartyAccount: state?.account?.getNewSubsByThirdPartyAccount,
+    SubsByThirdPartyAccountLoading:
+      state?.account?.getNewSubsByThirdPartyAccountLoading,
   }));
   const [selectedId, setSelectedId] = useState([]);
 
@@ -114,12 +116,7 @@ const Account = () => {
 
   useEffect(() => {
     if (isThirdPartyAccount) {
-      dispatch(
-        getTotalAmountPerMonthChart({
-          branch: filters?.branch?.value ? filters?.branch?.value : null,
-          status: filters?.status === "All Status" ? null : filters?.status,
-        })
-      );
+      dispatch(getNewSubsByThirdPartyAccount());
     }
   }, [filters?.branch, filters?.status, isThirdPartyAccount]);
 
@@ -158,15 +155,23 @@ const Account = () => {
   }, [exportedAccountData, isThirdPartyAccount]);
 
   useEffect(() => {
+    let data = handleFilters(SubsByThirdPartyAccount);
+    setSubsFilteredData(data);
+  }, [SubsByThirdPartyAccount, isThirdPartyAccount]);
+
+  useEffect(() => {
     if (
       filters?.branch?.label ||
       filters?.status !== "All Status" ||
       filters?.searchValue
     ) {
       let data = handleFilters();
+      let subsDate = handleFilters(SubsByThirdPartyAccount);
       setFilteredData(data);
+      setSubsFilteredData(subsDate);
     } else {
       setFilteredData(exportedAccountData);
+      setSubsFilteredData(SubsByThirdPartyAccount);
     }
   }, [filters?.branch, filters?.status, filters?.searchValue]);
 
@@ -534,32 +539,47 @@ const Account = () => {
     let allData;
     const isSameColor = bdPersonLegend === data;
     if (isSameColor) {
-      allData = handleFilters();
+      allData = isThirdPartyAccount
+        ? handleFilters(SubsByThirdPartyAccount)
+        : handleFilters();
     } else {
-      allData = filteredData;
+      allData = isThirdPartyAccount ? subsFilteredData : filteredData;
     }
     setBdPersonLegend(isSameColor ? "" : data);
     const updatedData = isSameColor
       ? allData
       : allData?.filter((item) =>
           data !== "Unknown"
-            ? item?.user_assign_Arr?.includes(data)
+            ? isThirdPartyAccount
+              ? item?.bd_person?.includes(data)
+              : item?.user_assign_Arr?.includes(data)
+            : isThirdPartyAccount
+            ? item?.bd_person?.length === 0
             : item?.user_assign_Arr?.length === 0
         );
 
-    setFilteredData(updatedData);
+    isThirdPartyAccount
+      ? setSubsFilteredData(updatedData)
+      : setFilteredData(updatedData);
   };
 
   const bdPersonPieChart = useMemo(() => {
-    if (filteredData?.length) {
+    if (
+      isThirdPartyAccount
+        ? subsFilteredData?.length > 0
+        : filteredData?.length > 0
+    ) {
       // Aggregate data by BD person based on selected type
       const bdPersonGroups = {};
-
-      filteredData.forEach((item) => {
-        const bdPersons =
-          item?.user_assign_Arr?.length > 0
-            ? item.user_assign_Arr
-            : ["Unknown"]; // Treat empty array as "Unknown"
+      let dataArr = isThirdPartyAccount ? subsFilteredData : filteredData;
+      dataArr.forEach((item) => {
+        const bdPersons = isThirdPartyAccount
+          ? item?.bd_person?.length > 0
+            ? item.bd_person
+            : ["Unknown"]
+          : item?.user_assign_Arr?.length > 0
+          ? item.user_assign_Arr
+          : ["Unknown"]; // Treat empty array as "Unknown"
 
         bdPersons.forEach((person) => {
           const normalizedPerson = person.trim().toLowerCase(); // Normalize names to avoid duplicates due to case sensitivity
@@ -667,7 +687,7 @@ const Account = () => {
     } else {
       return getEmptyPieChartConfig();
     }
-  }, [filteredData, bdPersonType]);
+  }, [filteredData, bdPersonType, subsFilteredData]);
 
   const getBdPersonTitle = () => {
     switch (bdPersonType) {
@@ -982,9 +1002,11 @@ const Account = () => {
     let allData;
     const isSameColor = accountBar === data;
     if (isSameColor) {
-      allData = handleFilters();
+      allData = isThirdPartyAccount
+        ? handleFilters(SubsByThirdPartyAccount)
+        : handleFilters();
     } else {
-      allData = filteredData;
+      allData = isThirdPartyAccount ? subsFilteredData : filteredData;
     }
     setAccountBar(isSameColor ? "" : data);
     let key;
@@ -998,11 +1020,17 @@ const Account = () => {
     const updatedData = isSameColor
       ? allData
       : allData?.filter((item) => item[key] === data);
-    setFilteredData(updatedData);
+    isThirdPartyAccount
+      ? setSubsFilteredData(updatedData)
+      : setFilteredData(updatedData);
   };
 
   const accountTypeChart = useMemo(() => {
-    if (filteredData?.length > 0) {
+    if (
+      isThirdPartyAccount
+        ? subsFilteredData?.length > 0
+        : filteredData?.length > 0
+    ) {
       let aggregationMap = new Map();
       let groupKey;
       let truncateLabels = true;
@@ -1017,21 +1045,12 @@ const Account = () => {
         groupKey = "industrySubSegment";
       }
       if (isThirdPartyAccount) {
-        filteredData.forEach((item) => {
-          const associatedAccounts = item.associated_account_details;
+        subsFilteredData.forEach((item) => {
+          const key = item[groupKey]; // industryGroup / industrySegment / industrySubSegment
+          if (!key) return;
 
-          if (
-            Array.isArray(associatedAccounts) &&
-            associatedAccounts.length > 0
-          ) {
-            associatedAccounts.forEach((account) => {
-              const key = account[groupKey]; // industryGroup / industrySegment / industrySubSegment
-              if (!key) return;
-
-              const current = aggregationMap.get(key) || 0;
-              aggregationMap.set(key, current + 1);
-            });
-          }
+          const current = aggregationMap.get(key) || 0;
+          aggregationMap.set(key, current + 1);
         });
       } else {
         filteredData.forEach((item) => {
@@ -1061,26 +1080,26 @@ const Account = () => {
           chart: {
             events: {
               xAxisLabelClick: function (event, chartContext, config) {
-                if (!isThirdPartyAccount) {
-                  const clickedCategory =
-                    config?.config?.xaxis?.categories[config.labelIndex];
-                  if (clickedCategory) {
-                    if (chartViewType === "byProductLine") {
-                      return;
-                    } else {
-                      handleAccountClick(clickedCategory);
-                    }
+                // if (!isThirdPartyAccount) {
+                const clickedCategory =
+                  config?.config?.xaxis?.categories[config.labelIndex];
+                if (clickedCategory) {
+                  if (chartViewType === "byProductLine") {
+                    return;
+                  } else {
+                    handleAccountClick(clickedCategory);
                   }
+                  // }
                 }
               },
               legendClick: function (chartContext, seriesIndex, config) {
-                if (!isThirdPartyAccount) {
-                  const clickedCategory =
-                    config?.config?.xaxis?.categories[seriesIndex];
-                  if (clickedCategory) {
-                    handleAccountClick(clickedCategory);
-                  }
+                // if (!isThirdPartyAccount) {
+                const clickedCategory =
+                  config?.config?.xaxis?.categories[seriesIndex];
+                if (clickedCategory) {
+                  handleAccountClick(clickedCategory);
                 }
+                // }
               },
             },
             type: "bar",
@@ -1119,7 +1138,7 @@ const Account = () => {
     } else {
       return getEmptyBarChartConfig();
     }
-  }, [filteredData, accountType]);
+  }, [filteredData, accountType, subsFilteredData]);
 
   const handleAccountChange = (viewType) => {
     setAccountType(viewType);
@@ -1133,24 +1152,29 @@ const Account = () => {
     let allData;
     const isSameColor = accountGroupLegend === data;
     if (isSameColor) {
-      allData = handleFilters();
+      allData = isThirdPartyAccount
+        ? handleFilters(SubsByThirdPartyAccount)
+        : handleFilters();
     } else {
-      allData = filteredData;
+      allData = isThirdPartyAccount ? subsFilteredData : filteredData;
     }
     setAccountGroupLegend(isSameColor ? "" : data);
     const updatedData = isSameColor
       ? allData
       : allData?.filter((item) => item?.account_group === data);
 
-    setFilteredData(updatedData);
+    isThirdPartyAccount
+      ? setSubsFilteredData(updatedData)
+      : setFilteredData(updatedData);
   };
 
   const accountGroupPieChart = useMemo(() => {
-    if (filteredData?.length) {
+    let dataArr = isThirdPartyAccount ? subsFilteredData : filteredData;
+    if (dataArr?.length) {
       // Aggregate data by account_group based on selected type
       const accountGroups = {};
 
-      filteredData.forEach((item) => {
+      dataArr.forEach((item) => {
         const group = item?.account_group || "Unknown";
 
         // Initialize group if not exists
@@ -1254,7 +1278,7 @@ const Account = () => {
     } else {
       return getEmptyPieChartConfig();
     }
-  }, [filteredData, accountGroup_Type]);
+  }, [filteredData, accountGroup_Type, subsFilteredData]);
 
   const getAccountGroupTitle = () => {
     switch (accountGroup_Type) {
@@ -1284,13 +1308,15 @@ const Account = () => {
       const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
       monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
     }
-
+    let dataArr = isThirdPartyAccount ? subsFilteredData : filteredData;
     // Aggregate DTP and ACV by endDate month
-    (totalAmountMonthThirdParty || []).forEach((sub) => {
+    (dataArr || []).forEach((sub) => {
       const endMonth = dayjs(sub?.subsEndDate).format("YYYY-MM");
       if (monthlyData[endMonth]) {
-        monthlyData[endMonth].dtp_total += Number(sub?.totalDTP) || 0;
-        monthlyData[endMonth].acv_total += Number(sub?.totalAcv) || 0;
+        monthlyData[endMonth].dtp_total +=
+          Number(isThirdPartyAccount ? sub?.dtp_price : sub?.totalDTP) || 0;
+        monthlyData[endMonth].acv_total +=
+          Number(isThirdPartyAccount ? sub?.acv_price : sub?.totalAcv) || 0;
       }
     });
 
@@ -1303,7 +1329,7 @@ const Account = () => {
     );
 
     return { categories, dtpData, acvData };
-  }, [totalAmountMonthThirdParty]);
+  }, [SubsByThirdPartyAccount, filteredData]);
 
   const amountPerMonth = {
     options: {
@@ -1335,25 +1361,35 @@ const Account = () => {
 
   const handleAccountTypeLegendClick = (data) => {
     let allData;
-    const isSameColor = accountGroupLegend === data;
+    const isSameColor = accountTypeLegend === data;
     if (isSameColor) {
-      allData = handleFilters();
+      allData = isThirdPartyAccount
+        ? handleFilters(SubsByThirdPartyAccount)
+        : handleFilters();
     } else {
-      allData = filteredData;
+      allData = isThirdPartyAccount ? subsFilteredData : filteredData;
     }
-    setAccountGroupLegend(isSameColor ? "" : data);
+    setAccountTypeLegend(isSameColor ? "" : data);
     const updatedData = isSameColor
       ? allData
       : allData?.filter((item) => item?.account_type === data);
 
-    setFilteredData(updatedData);
+    isThirdPartyAccount
+      ? setSubsFilteredData(updatedData)
+      : setFilteredData(updatedData);
   };
+
   const accountTypePieChart = useMemo(() => {
-    if (filteredData?.length) {
+    if (
+      isThirdPartyAccount
+        ? subsFilteredData?.length > 0
+        : filteredData?.length > 0
+    ) {
       // Aggregate data by account_group based on selected type
       const accountTypeGroups = {};
+      let dataArr = isThirdPartyAccount ? subsFilteredData : filteredData;
 
-      filteredData.forEach((item) => {
+      dataArr.forEach((item) => {
         const group = item?.account_type || "Unknown";
 
         // Initialize group if not exists
@@ -1457,7 +1493,7 @@ const Account = () => {
     } else {
       return getEmptyPieChartConfig();
     }
-  }, [filteredData, accountType_Type]);
+  }, [filteredData, accountType_Type, subsFilteredData]);
 
   const getAccountTypeTitle = () => {
     switch (accountType_Type) {
@@ -1474,6 +1510,136 @@ const Account = () => {
   const handleAccountTypeChange = (viewType) => {
     setAccountType_Type(viewType);
   };
+
+  // Subs By Third Party
+  const subsColumns = [
+    {
+      field: "subscriptionReferenceNumber",
+      headerName: "subscription",
+      width: 150,
+      renderCell: (params, index) => (
+        <span className="action-button bg-white text-black px-3 py-1 rounded border-0">
+          {params?.value}
+        </span>
+      ),
+    },
+    {
+      field: "account_name",
+      headerName: "Account Name",
+      width: 250,
+      renderCell: (params) => {
+        const { value: account } = params;
+        return <div>{account}</div>;
+      },
+    },
+    {
+      field: "third_party_label",
+      headerName: "Third Party Name",
+      width: 200,
+      renderCell: (params) => {
+        const { value: third_party_label } = params;
+        return <div>{third_party_label}</div>;
+      },
+    },
+    { field: "part_number", headerName: "Part Number", width: 200 },
+    {
+      field: "bd_person",
+      headerName: "BD Person Name",
+      width: 200,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "renewal_person",
+      headerName: "Renewal Person Name",
+      width: 200,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    { field: "account_csn", headerName: "Account CSN", width: 100 },
+    {
+      field: "retention_health_riskBand",
+      headerName: "Retention health riskBand",
+      width: 100,
+    },
+    {
+      field: "branch",
+      headerName: "Branch",
+      width: 100,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}>Undefined</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: "contract_manager_email",
+      headerName: "Contract Mgr. Email",
+      width: 200,
+      renderCell: (params) => {
+        const { value: email } = params;
+        return <div>{email}</div>;
+      },
+    },
+    { field: "account_type", headerName: "Account Type", width: 130 },
+    { field: "seats", headerName: "Seats", width: 70 },
+    { field: "startDate", headerName: "Subs Start Date", width: 130 },
+    { field: "endDate", headerName: "Subs End Date ", width: 130 },
+    { field: "trisita_status", headerName: "Trisita Status", width: 130 },
+    { field: "subscriptionStatus", headerName: "Status", width: 100 },
+    { field: "lastPurchaseDate", headerName: "Last Purchase date", width: 130 },
+    { field: "account_group", headerName: "Account Group", width: 100 },
+    { field: "programType", headerName: "Program Type", width: 100 },
+    { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
+    { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
+    { field: "productLineCode", headerName: "Product Line Code", width: 130 },
+    { field: "contract_term", headerName: "Contract Term", width: 130 },
+    { field: "switchType", headerName: "Switch Type", width: 130 },
+    { field: "switchYear", headerName: "Switch Year", width: 130 },
+    {
+      field: "acv_price",
+      headerName: "Total ACV Price",
+      width: 130,
+      renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "dtp_price",
+      headerName: "Total DTP Price",
+      width: 130,
+      renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+      sortComparator: (v1, v2) => Number(v1) - Number(v2),
+    },
+    {
+      field: "productLine",
+      headerName: "Product Line",
+      width: 250,
+      renderCell: (params) => {
+        const { value: productLine } = params;
+
+        return <>{productLine}</>;
+      },
+    },
+  ];
+
   return (
     <>
       <div className="account">
@@ -1542,6 +1708,31 @@ const Account = () => {
             }}
           />
         </div>
+        <div className="account-table mt-4">
+          {exportedAccountDataLoading ? (
+            <SkeletonLoader isDashboard height="350px" />
+          ) : (
+            <div className="">
+              <ExportToExcel
+                data={exportedData}
+                columns={columns}
+                fileName={`account_trisita_${userDetail?.first_name}_${
+                  userDetail?.last_name
+                }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
+                className="account-export-btn"
+              />
+              <CommonTable
+                rows={filteredData}
+                columns={columns}
+                getRowId={(row) => row?.id}
+                checkboxSelection
+                handleRowSelection={handleSelectionChange}
+                toolbar
+                exportFileName={`account_trisita`}
+              />
+            </div>
+          )}
+        </div>
         <div className="subscription-chart number-of-seasts-chart">
           {exportedAccountDataLoading ? (
             <SkeletonLoader />
@@ -1583,20 +1774,6 @@ const Account = () => {
               />
             )}
           </div>
-        )}
-        {totalAmountMonthThirdPartyLoading ? (
-          <SkeletonLoader />
-        ) : (
-          isThirdPartyAccount && (
-            <div className="subscription-chart number-of-seasts-chart">
-              <CommonChart
-                title="Total Amount as per Months"
-                options={amountPerMonth.options}
-                series={amountPerMonth.series}
-                className="chart-data-2"
-              />
-            </div>
-          )
         )}
 
         {exportedAccountDataLoading ? (
@@ -1672,31 +1849,32 @@ const Account = () => {
             />
           </div>
         )}
-        <div className="account-table mt-4">
-          {exportedAccountDataLoading ? (
-            <SkeletonLoader isDashboard height="350px" />
-          ) : (
-            <div className="">
-              <ExportToExcel
-                data={exportedData}
-                columns={columns}
-                fileName={`account_trisita_${userDetail?.first_name}_${
-                  userDetail?.last_name
-                }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
-                className="account-export-btn"
-              />
-              <CommonTable
-                rows={filteredData}
-                columns={columns}
-                getRowId={(row) => row?.id}
-                checkboxSelection
-                handleRowSelection={handleSelectionChange}
-                toolbar
-                exportFileName={`account_trisita`}
-              />
-            </div>
-          )}
-        </div>
+
+        {SubsByThirdPartyAccountLoading ? (
+          <SkeletonLoader />
+        ) : (
+          isThirdPartyAccount && (
+            <>
+              <div className="subscription-chart number-of-seasts-chart">
+                <CommonChart
+                  title="Total Amount as per Months"
+                  options={amountPerMonth.options}
+                  series={amountPerMonth.series}
+                  className="chart-data-2"
+                />
+              </div>
+              <div className="account-table mt-4">
+                <CommonTable
+                  rows={subsFilteredData}
+                  columns={subsColumns}
+                  getRowId={(row) => row?.id}
+                  toolbar
+                  exportFileName={`third_party_account_trisita_subs`}
+                />
+              </div>
+            </>
+          )
+        )}
       </div>
       <CommonModal
         isOpen={modal?.isOpen}

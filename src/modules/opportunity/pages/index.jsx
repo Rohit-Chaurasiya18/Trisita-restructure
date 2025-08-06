@@ -74,8 +74,6 @@ const Opportunity = () => {
   });
 
   const [opportunityBarChart, SetOpportunityBarChart] = useState([]);
-  const [opportunityAccountDataSecondGraph, SetOpportunityDataSecondGraph] =
-    useState([]);
   const [modal, setModal] = useState({
     isOpen: false,
     opportunity_number: "",
@@ -425,13 +423,6 @@ const Opportunity = () => {
     }));
 
     SetOpportunityBarChart(modifiedData);
-
-    // Top 25 accounts
-    const top25 = Object.entries(accountNameCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 25);
-
-    SetOpportunityDataSecondGraph(Object.fromEntries(top25));
   };
 
   // All User Product Seat data Graph
@@ -483,83 +474,6 @@ const Opportunity = () => {
       },
     }),
     [dataValues, categories]
-  );
-
-  const secondgraphdata = Object.values(opportunityAccountDataSecondGraph);
-  const secondgraphlabel = Object.keys(opportunityAccountDataSecondGraph);
-  const [accountNameLegend, setAccountNameLegend] = useState("");
-
-  const handleAccountNameLegendClick = (data) => {
-    let allData;
-    const isSameColor = accountNameLegend === data;
-    if (isSameColor) {
-      allData = opportunityList;
-    } else {
-      allData = filteredData;
-    }
-    setAccountNameLegend(isSameColor ? "" : data);
-    const updatedData = isSameColor
-      ? allData
-      : allData?.filter((item) =>
-          data !== "Unknown" ? item?.account_name === data : !item?.account_name
-        );
-
-    setFilteredData(updatedData);
-  };
-  const AccountDataChart = useMemo(
-    () => ({
-      options: {
-        chart: {
-          type: "pie",
-          height: 350,
-          events: {
-            legendClick: (chartContext, seriesIndex) => {
-              const clickedLegend = secondgraphlabel[seriesIndex];
-              if (clickedLegend) {
-                handleAccountNameLegendClick(clickedLegend);
-              }
-            },
-          },
-        },
-        labels: secondgraphlabel,
-        legend: {
-          position: "bottom",
-          onItemClick: {
-            toggleDataSeries: true, // Enable toggling of data series
-          },
-          onItemHover: {
-            highlightDataSeries: true, // Highlight the hovered series
-          },
-          formatter: (seriesName, opts) => {
-            const isHighlighted = seriesName === accountNameLegend;
-            const count = opts.w.globals.series[opts.seriesIndex];
-            return `<span style="color: ${
-              isHighlighted ? "black" : "black"
-            };">${seriesName} - ${count}</span>`;
-          },
-        },
-        plotOptions: {
-          bar: {
-            distributed: true, // Distribute colors across bars
-          },
-        },
-        responsive: [
-          {
-            breakpoint: 2260,
-            options: {
-              legend: {
-                position: "bottom",
-              },
-              chart: {
-                height: 500,
-              },
-            },
-          },
-        ],
-      },
-      series: secondgraphdata,
-    }),
-    [secondgraphlabel]
   );
 
   // Total Amount as per Months
@@ -1216,6 +1130,138 @@ const Opportunity = () => {
     setRetentionRiskType(viewType);
   };
 
+  // Opportunity By Account (Top 25)
+  const [accountType, setAccountType] = useState("opportunity");
+  const [accountLegend, setAccountLegend] = useState("");
+
+  const handleAccountLegendClick = (data) => {
+    let allData;
+    const isSameColor = accountLegend === data;
+    if (isSameColor) {
+      allData = opportunityList;
+    } else {
+      allData = filteredData;
+    }
+    setAccountLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) =>
+          data !== "Unknown" ? item?.account_name === data : !item?.account_name
+        );
+
+    setFilteredData(updatedData);
+  };
+
+  const accountBarChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const accountGroups = {};
+      filteredData.forEach((item) => {
+        const group = item?.account_name || "Unknown";
+        // Initialize group if not exists
+        if (!accountGroups[group]) {
+          accountGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+        // Aggregate values
+        accountGroups[group].count += 1;
+        accountGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        accountGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+      // Convert to arrays for the chart
+      const labels = Object.keys(accountGroups);
+      let series;
+
+      switch (accountType) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(accountGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(accountGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "opportunity":
+        default:
+          series = labels.map((group) => accountGroups[group].count);
+      }
+
+      // Optional: sort labels and series based on value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label)?.splice(0, 24);
+      const sortedSeries = sortedData.map((item) => item.value)?.splice(0, 24);
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 350,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleAccountLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === accountLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, accountType]);
+
+  const handleAccountChange = (viewType) => {
+    setAccountType(viewType);
+  };
+
   return (
     <>
       <div className="opportunity-container">
@@ -1323,8 +1369,14 @@ const Opportunity = () => {
               />
               <CommonChart
                 title="Oppen. by Account name (Top 25)"
-                options={AccountDataChart.options}
-                series={AccountDataChart.series}
+                options={accountBarChart?.options}
+                series={accountBarChart?.series}
+                subCategory={["Opportunity", "DTP", "ACV"]}
+                onSubCategoryClick={(index) => {
+                  if (index === 0) handleAccountChange("opportunity");
+                  if (index === 1) handleAccountChange("dtp_price");
+                  if (index === 2) handleAccountChange("acv_price");
+                }}
               />
             </div>
           </div>

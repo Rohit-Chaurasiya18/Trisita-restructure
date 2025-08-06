@@ -5,16 +5,15 @@ import {
   END_CUSTOMER_ACCOUNT,
   GET_ACCOUNT,
   GET_ACCOUNT_BY_BDPERSON,
-  GET_ACCOUNT_INFORMATION,
   GET_ALL_OEM_MANAGER,
   GET_ALL_USER,
   GET_BD_RENEWAL_PERSON,
   GET_CONTRACTS,
   GET_EXPORTED_ACCOUNTS_DATA,
   GET_NEW_ACCOUNT_INFORMATION,
+  GET_NEW_SUBS_BY_THIRDPARTY,
   GET_SUBS_BY_THIRD_PARTY,
   GET_THIRD_PARTY_ACCOUNT,
-  GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY,
   INSIGHT_METRICS_CSN,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -246,15 +245,11 @@ export const getSubscriptionByThirdParty = createAsyncThunk(
   }
 );
 
-// Get total amount per month data
-export const getTotalAmountPerMonthChart = createAsyncThunk(
-  `account/getTotalAmountPerMonthChart`,
+export const getNewSubsByThirdPartyAccount = createAsyncThunk(
+  `account/getNewSubsByThirdPartyAccount`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(
-        GET_TOTAL_AMOUNT_PER_MONTH_FOR_THIRD_PARTY +
-          `?branch_id=${payload?.branch}&status=${payload?.status}`
-      );
+      const response = await axiosReact.get(GET_NEW_SUBS_BY_THIRDPARTY);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -284,8 +279,8 @@ const accountState = {
   accountInformationLoading: false,
   subscriptionByThirdParty: [],
   subscriptionByThirdPartyLoading: false,
-  totalAmountMonthThirdPartyLoading: false,
-  totalAmountMonthThirdParty: [],
+  getNewSubsByThirdPartyAccountLoading: false,
+  getNewSubsByThirdPartyAccount: [],
 };
 
 const accountSlice = createSlice({
@@ -512,18 +507,26 @@ const accountSlice = createSlice({
       state.subscriptionByThirdPartyLoading = false;
     });
 
-    // getTotalAmountPerMonthChart
-    builder.addCase(getTotalAmountPerMonthChart.pending, (state) => {
-      state.totalAmountMonthThirdParty = [];
-      state.totalAmountMonthThirdPartyLoading = true;
+    //getNewSubsByThirdPartyAccount
+    builder.addCase(getNewSubsByThirdPartyAccount.pending, (state) => {
+      state.getNewSubsByThirdPartyAccount = [];
+      state.getNewSubsByThirdPartyAccountLoading = true;
     });
-    builder.addCase(getTotalAmountPerMonthChart.fulfilled, (state, action) => {
-      state.totalAmountMonthThirdParty = action.payload.data;
-      state.totalAmountMonthThirdPartyLoading = false;
-    });
-    builder.addCase(getTotalAmountPerMonthChart.rejected, (state) => {
-      state.totalAmountMonthThirdParty = [];
-      state.totalAmountMonthThirdPartyLoading = false;
+
+    builder.addCase(
+      getNewSubsByThirdPartyAccount.fulfilled,
+      (state, action) => {
+        state.getNewSubsByThirdPartyAccount =
+          action.payload.data?.subscriptions?.map((item) => ({
+            ...item,
+            third_party_label: item?.third_party_names?.join(", "),
+          }));
+        state.getNewSubsByThirdPartyAccountLoading = false;
+      }
+    );
+    builder.addCase(getNewSubsByThirdPartyAccount.rejected, (state) => {
+      state.getNewSubsByThirdPartyAccount = [];
+      state.getNewSubsByThirdPartyAccountLoading = false;
     });
   },
 });
