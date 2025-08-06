@@ -1033,7 +1033,14 @@ const DeletedSubscription = () => {
                     account: newValues,
                   }));
                 }}
-                options={account_list || []}
+                options={
+                  account_list?.filter(
+                    (item) =>
+                      !filters?.account
+                        ?.map((i) => i?.value)
+                        ?.includes(item?.value)
+                  ) || []
+                }
                 multiple
                 getOptionLabel={(option) => `${option?.label} (${option?.csn})`}
                 loading={accountListLoading}
