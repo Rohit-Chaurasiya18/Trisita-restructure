@@ -1308,10 +1308,10 @@ const Account = () => {
       const monthKey = baseMonth.add(i, "month").format("YYYY-MM");
       monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
     }
-    let dataArr = isThirdPartyAccount ? subsFilteredData : filteredData;
+
     // Aggregate DTP and ACV by endDate month
-    (dataArr || []).forEach((sub) => {
-      const endMonth = dayjs(sub?.subsEndDate).format("YYYY-MM");
+    (subsFilteredData || []).forEach((sub) => {
+      const endMonth = dayjs(sub?.endDate).format("YYYY-MM");
       if (monthlyData[endMonth]) {
         monthlyData[endMonth].dtp_total +=
           Number(isThirdPartyAccount ? sub?.dtp_price : sub?.totalDTP) || 0;

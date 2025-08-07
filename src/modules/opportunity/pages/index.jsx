@@ -481,7 +481,9 @@ const Opportunity = () => {
     const monthlyData = {};
 
     // Determine base month (start from selected startDate if available, else current month)
-    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs(); // fallback to current month
+    const baseMonth = filters?.to_date
+      ? dayjs(filters.to_date)
+      : dayjs().add(3, "month"); // fallback to current month
 
     // Previous 12 months
     for (let i = 11; i >= 0; i--) {
