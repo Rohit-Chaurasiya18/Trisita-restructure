@@ -49,6 +49,7 @@ import {
   SelectCampaignAudience,
   FinalCampaign,
   ExportedFile,
+  DownloadHistory,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -187,6 +188,10 @@ const routesConfig = {
     {
       path: routesConstants.MANAGE_TEMPLATE,
       component: ManageTemplate,
+    },
+    {
+      path: routesConstants.DOWNLOAD_HISTORY,
+      component: DownloadHistory,
     },
     {
       path: routesConstants.UPLOAD,

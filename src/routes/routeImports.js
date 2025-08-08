@@ -135,6 +135,9 @@ export const FinalCampaign = lazy(() =>
 export const ExportedFile = lazy(() =>
   import("@/modules/data/exportedFile/pages/index")
 );
+export const DownloadHistory = lazy(() =>
+  import("@/modules/data/downloadHistory/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));

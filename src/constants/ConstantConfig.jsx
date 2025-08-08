@@ -154,6 +154,11 @@ export const navLinks = [
         iconUrl: <ReceiptOutlinedIcon />,
       },
       {
+        itemName: "Download History",
+        href: routesConstants?.DOWNLOAD_HISTORY,
+        iconUrl: <Diversity3Icon />,
+      },
+      {
         itemName: "Exported File",
         href: routesConstants?.EXPORTED_FILE,
         iconUrl: <Diversity3Icon />,
