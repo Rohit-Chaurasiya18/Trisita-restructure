@@ -73,19 +73,25 @@ const CustomToolbar = ({ rows, columns, moduleName, fileName }) => {
     const csvContent = csvRows.join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-    // Download CSV
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
     // Send CSV to your API (as a file or raw content)
     const formData = new FormData();
     formData.append("module_name", moduleName);
-    formData.append("exported_file", blob);
-    dispatch(getExportExcelFile(formData)).then((res) => {});
+    const file = new File([blob], fileName, {
+      type: "text/csv;charset=utf-8;",
+    });
+    formData.append("exported_file", file);
+    // formData.append("exported_file", blob);
+    dispatch(getExportExcelFile(formData)).then((res) => {
+      if (res?.payload?.status === 201 || res?.payload?.status === 200) {
+        // Download CSV
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    });
   };
 
   return (

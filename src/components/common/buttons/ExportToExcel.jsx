@@ -26,11 +26,17 @@ const ExportToExcel = ({
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const blob = new Blob([excelBuffer], { type: fileType });
     const fileNameWithExtension = fileName + fileExtension;
-    saveAs(blob, fileNameWithExtension);
     const formData = new FormData();
     formData.append("module_name", moduleName);
-    formData.append("exported_file", blob);
-    dispatch(getExportExcelFile(formData)).then((res) => {});
+    const file = new File([blob], fileNameWithExtension, { type: fileType });
+    formData.append("exported_file", file);
+    // formData.append("exported_file", blob);
+    dispatch(getExportExcelFile(formData)).then((res) => {
+      if (res?.payload?.status === 201 || res?.payload?.status === 200) {
+        // Download Excel
+        saveAs(blob, fileNameWithExtension);
+      }
+    });
   };
 
   return (

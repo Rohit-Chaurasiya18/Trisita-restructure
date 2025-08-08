@@ -19,7 +19,7 @@ export const getExportExcelFile = createAsyncThunk(
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+      return thunkAPI.rejectWithValue(err);
     }
   }
 );
