@@ -159,10 +159,15 @@ export const navLinks = [
         iconUrl: <Diversity3Icon />,
       },
       {
-        itemName: "Exported File",
-        href: routesConstants?.EXPORTED_FILE,
+        itemName: "Upload History",
+        href: routesConstants?.UPLOAD_HISTORY,
         iconUrl: <Diversity3Icon />,
       },
+      // {
+      //   itemName: "Exported File",
+      //   href: routesConstants?.EXPORTED_FILE,
+      //   iconUrl: <Diversity3Icon />,
+      // },
       {
         itemName: "Product Master",
         href: routesConstants?.PRODUCT_MASTER,

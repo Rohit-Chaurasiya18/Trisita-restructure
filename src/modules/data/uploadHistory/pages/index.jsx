@@ -1,35 +1,37 @@
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
-import { getExportExcelFileData } from "@/modules/insightMetrics/slice/insightMetricsSlice";
+import { getUploadedFiles } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import moment from "moment";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-const DownloadHistory = () => {
+const UploadHistory = () => {
   const dispatch = useDispatch();
-  const { exportedData, exportesDataLoading } = useSelector((state) => ({
-    exportedData: state?.insightMetrics?.exportedData,
-    exportesDataLoading: state?.insightMetrics?.exportesDataLoading,
-  }));
-
+  const { uploadedFilesData, uploadedFilesDataLoading } = useSelector(
+    (state) => ({
+      uploadedFilesData: state?.insightMetrics?.uploadedFilesData,
+      uploadedFilesDataLoading: state?.insightMetrics?.uploadedFilesDataLoading,
+    })
+  );
   useEffect(() => {
-    dispatch(getExportExcelFileData());
+    dispatch(getUploadedFiles());
   }, []);
 
   const columns = [
-    { field: "module_name", headerName: "Module Name", flex: 1 },
     { field: "user_name", headerName: "User Name", flex: 1 },
+    { field: "user_email", headerName: "User Email", flex: 1 },
+    { field: "file_name", headerName: "File Name", flex: 1 },
     {
-      field: "export_date",
-      headerName: "Download At",
+      field: "upload_date",
+      headerName: "Uploaded At",
       flex: 1,
       renderCell: (params) => (
         <div>{moment(params?.value).format("MMMM DD, YYYY hh:mm:ss A")}</div>
       ),
     },
     {
-      field: "exported_file",
-      headerName: "Downloaded File",
+      field: "uploaded_file",
+      headerName: "Uploaded File",
       flex: 1,
       renderCell: (params) =>
         params.value ? (
@@ -45,17 +47,17 @@ const DownloadHistory = () => {
     <>
       <div className="manage-teams-container">
         <div className="manage-team-header">
-          <div className="commom-header-title mb-0">Download History</div>
+          <div className="commom-header-title mb-0">Uploaded History</div>
           <span className="common-breadcrum-msg">
-            Welcome to your Download History
+            Welcome to your Uploaded History
           </span>
         </div>
         <div className="manage-team-table">
-          {exportesDataLoading ? (
+          {uploadedFilesDataLoading ? (
             <SkeletonLoader />
           ) : (
             <CommonTable
-              rows={exportedData?.length > 0 ? exportedData : []}
+              rows={uploadedFilesData?.length > 0 ? uploadedFilesData : []}
               columns={columns}
               getRowId={(row) => row.id}
               toolbar
@@ -68,4 +70,4 @@ const DownloadHistory = () => {
   );
 };
 
-export default DownloadHistory;
+export default UploadHistory;

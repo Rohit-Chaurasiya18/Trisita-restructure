@@ -50,6 +50,7 @@ import {
   FinalCampaign,
   ExportedFile,
   DownloadHistory,
+  UploadHistory,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -206,6 +207,10 @@ const routesConfig = {
           component: UploadBulk,
         },
       ],
+    },
+    {
+      path: routesConstants.UPLOAD_HISTORY,
+      component: UploadHistory,
     },
     {
       path: routesConstants.EXPORTED_FILE,

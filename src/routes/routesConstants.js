@@ -36,6 +36,7 @@ const routesConstants = {
   UPLOAD: "/upload",
   UPLOAD_BULK: "/upload_bulk",
   DOWNLOAD_HISTORY: "/download_history",
+  UPLOAD_HISTORY: "/upload_history",
   EXPORTED_FILE: "/exported_file",
   PRODUCT_MASTER: "/product_master",
   ADD_PRODUCT_MASTER: "/add_product_master",

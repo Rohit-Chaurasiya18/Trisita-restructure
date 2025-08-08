@@ -5,6 +5,7 @@ import {
   GET_ALL_BRANCH,
   GET_EXPORT_EXCEL_FILES,
   GET_INSIGHT_METRICS_CONTRACT,
+  GET_UPLOADED_FILES,
   INSIGHT_METRICS_CUSTOMER,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -15,6 +16,32 @@ export const getExportExcelFile = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.post(GET_EXPORT_EXCEL_FILES, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const getExportExcelFileData = createAsyncThunk(
+  `insightMetrics/getExportExcelFileData`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_EXPORT_EXCEL_FILES);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const getUploadedFiles = createAsyncThunk(
+  `insightMetrics/getUploadedFiles`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_UPLOADED_FILES);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -93,6 +120,10 @@ const insightMetricsState = {
   lastUpdated: null,
   insightMetricsContractLoading: false,
   insightMetricsContract: null,
+  exportedData: [],
+  exportesDataLoading: false,
+  uploadedFilesData: [],
+  uploadedFilesDataLoading: false,
 };
 
 const insightMetricsSlice = createSlice({
@@ -185,6 +216,34 @@ const insightMetricsSlice = createSlice({
     builder.addCase(getInsightMetricsContract.rejected, (state) => {
       state.insightMetricsContract = null;
       state.insightMetricsContractLoading = false;
+    });
+
+    // getExportExcelFileData
+    builder.addCase(getExportExcelFileData.pending, (state) => {
+      state.exportedData = [];
+      state.exportesDataLoading = true;
+    });
+    builder.addCase(getExportExcelFileData.fulfilled, (state, action) => {
+      state.exportedData = action.payload.data;
+      state.exportesDataLoading = false;
+    });
+    builder.addCase(getExportExcelFileData.rejected, (state) => {
+      state.exportedData = [];
+      state.exportesDataLoading = false;
+    });
+
+    // getUploadedFiles
+    builder.addCase(getUploadedFiles.pending, (state) => {
+      state.uploadedFilesData = [];
+      state.uploadedFilesDataLoading = true;
+    });
+    builder.addCase(getUploadedFiles.fulfilled, (state, action) => {
+      state.uploadedFilesData = action.payload.data;
+      state.uploadedFilesDataLoading = false;
+    });
+    builder.addCase(getUploadedFiles.rejected, (state) => {
+      state.uploadedFilesData = [];
+      state.uploadedFilesDataLoading = false;
     });
   },
 });

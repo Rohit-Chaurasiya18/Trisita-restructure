@@ -138,6 +138,9 @@ export const ExportedFile = lazy(() =>
 export const DownloadHistory = lazy(() =>
   import("@/modules/data/downloadHistory/pages/index")
 );
+export const UploadHistory = lazy(() =>
+  import("@/modules/data/uploadHistory/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));
