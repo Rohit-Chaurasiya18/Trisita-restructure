@@ -191,6 +191,7 @@ const UniqueUserCount = () => {
               getRowId={(row) => row?.id}
               toolbar
               exportFileName="unique_user_usages"
+              moduleName="Unique User Usages"
             />
           </div>
         )}

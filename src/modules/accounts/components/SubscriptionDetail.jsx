@@ -2,7 +2,7 @@ import CommonTable from "@/components/common/dataTable/CommonTable";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { useSelector } from "react-redux";
 
-const SubscriptionDetail = () => {
+const SubscriptionDetail = ({ moduleName = "" }) => {
   const { subscriptionByThirdParty, subscriptionByThirdPartyLoading } =
     useSelector((state) => ({
       subscriptionByThirdParty: state?.account?.subscriptionByThirdParty,
@@ -142,6 +142,7 @@ const SubscriptionDetail = () => {
           columns={columns}
           getRowId={(row) => row?.id}
           toolbar
+          moduleName={moduleName}
         />
       )}
     </>

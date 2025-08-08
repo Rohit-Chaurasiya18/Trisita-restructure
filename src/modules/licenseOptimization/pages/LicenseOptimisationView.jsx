@@ -155,6 +155,7 @@ const LicenseOptimisationView = () => {
               getRowId={(row) => row?.user_id}
               toolbar
               exportFileName="license_optimise"
+              moduleName="License Optimisation"
             />
           </div>
         )}
@@ -172,6 +173,7 @@ const LicenseOptimisationView = () => {
           getRowId={(row) => row?.id}
           toolbar
           exportFileName="features"
+          moduleName="License Optimisation"
         />
       </CommonModal>
     </>

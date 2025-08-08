@@ -686,9 +686,11 @@ const InsightMetrics = () => {
               columns={columns}
               fileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
+              moduleName="Insight Metrics"
             />
             <h3 className="common-insight-title">Table Data</h3>
             <CommonTable
+              moduleName="Insight Metrics"
               rows={filteredData}
               columns={columns}
               getRowId={getRowId}

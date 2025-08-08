@@ -550,6 +550,7 @@ const InvoicePending = () => {
             columns={columns}
             getRowId={(row) => row?.order_number}
             toolbar
+            moduleName="Invoice Pending"
           />
         </div>
       )}

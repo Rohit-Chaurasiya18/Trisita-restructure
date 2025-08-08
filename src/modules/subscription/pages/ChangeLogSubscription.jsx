@@ -275,6 +275,7 @@ const ChangedLogSubscription = () => {
               columns={columns}
               fileName={`subs_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
+              moduleName="Subscription Change Log"
             />
             <h3 className="common-insight-title">Table Data</h3>
             <CommonTable
@@ -285,6 +286,7 @@ const ChangedLogSubscription = () => {
               handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`subs_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+              moduleName="Subscription Change Log"
             />
           </div>
         )}

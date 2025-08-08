@@ -1169,6 +1169,7 @@ const AlertSubscription = () => {
                 checkboxSelection
                 toolbar
                 exportFileName={`subs_trisita`}
+                moduleName="ROR Change Alert / Lost to Competition"
               />
             </div>
           )}

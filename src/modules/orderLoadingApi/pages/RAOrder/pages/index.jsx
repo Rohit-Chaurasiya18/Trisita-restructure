@@ -1143,6 +1143,7 @@ const RAOrder = () => {
                 checkboxSelection
                 toolbar
                 exportFileName={`subs_trisita`}
+                moduleName="RA Order"
               />
             </div>
           )}

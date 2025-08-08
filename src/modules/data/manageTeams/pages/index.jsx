@@ -73,6 +73,7 @@ const ManageTeams = () => {
             columns={columns}
             getRowId={(row) => row.id}
             toolbar
+            moduleName="Manage Team"
           />
         </div>
       </div>

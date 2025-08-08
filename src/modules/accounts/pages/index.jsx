@@ -1720,6 +1720,7 @@ const Account = () => {
                   userDetail?.last_name
                 }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
                 className="account-export-btn"
+                moduleName="Account"
               />
               <CommonTable
                 rows={filteredData}
@@ -1729,6 +1730,9 @@ const Account = () => {
                 handleRowSelection={handleSelectionChange}
                 toolbar
                 exportFileName={`account_trisita`}
+                moduleName={
+                  isThirdPartyAccount ? "Third Party Account" : "Account"
+                }
               />
             </div>
           )}
@@ -1870,6 +1874,9 @@ const Account = () => {
                   getRowId={(row) => row?.id}
                   toolbar
                   exportFileName={`third_party_account_trisita_subs`}
+                  moduleName={
+                    isThirdPartyAccount ? "Third Party Account" : "Account"
+                  }
                 />
               </div>
             </>
@@ -1898,11 +1905,11 @@ const Account = () => {
         }
       >
         {modal?.type === 1 ? (
-          <SubscriptionDetail />
+          <SubscriptionDetail moduleName="Account" />
         ) : modal?.isAssign ? (
           <AssignUserBranch id={modal?.id} handleCallback={handleCallback} />
         ) : (
-          <CustomTabs />
+          <CustomTabs moduleName={"Account"} />
         )}
       </CommonModal>
     </>

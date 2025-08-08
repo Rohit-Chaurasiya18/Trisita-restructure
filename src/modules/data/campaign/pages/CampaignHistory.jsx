@@ -145,6 +145,7 @@ const CampaignHistory = () => {
             getRowId={(row) => row?.id}
             toolbar
             disableSelection
+            moduleName="Campaign History"
           />
         </div>
       </div>

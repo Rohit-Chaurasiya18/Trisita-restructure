@@ -11,7 +11,6 @@ import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete"
 import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonChart from "@/components/common/chart/CommonChart";
 
-
 const Usuage = () => {
   const dispatch = useDispatch();
   const { csn, from_date, to_date } = useParams();
@@ -318,7 +317,8 @@ const Usuage = () => {
             columns={columns}
             getRowId={getRowId}
             toolbar
-            exportFileName="usuages"
+            exportFileName="usages"
+            moduleName="Usages"
           />
         </div>
       )}

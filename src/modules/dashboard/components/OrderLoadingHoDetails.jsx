@@ -134,6 +134,7 @@ const OrderLoadingHoDetails = ({ selected }) => {
         }
         getRowId={(row) => row?.id}
         toolbar
+        moduleName="Order Loading HO"
       />
     </>
   );

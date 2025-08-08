@@ -5,6 +5,7 @@ const ProductDetailModal = ({
   data = [],
   handleDeleteRow,
   handleRowSelect,
+  moduleName = "",
 }) => {
   const columns = [
     {
@@ -68,6 +69,7 @@ const ProductDetailModal = ({
         columns={columns}
         getRowId={(row) => row?.id}
         toolbar
+        moduleName={moduleName}
       />
     </div>
   );

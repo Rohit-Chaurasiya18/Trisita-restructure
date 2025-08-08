@@ -526,7 +526,7 @@ const AddEditOrderLoadingHO = () => {
   };
   return (
     <>
-      {orderLoadingHoDetailLoading  ? (
+      {orderLoadingHoDetailLoading ? (
         <SkeletonLoader />
       ) : (
         <div className="">
@@ -1366,6 +1366,7 @@ const AddEditOrderLoadingHO = () => {
                 id: idx + 1,
               }))}
               handleDeleteRow={handleDeleteRow}
+              moduleName="Order Loading HO"
             />
           </CommonModal>
           <CommonModal

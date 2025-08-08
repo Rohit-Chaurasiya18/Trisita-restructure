@@ -555,6 +555,7 @@ const PaymentOverdue = () => {
             columns={columns}
             getRowId={(row) => row?.order_number}
             toolbar
+            moduleName="Payments Overdue"
           />
         </div>
       )}

@@ -1376,6 +1376,7 @@ const NewOpportunity = () => {
             // checkboxSelection
             toolbar
             exportFileName={`new_opp_trisita`}
+            moduleName="New Opportunity"
           />
         </div>
       )}

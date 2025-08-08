@@ -87,6 +87,7 @@ const Product = () => {
               columns={columns}
               fileName={fileName}
               className="insight-export-btn"
+              moduleName="Product"
             />
             <h3 className="common-insight-title">Product Data</h3>
             <CommonTable
@@ -97,6 +98,7 @@ const Product = () => {
               toolbar
               exportFileName={fileName}
               handleRowSelection={handleSelectionChange}
+              moduleName="Product"
             />
           </div>
         )}

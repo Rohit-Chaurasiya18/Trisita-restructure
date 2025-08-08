@@ -555,6 +555,7 @@ const PaymentOutstanding = () => {
             columns={columns}
             getRowId={(row) => row?.order_number}
             toolbar
+            moduleName="Payment Outstanding"
           />
         </div>
       )}

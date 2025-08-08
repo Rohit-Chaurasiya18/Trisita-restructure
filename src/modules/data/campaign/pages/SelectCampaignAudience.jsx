@@ -258,6 +258,7 @@ const SelectCampaignAudience = () => {
               handleRowSelection={handleSelectionChange}
               isCustomRowSelection={true}
               rowSelectionModel={rowSelectionModel}
+              moduleName="Run Campaign"
             />
           </div>
         )}

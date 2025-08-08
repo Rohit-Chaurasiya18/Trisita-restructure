@@ -45,7 +45,7 @@ const RenewalEmailSent = () => {
   useEffect(() => {
     dispatch(getAllBranch());
   }, []);
-  
+
   const debounce = useDebounce(filters?.endDate, 500);
 
   useEffect(() => {
@@ -294,6 +294,7 @@ const RenewalEmailSent = () => {
                 userDetail?.last_name
               }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
               className="account-export-btn"
+              moduleName="Renewal Email"
             />
             <CommonTable
               rows={filteredData}
@@ -303,6 +304,7 @@ const RenewalEmailSent = () => {
               handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`renewal_email_sent_${userDetail?.first_name}_${userDetail?.last_name}`}
+              moduleName="Renewal Email"
             />
           </div>
           <CommonModal

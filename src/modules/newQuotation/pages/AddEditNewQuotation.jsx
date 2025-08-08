@@ -915,6 +915,7 @@ const AddEditNewQuotation = () => {
                 }))}
                 handleDeleteRow={handleDeleteRow}
                 handleRowSelect={handleRowSelect}
+                moduleName="New Quotation"
               />
             ) : (
               <></>

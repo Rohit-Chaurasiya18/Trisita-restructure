@@ -162,6 +162,7 @@ const ProductMaster = () => {
             columns={columns}
             fileName={fileName}
             className="insight-export-btn"
+            moduleName="Product Master"
           />
           <h3 className="common-insight-title">Product Master Data</h3>
           <CommonTable
@@ -172,6 +173,7 @@ const ProductMaster = () => {
             toolbar
             exportFileName={fileName}
             handleRowSelection={handleSelectionChange}
+            moduleName="Product Master"
           />
         </div>
       )}

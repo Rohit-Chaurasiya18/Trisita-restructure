@@ -175,7 +175,7 @@ const Details = () => {
   );
 };
 
-const ContractTab = () => {
+const ContractTab = ({ moduleName }) => {
   const { contractsDetails, contractsDetailsLoading } = useSelector(
     (state) => ({
       contractsDetails: state?.account?.contractsDetails,
@@ -204,13 +204,14 @@ const ContractTab = () => {
           columns={contract_columns}
           getRowId={contract_getRowId}
           toolbar
+          moduleName={moduleName}
         />
       )}
     </>
   );
 };
 
-const InsightSummary = () => {
+const InsightSummary = ({ moduleName }) => {
   const { insightMetrics, insightMetricsCsnLoading } = useSelector((state) => ({
     insightMetrics: state?.account?.insightMetricsCsn,
     insightMetricsCsnLoading: state?.account?.insightMetricsCsnLoading,
@@ -239,6 +240,7 @@ const InsightSummary = () => {
           columns={insight_columns}
           getRowId={insight_getRowId}
           toolbar
+          moduleName={moduleName}
         />
       )}
     </>
@@ -260,7 +262,7 @@ const UsageSummary = () => {
   );
 };
 
-const CustomTabs = () => {
+const CustomTabs = ({ moduleName = "" }) => {
   const [activeTab, setActiveTab] = useState("1");
   const tabRefs = useRef([]);
 
@@ -287,9 +289,9 @@ const CustomTabs = () => {
       case "2":
         return <Details />;
       case "3":
-        return <ContractTab />;
+        return <ContractTab moduleName={moduleName} />;
       case "4":
-        return <InsightSummary />;
+        return <InsightSummary moduleName={moduleName} />;
       case "5":
         return <UsageSummary />;
       default:

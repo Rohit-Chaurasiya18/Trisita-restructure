@@ -570,6 +570,7 @@ const InsightMetricsV2 = () => {
               columns={columns}
               fileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
+              moduleName="Insight Metrics V2"
             />
             <h3 className="common-insight-title">Table Data</h3>
             <CommonTable
@@ -580,6 +581,7 @@ const InsightMetricsV2 = () => {
               handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`insight_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+              moduleName="Insight Metrics V2"
             />
           </div>
         )}

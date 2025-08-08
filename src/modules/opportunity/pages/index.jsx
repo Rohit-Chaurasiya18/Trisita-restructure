@@ -1453,6 +1453,7 @@ const Opportunity = () => {
                 userDetail?.last_name
               }_${new Date().toLocaleDateString()}_${new Date().toLocaleTimeString()}`}
               className="account-export-btn"
+              moduleName="Renewal Opportunity"
             />
             <CommonTable
               rows={filteredData}
@@ -1462,6 +1463,7 @@ const Opportunity = () => {
               handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`oppn_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+              moduleName="Renewal Opportunity"
             />
           </div>
         )}

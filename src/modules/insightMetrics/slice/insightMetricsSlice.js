@@ -3,11 +3,25 @@ import { axiosReact } from "@/services/api";
 import {
   GET_ALL_ACCOUNT,
   GET_ALL_BRANCH,
+  GET_EXPORT_EXCEL_FILES,
   GET_INSIGHT_METRICS_CONTRACT,
   INSIGHT_METRICS_CUSTOMER,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+
+export const getExportExcelFile = createAsyncThunk(
+  `insightMetrics/getExportExcelFile`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(GET_EXPORT_EXCEL_FILES, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 
 export const getAllBranch = createAsyncThunk(
   `insightMetrics/getAllBranch`,
@@ -172,7 +186,6 @@ const insightMetricsSlice = createSlice({
       state.insightMetricsContract = null;
       state.insightMetricsContractLoading = false;
     });
-
   },
 });
 

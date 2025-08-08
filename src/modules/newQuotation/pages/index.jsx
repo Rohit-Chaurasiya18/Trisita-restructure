@@ -409,7 +409,8 @@ const NewQuotation = () => {
             columns={columns}
             getRowId={(row) => row?.id}
             toolbar
-            exportFileName={`new_opportunity`}
+            exportFileName={`new_quotation`}
+            moduleName="New Quotation"
           />
         )}
       </div>
@@ -441,6 +442,7 @@ const NewQuotation = () => {
             columns={product_master_Columns}
             getRowId={(row) => row?.product_detail_id}
             toolbar
+            moduleName="New Quotation"
           />
         )}
       </CommonModal>

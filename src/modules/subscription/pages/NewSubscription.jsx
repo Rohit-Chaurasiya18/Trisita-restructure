@@ -1215,6 +1215,7 @@ const NewSubscription = () => {
                 checkboxSelection
                 toolbar
                 exportFileName={`subs_trisita`}
+                moduleName="New Subscription"
               />
             </div>
           )}

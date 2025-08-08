@@ -391,6 +391,7 @@ const CompareSubscription = () => {
               columns={columns}
               fileName={`subs_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
+              moduleName="Subscription Data Comparison"
             />
             <h3 className="common-insight-title">
               {filters?.subscriptionType === subscriptionTypeData?.New
@@ -405,6 +406,7 @@ const CompareSubscription = () => {
               handleRowSelection={handleSelectionChange}
               toolbar
               exportFileName={`subs_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+              moduleName="Subscription Data Comparison"
             />
           </div>
         )}
@@ -418,6 +420,7 @@ const CompareSubscription = () => {
               columns={status_columns}
               fileName={`subs_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
               className="insight-export-btn"
+              moduleName="Subscription Data Comparison"
             />
             <h3 className="common-insight-title">Subscription Change Log</h3>
             <CommonTable
@@ -428,6 +431,7 @@ const CompareSubscription = () => {
               handleRowSelection={handleSelectionChange2}
               toolbar
               exportFileName={`subs_trisita_${userDetail?.first_name}_${userDetail?.last_name}`}
+              moduleName="Subscription Data Comparison"
             />
           </div>
         )}

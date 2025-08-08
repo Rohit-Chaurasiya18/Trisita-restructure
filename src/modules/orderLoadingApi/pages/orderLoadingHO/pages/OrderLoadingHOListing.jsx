@@ -581,6 +581,7 @@ const OrderLoadingHOListing = () => {
             columns={columns}
             getRowId={(row) => row?.id}
             toolbar
+            moduleName="Order Loading PO"
           />
         </div>
       )}
