@@ -48,6 +48,7 @@ import {
   RunCampaign,
   SelectCampaignAudience,
   FinalCampaign,
+  ExportedFile,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 
@@ -203,7 +204,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.EXPORTED_FILE,
-      component: Get_usage,
+      component: ExportedFile,
     },
     {
       path: routesConstants.PRODUCT_MASTER,

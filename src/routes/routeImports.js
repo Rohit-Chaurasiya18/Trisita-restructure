@@ -132,6 +132,9 @@ export const SelectCampaignAudience = lazy(() =>
 export const FinalCampaign = lazy(() =>
   import("@/modules/data/campaign/pages/FinalCampaign")
 );
+export const ExportedFile = lazy(() =>
+  import("@/modules/data/exportedFile/pages/index")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));

@@ -199,7 +199,7 @@ const ContactInformation = () => {
                     <div className="col-12">
                       <div className="col-2">Name</div>
                       <div className="col-10">
-                        {item?.first_name + item?.last_name || "N/A"}
+                        {item?.first_name || "N/A"}
                       </div>
                     </div>
                     <div className="col-12">
