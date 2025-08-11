@@ -31,7 +31,11 @@ import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import SubscriptionDetail from "../components/SubscriptionDetail";
 import dayjs from "dayjs";
 import CommonChart from "@/components/common/chart/CommonChart";
-import { getEmptyBarChartConfig, getEmptyPieChartConfig } from "@/constants";
+import {
+  getEmptyBarChartConfig,
+  getEmptyPieChartConfig,
+  userType,
+} from "@/constants";
 
 const Account = () => {
   const [filters, setFilters] = useState({
@@ -211,30 +215,22 @@ const Account = () => {
       ),
     },
     {
-      field: "user_assign",
-      headerName: "BD Person Name",
-      width: 160,
-      renderCell: (params) => (
-        <div>
-          {params?.value?.trim() ? (
-            params?.value
-          ) : (
-            <span style={{ color: "red" }}>Undefined</span>
-          )}
-        </div>
-      ),
-    },
-    {
       field: "name",
       headerName: "Account Name",
-      width: 200,
+      width: 250,
       renderCell: (params) => (
         <Tooltip title={params?.value || ""}>
           <button
-            className="text-red-600 border-0 "
-            onClick={() =>
-              navigate(routesConstants?.UPDATE_ACCOUNT + "/" + params?.id)
-            }
+            className={`${
+              userDetail?.user_type !== userType.client && "text-red-600"
+            } border-0`}
+            onClick={() => {
+              if (userDetail?.user_type === userType.client) {
+                return;
+              } else {
+                navigate(routesConstants?.UPDATE_ACCOUNT + "/" + params?.id);
+              }
+            }}
           >
             <span>{params?.value}</span>
           </button>
@@ -246,29 +242,33 @@ const Account = () => {
       headerName: "Acccount Type",
       width: 130,
     },
-    {
-      field: "account_group",
-      headerName: "Acccount Group",
-      width: 130,
-    },
-    ...(isThirdPartyAccount
+    ...(userDetail?.user_type !== userType.client
       ? [
           {
-            field: "associated_account",
-            headerName: "Associated Account",
-            width: 300,
-            renderCell: (params) => (
-              <Tooltip title={params?.value || ""}>
-                <div>
-                  {params?.value ? (
-                    params?.value
-                  ) : (
-                    <span style={{ color: "red" }}>Undefined</span>
-                  )}
-                </div>
-              </Tooltip>
-            ),
+            field: "account_group",
+            headerName: "Acccount Group",
+            width: 130,
           },
+          ...(isThirdPartyAccount
+            ? [
+                {
+                  field: "associated_account",
+                  headerName: "Associated Account",
+                  width: 300,
+                  renderCell: (params) => (
+                    <Tooltip title={params?.value || ""}>
+                      <div>
+                        {params?.value ? (
+                          params?.value
+                        ) : (
+                          <span style={{ color: "red" }}>Undefined</span>
+                        )}
+                      </div>
+                    </Tooltip>
+                  ),
+                },
+              ]
+            : []),
         ]
       : []),
     { field: "industryGroup", headerName: "Industry", width: 100 },
@@ -312,100 +312,122 @@ const Account = () => {
       width: 120,
     },
     { field: "buyingReadinessScore", headerName: "Rediness Score", width: 130 },
-    {
-      field: "renewal_person",
-      headerName: "Renewal Person Name",
-      width: 160,
-      renderCell: (params) => (
-        <div>
-          {params?.value ? (
-            params?.value
-          ) : (
-            <span style={{ color: "red" }}>Undefined</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: "branch",
-      headerName: "Branch",
-      width: 100,
-      renderCell: (params) => (
-        <div>
-          {params?.value && params?.value ? (
-            params?.value
-          ) : (
-            <span style={{ color: "red" }}>Undefined</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: "acv_price",
-      headerName: "Total ACV Price",
-      width: 130,
-      renderCell: (params) => <div>{Number(params?.value).toFixed(2)}</div>,
-      sortComparator: (v1, v2) => Number(v1) - Number(v2),
-    },
-    {
-      field: "dtp_price",
-      headerName: "Total DTP Price",
-      width: 130,
-      renderCell: (params) => <div>{Number(params?.value).toFixed(2)}</div>,
-      sortComparator: (v1, v2) => Number(v1) - Number(v2),
-    },
-    {
-      field: "total_seats",
-      headerName: "Total Seats",
-      width: 130,
-      renderCell: (params) => <div>{Number(params?.value)}</div>,
-      sortComparator: (v1, v2) => Number(v1) - Number(v2),
-    },
 
-    ...(isThirdPartyAccount
+    ...(userDetail?.user_type !== userType.client
       ? [
           {
-            field: "show_subscription",
-            headerName: "Show subscription",
-            width: 250,
+            field: "branch",
+            headerName: "Branch",
+            width: 100,
+            renderCell: (params) => (
+              <div>
+                {params?.value && params?.value ? (
+                  params?.value
+                ) : (
+                  <span style={{ color: "red" }}>Undefined</span>
+                )}
+              </div>
+            ),
+          },
+          {
+            field: "user_assign",
+            headerName: "BD Person Name",
+            width: 160,
+            renderCell: (params) => (
+              <div>
+                {params?.value?.trim() ? (
+                  params?.value
+                ) : (
+                  <span style={{ color: "red" }}>Undefined</span>
+                )}
+              </div>
+            ),
+          },
+          {
+            field: "renewal_person",
+            headerName: "Renewal Person Name",
+            width: 160,
+            renderCell: (params) => (
+              <div>
+                {params?.value ? (
+                  params?.value
+                ) : (
+                  <span style={{ color: "red" }}>Undefined</span>
+                )}
+              </div>
+            ),
+          },
+          {
+            field: "acv_price",
+            headerName: "Total ACV Price",
+            width: 130,
+            renderCell: (params) => (
+              <div>{Number(params?.value).toFixed(2)}</div>
+            ),
+            sortComparator: (v1, v2) => Number(v1) - Number(v2),
+          },
+          {
+            field: "dtp_price",
+            headerName: "Total DTP Price",
+            width: 130,
+            renderCell: (params) => (
+              <div>{Number(params?.value).toFixed(2)}</div>
+            ),
+            sortComparator: (v1, v2) => Number(v1) - Number(v2),
+          },
+          {
+            field: "total_seats",
+            headerName: "Total Seats",
+            width: 130,
+            renderCell: (params) => <div>{Number(params?.value)}</div>,
+            sortComparator: (v1, v2) => Number(v1) - Number(v2),
+          },
+          ...(isThirdPartyAccount
+            ? [
+                {
+                  field: "show_subscription",
+                  headerName: "Show subscription",
+                  width: 250,
+                  renderCell: (params, index) => (
+                    <span
+                      onClick={() => {
+                        setModal({
+                          isOpen: true,
+                          type: 1,
+                        });
+                        dispatch(getSubscriptionByThirdParty(params?.row?.id));
+                      }}
+                      className="assign-button text-black px-3 py-1 rounded border-0"
+                    >
+                      Show subscription
+                    </span>
+                  ),
+                },
+              ]
+            : []),
+          {
+            field: "action",
+            headerName: "Action",
+            width: 150,
             renderCell: (params, index) => (
               <span
-                onClick={() => {
-                  setModal({
+                onClick={() =>
+                  setModal((prev) => ({
+                    ...prev,
+                    id: params?.row?.id,
                     isOpen: true,
-                    type: 1,
-                  });
-                  dispatch(getSubscriptionByThirdParty(params?.row?.id));
-                }}
+                    isAssign: true,
+                    type: null,
+                  }))
+                }
                 className="assign-button text-black px-3 py-1 rounded border-0"
               >
-                Show subscription
+                Assign
               </span>
             ),
           },
         ]
       : []),
-    {
-      field: "action",
-      headerName: "Action",
-      width: 150,
-      renderCell: (params, index) => (
-        <span
-          onClick={() =>
-            setModal((prev) => ({
-              ...prev,
-              id: params?.row?.id,
-              isOpen: true,
-              isAssign: true,
-              type: null,
-            }))
-          }
-          className="assign-button text-black px-3 py-1 rounded border-0"
-        >
-          Assign
-        </span>
-      ),
-    },
   ];
 
   const handleCallback = () => {
@@ -1673,15 +1695,17 @@ const Account = () => {
             All
           </CommonButton>
 
-          <CommonAutocomplete
-            onChange={(event, newValue) => {
-              setFilters((prev) => ({ ...prev, branch: newValue }));
-            }}
-            options={branch_list}
-            label="Select a Branch"
-            loading={branchListLoading}
-            value={filters?.branch}
-          />
+          {userDetail?.user_type !== userType.client && (
+            <CommonAutocomplete
+              onChange={(event, newValue) => {
+                setFilters((prev) => ({ ...prev, branch: newValue }));
+              }}
+              options={branch_list}
+              label="Select a Branch"
+              loading={branchListLoading}
+              value={filters?.branch}
+            />
+          )}
 
           <CommonSelect
             value={filters?.status}
@@ -1697,7 +1721,6 @@ const Account = () => {
               }));
             }}
           />
-
           <CommonSearchInput
             value={filters?.searchValue}
             label="Search Accounts"
@@ -1737,150 +1760,157 @@ const Account = () => {
             </div>
           )}
         </div>
-        <div className="subscription-chart number-of-seasts-chart">
-          {exportedAccountDataLoading ? (
-            <SkeletonLoader />
-          ) : (
-            <CommonChart
-              title={
-                chartViewType === "byProductLine"
-                  ? "Trend of number of seats purchased by product line code"
-                  : chartViewType === "byAccountName"
-                  ? "Trend of number of seats purchased by account name"
-                  : "Trend of number of seats purchased by last purchase year"
-              }
-              options={numberOfSeats?.options}
-              series={numberOfSeats?.series}
-              subCategory={["By Account names", "By Product line"]}
-              onSubCategoryClick={(index) => {
-                if (index === 0) handleChartViewChange("byAccountName");
-                if (index === 1) handleChartViewChange("byProductLine");
-              }}
-            />
-          )}
-        </div>
-        {isThirdPartyAccount && (
-          <div className="subscription-chart number-of-seasts-chart">
+
+        {userDetail?.user_type !== userType.client && (
+          <>
+            <div className="subscription-chart number-of-seasts-chart">
+              {exportedAccountDataLoading ? (
+                <SkeletonLoader />
+              ) : (
+                <CommonChart
+                  title={
+                    chartViewType === "byProductLine"
+                      ? "Trend of number of seats purchased by product line code"
+                      : chartViewType === "byAccountName"
+                      ? "Trend of number of seats purchased by account name"
+                      : "Trend of number of seats purchased by last purchase year"
+                  }
+                  options={numberOfSeats?.options}
+                  series={numberOfSeats?.series}
+                  subCategory={["By Account names", "By Product line"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleChartViewChange("byAccountName");
+                    if (index === 1) handleChartViewChange("byProductLine");
+                  }}
+                />
+              )}
+            </div>
+            {isThirdPartyAccount && (
+              <div className="subscription-chart number-of-seasts-chart">
+                {exportedAccountDataLoading ? (
+                  <SkeletonLoader />
+                ) : (
+                  <CommonChart
+                    title={getAssociatedAccountTitle()}
+                    options={associatedAccountPieChart?.options}
+                    series={associatedAccountPieChart?.series}
+                    className="chart-data-2"
+                    subCategory={["Account", "DTP", "ACV"]}
+                    onSubCategoryClick={(index) => {
+                      if (index === 0) handleAssociatedAccountChange("account");
+                      if (index === 1)
+                        handleAssociatedAccountChange("dtp_price");
+                      if (index === 2)
+                        handleAssociatedAccountChange("acv_price");
+                    }}
+                  />
+                )}
+              </div>
+            )}
+
             {exportedAccountDataLoading ? (
               <SkeletonLoader />
             ) : (
-              <CommonChart
-                title={getAssociatedAccountTitle()}
-                options={associatedAccountPieChart?.options}
-                series={associatedAccountPieChart?.series}
-                className="chart-data-2"
-                subCategory={["Account", "DTP", "ACV"]}
-                onSubCategoryClick={(index) => {
-                  if (index === 0) handleAssociatedAccountChange("account");
-                  if (index === 1) handleAssociatedAccountChange("dtp_price");
-                  if (index === 2) handleAssociatedAccountChange("acv_price");
-                }}
-              />
-            )}
-          </div>
-        )}
-
-        {exportedAccountDataLoading ? (
-          <SkeletonLoader />
-        ) : (
-          <div className="opportunity-retention-account subscription-chart">
-            <CommonChart
-              title={
-                accountType === "industry"
-                  ? "Total account by industry"
-                  : accountType === "segment"
-                  ? "Total account by segment"
-                  : "Total account by sub-segment"
-              }
-              options={accountTypeChart?.options}
-              series={accountTypeChart?.series}
-              subCategory={["Industry", "Segment", "Sub-Segment"]}
-              onSubCategoryClick={(index) => {
-                if (index === 0) handleAccountChange("industry");
-                if (index === 1) handleAccountChange("segment");
-                if (index === 2) handleAccountChange("subSegment");
-              }}
-            />
-
-            <CommonChart
-              title={getAccountTypeTitle()}
-              options={accountTypePieChart?.options}
-              series={accountTypePieChart?.series}
-              className="chart-data-2"
-              subCategory={["Account", "DTP", "ACV"]}
-              onSubCategoryClick={(index) => {
-                if (index === 0) handleAccountTypeChange("account");
-                if (index === 1) handleAccountTypeChange("dtp_price");
-                if (index === 2) handleAccountTypeChange("acv_price");
-              }}
-            />
-          </div>
-        )}
-
-        {exportedAccountDataLoading ? (
-          <SkeletonLoader />
-        ) : (
-          <div className="opportunity-retention-account subscription-chart">
-            <CommonChart
-              title={getBdPersonTitle()}
-              options={bdPersonPieChart?.options}
-              series={bdPersonPieChart?.series}
-              className="chart-data-2"
-              subCategory={["Account", "DTP", "ACV"]}
-              onSubCategoryClick={(index) => {
-                if (index === 0) handleBdPersonChange("account");
-                if (index === 1) handleBdPersonChange("dtp_price");
-                if (index === 2) handleBdPersonChange("acv_price");
-              }}
-            />
-            <CommonChart
-              title={getAccountGroupTitle()}
-              options={accountGroupPieChart?.options}
-              series={accountGroupPieChart?.series}
-              className="chart-data-2"
-              subCategory={["Account", "DTP", "ACV"]}
-              onSubCategoryClick={(index) => {
-                if (index === 0) handleAccountGroupChange("account");
-                if (index === 1) handleAccountGroupChange("dtp_price");
-                if (index === 2) handleAccountGroupChange("acv_price");
-              }}
-            />
-            <CommonChart
-              title="Top 12 cities by number of account trend showing between active and inactive"
-              options={generateCityBarChartData?.options}
-              series={generateCityBarChartData?.series}
-              className="chart-data-2"
-            />
-          </div>
-        )}
-
-        {SubsByThirdPartyAccountLoading ? (
-          <SkeletonLoader />
-        ) : (
-          isThirdPartyAccount && (
-            <>
-              <div className="subscription-chart number-of-seasts-chart">
+              <div className="opportunity-retention-account subscription-chart">
                 <CommonChart
-                  title="Total Amount as per Months"
-                  options={amountPerMonth.options}
-                  series={amountPerMonth.series}
+                  title={
+                    accountType === "industry"
+                      ? "Total account by industry"
+                      : accountType === "segment"
+                      ? "Total account by segment"
+                      : "Total account by sub-segment"
+                  }
+                  options={accountTypeChart?.options}
+                  series={accountTypeChart?.series}
+                  subCategory={["Industry", "Segment", "Sub-Segment"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleAccountChange("industry");
+                    if (index === 1) handleAccountChange("segment");
+                    if (index === 2) handleAccountChange("subSegment");
+                  }}
+                />
+
+                <CommonChart
+                  title={getAccountTypeTitle()}
+                  options={accountTypePieChart?.options}
+                  series={accountTypePieChart?.series}
+                  className="chart-data-2"
+                  subCategory={["Account", "DTP", "ACV"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleAccountTypeChange("account");
+                    if (index === 1) handleAccountTypeChange("dtp_price");
+                    if (index === 2) handleAccountTypeChange("acv_price");
+                  }}
+                />
+              </div>
+            )}
+
+            {exportedAccountDataLoading ? (
+              <SkeletonLoader />
+            ) : (
+              <div className="opportunity-retention-account subscription-chart">
+                <CommonChart
+                  title={getBdPersonTitle()}
+                  options={bdPersonPieChart?.options}
+                  series={bdPersonPieChart?.series}
+                  className="chart-data-2"
+                  subCategory={["Account", "DTP", "ACV"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleBdPersonChange("account");
+                    if (index === 1) handleBdPersonChange("dtp_price");
+                    if (index === 2) handleBdPersonChange("acv_price");
+                  }}
+                />
+                <CommonChart
+                  title={getAccountGroupTitle()}
+                  options={accountGroupPieChart?.options}
+                  series={accountGroupPieChart?.series}
+                  className="chart-data-2"
+                  subCategory={["Account", "DTP", "ACV"]}
+                  onSubCategoryClick={(index) => {
+                    if (index === 0) handleAccountGroupChange("account");
+                    if (index === 1) handleAccountGroupChange("dtp_price");
+                    if (index === 2) handleAccountGroupChange("acv_price");
+                  }}
+                />
+                <CommonChart
+                  title="Top 12 cities by number of account trend showing between active and inactive"
+                  options={generateCityBarChartData?.options}
+                  series={generateCityBarChartData?.series}
                   className="chart-data-2"
                 />
               </div>
-              <div className="account-table mt-4">
-                <CommonTable
-                  rows={subsFilteredData}
-                  columns={subsColumns}
-                  getRowId={(row) => row?.id}
-                  toolbar
-                  exportFileName={`third_party_account_trisita_subs`}
-                  moduleName={
-                    isThirdPartyAccount ? "Third Party Account" : "Account"
-                  }
-                />
-              </div>
-            </>
-          )
+            )}
+
+            {SubsByThirdPartyAccountLoading ? (
+              <SkeletonLoader />
+            ) : (
+              isThirdPartyAccount && (
+                <>
+                  <div className="subscription-chart number-of-seasts-chart">
+                    <CommonChart
+                      title="Total Amount as per Months"
+                      options={amountPerMonth.options}
+                      series={amountPerMonth.series}
+                      className="chart-data-2"
+                    />
+                  </div>
+                  <div className="account-table mt-4">
+                    <CommonTable
+                      rows={subsFilteredData}
+                      columns={subsColumns}
+                      getRowId={(row) => row?.id}
+                      toolbar
+                      exportFileName={`third_party_account_trisita_subs`}
+                      moduleName={
+                        isThirdPartyAccount ? "Third Party Account" : "Account"
+                      }
+                    />
+                  </div>
+                </>
+              )
+            )}
+          </>
         )}
       </div>
       <CommonModal

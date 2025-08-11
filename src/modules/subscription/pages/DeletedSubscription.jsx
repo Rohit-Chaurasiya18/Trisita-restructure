@@ -142,7 +142,7 @@ const DeletedSubscription = () => {
         headerName: "Account Name",
         width: 200,
         renderCell: (params) => (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>
+          <div>
             {params?.value}
           </div>
         ),

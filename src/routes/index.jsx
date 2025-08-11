@@ -36,6 +36,16 @@ Public.prototype = {
 
 const Private = (route) => {
   const { component: Component } = route;
+  const { userDetail } = useSelector((state) => ({
+    userDetail: state?.login?.userDetail,
+  }));
+
+  // Check role access
+  const hasAccess = route?.roles?.includes(userDetail?.user_type);
+
+  if (!hasAccess) {
+    return <Navigate to={routesConstants?.DASHBOARD} replace />;
+  }
   return (
     <Suspense fallback={<Loader />}>
       <Component />
