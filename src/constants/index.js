@@ -78,3 +78,7 @@ export const getEmptyBarChartConfig = ({
     series: [],
   };
 };
+export const userType = {
+  superadmin: "Superadmin",
+  client: "Client",
+};

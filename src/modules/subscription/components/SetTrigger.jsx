@@ -74,7 +74,6 @@ const SetTrigger = ({ modal, handleClose, isQuotation = false }) => {
         id: modal?.id,
         cc_emails: values?.cc_emails,
       };
-      console.log(payload);
       const action = isQuotation
         ? handleSendQuotation(payload)
         : handleTriggerTemplate(payload);

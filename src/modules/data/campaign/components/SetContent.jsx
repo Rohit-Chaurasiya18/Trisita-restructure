@@ -44,7 +44,6 @@ const SetContent = ({ modal, handleClose }) => {
       formik.setFieldValue("phone", modal?.data?.phone_no);
     }
   }, [modal?.data]);
-  console.log(formik.values);
   return (
     <>
       <form className="allocate-form" onSubmit={formik.handleSubmit}>

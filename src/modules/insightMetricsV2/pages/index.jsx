@@ -21,6 +21,7 @@ import {
   getAllBranch,
 } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import CommonChart from "@/components/common/chart/CommonChart";
+import { userType } from "@/constants";
 
 const InsightMetricsV2 = () => {
   const dispatch = useDispatch();
@@ -341,34 +342,53 @@ const InsightMetricsV2 = () => {
     },
     { field: "contractNumber", headerName: "Contract#", width: 150 },
     { field: "customerCSN", headerName: "customerCSN", width: 150 },
-    {
-      field: "bd_person",
-      headerName: "BD Person Name",
-      width: 200,
-      renderCell: (params) => (
-        <div>
-          {params.value && params.value ? (
-            params.value
-          ) : (
-            <span style={{ color: "red" }}>Undefined</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: "renewal_person",
-      headerName: "Renewal Person Name",
-      width: 200,
-      renderCell: (params) => (
-        <div>
-          {params.value && params.value ? (
-            params.value
-          ) : (
-            <span style={{ color: "red" }}>Undefined</span>
-          )}
-        </div>
-      ),
-    },
+    ...(userDetail?.user_type !== userType.client
+      ? [
+          {
+            field: "branch",
+            headerName: "Branch",
+            width: 100,
+            renderCell: (params) => (
+              <div>
+                {params.value && params.value ? (
+                  params.value
+                ) : (
+                  <span style={{ color: "red" }}>Undefined</span>
+                )}
+              </div>
+            ),
+          },
+          {
+            field: "bd_person",
+            headerName: "BD Person Name",
+            width: 200,
+            renderCell: (params) => (
+              <div>
+                {params.value && params.value ? (
+                  params.value
+                ) : (
+                  <span style={{ color: "red" }}>Undefined</span>
+                )}
+              </div>
+            ),
+          },
+          {
+            field: "renewal_person",
+            headerName: "Renewal Person Name",
+            width: 200,
+            renderCell: (params) => (
+              <div>
+                {params.value && params.value ? (
+                  params.value
+                ) : (
+                  <span style={{ color: "red" }}>Undefined</span>
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+
     {
       field: "Account",
       headerName: "Account",
@@ -389,20 +409,7 @@ const InsightMetricsV2 = () => {
       width: 120,
     },
     { field: "subs_end_date", headerName: "Subs End Date", width: 120 },
-    {
-      field: "branch",
-      headerName: "Branch",
-      width: 100,
-      renderCell: (params) => (
-        <div>
-          {params.value && params.value ? (
-            params.value
-          ) : (
-            <span style={{ color: "red" }}>Undefined</span>
-          )}
-        </div>
-      ),
-    },
+
     { field: "productLineCode", headerName: "productLineCode", width: 200 },
     { field: "seatsPurchased", headerName: "seatsPurchased", width: 200 },
     { field: "usersAssigned", headerName: "usersAssigned", width: 200 },
@@ -462,19 +469,21 @@ const InsightMetricsV2 = () => {
               All
             </CommonButton>
 
-            <CommonAutocomplete
-              onChange={(event, newValue) => {
-                setFilters((prev) => ({
-                  ...prev,
-                  branch: newValue,
-                }));
-              }}
-              options={branch_list}
-              label="Select a Branch"
-              loading={branchListLoading}
-              value={filters?.branch}
-              getOptionLabel={(option) => option?.label}
-            />
+            {userDetail?.user_type !== userType.client && (
+              <CommonAutocomplete
+                onChange={(event, newValue) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    branch: newValue,
+                  }));
+                }}
+                options={branch_list}
+                label="Select a Branch"
+                loading={branchListLoading}
+                value={filters?.branch}
+                getOptionLabel={(option) => option?.label}
+              />
+            )}
             <CommonSelect
               onChange={(e) => {
                 setFilters((prev) => ({

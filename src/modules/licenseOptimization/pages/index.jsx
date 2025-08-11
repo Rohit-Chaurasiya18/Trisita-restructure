@@ -11,15 +11,19 @@ import {
 } from "../slice/LicenseOptimizationSlice";
 import { Autocomplete, tabClasses, TextField, Typography } from "@mui/material";
 import routesConstants from "@/routes/routesConstants";
+import { userType } from "@/constants";
 
 const LicenseOptization = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { filter, branch_list, branchListLoading } = useSelector((state) => ({
-    branch_list: state?.insightMetrics?.branchList,
-    branchListLoading: state?.insightMetrics?.branchListLoading,
-    filter: state?.layout?.filter,
-  }));
+  const { filter, branch_list, branchListLoading, userDetail } = useSelector(
+    (state) => ({
+      branch_list: state?.insightMetrics?.branchList,
+      branchListLoading: state?.insightMetrics?.branchListLoading,
+      filter: state?.layout?.filter,
+      userDetail: state?.login?.userDetail,
+    })
+  );
   const [dateRange, setDateRange] = useState([null, null]);
   const [accountOptions, setAccountOptions] = useState([]);
   const [productLineCodeOptions, setProductLineCodeOptions] = useState([]);
@@ -49,7 +53,12 @@ const LicenseOptization = () => {
   }, []);
 
   useEffect(() => {
-    if (filters?.branch?.value) {
+    if (userDetail?.user_type === userType.client) {
+    }
+  }, [userDetail]);
+
+  const fetchData = () => {
+    if (filters?.branch?.value || userDetail?.user_type === userType.client) {
       let payload = {
         branch: filters?.branch?.value || "",
         account: filters?.account?.map((account) => account?.csn) || "",
@@ -92,12 +101,16 @@ const LicenseOptization = () => {
       setAccountOptions([]);
       setProductLineCodeOptions([]);
     }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [filters]);
 
   const checkFilters = () => {
     if (
       filters?.account?.length > 0 &&
-      filters?.branch?.value &&
+      // filters?.branch?.value &&
       filters?.productLineCode?.length > 0 &&
       filters?.startDate &&
       filters?.endDate
@@ -111,7 +124,7 @@ const LicenseOptization = () => {
   const handleLicenseOptimisation = () => {
     if (
       filters?.account?.length > 0 &&
-      filters?.branch?.value &&
+      // filters?.branch?.value &&
       filters?.productLineCode?.length > 0 &&
       filters?.startDate &&
       filters?.endDate
@@ -143,20 +156,22 @@ const LicenseOptization = () => {
       <div className="commom-header-title mb-0">License Optimisation</div>
       <span className="common-breadcrum-msg">Welcome to you Team</span>
       <div className="get-usuage-filter license-optimise">
-        <CommonAutocomplete
-          onChange={(event, newValue) => {
-            setFilters((prev) => ({
-              ...prev,
-              branch: newValue,
-              account: [],
-              productLineCode: [],
-            }));
-          }}
-          options={branch_list}
-          label="Select a Branch"
-          loading={branchListLoading}
-          value={filters?.branch}
-        />
+        {userDetail?.user_type !== userType.client && (
+          <CommonAutocomplete
+            onChange={(event, newValue) => {
+              setFilters((prev) => ({
+                ...prev,
+                branch: newValue,
+                account: [],
+                productLineCode: [],
+              }));
+            }}
+            options={branch_list}
+            label="Select a Branch"
+            loading={branchListLoading}
+            value={filters?.branch}
+          />
+        )}
         <Autocomplete
           value={filters?.account}
           onChange={(event, newValues) => {
