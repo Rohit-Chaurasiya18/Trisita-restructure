@@ -236,7 +236,7 @@ const Account = () => {
               navigate(routesConstants?.UPDATE_ACCOUNT + "/" + params?.id)
             }
           >
-            <span className="table-cell-truncate">{params?.value}</span>
+            <span>{params?.value}</span>
           </button>
         </Tooltip>
       ),
