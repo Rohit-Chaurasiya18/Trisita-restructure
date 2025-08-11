@@ -30,8 +30,8 @@ const Login = () => {
   }, []);
 
   const initialValues = {
-    email: "ankit@trisita.com",
-    password: "Rivaan@007",
+    email: "",
+    password: "",
   };
 
   const validationSchema = Yup.object({
