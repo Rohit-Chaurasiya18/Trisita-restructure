@@ -449,7 +449,7 @@ const InsightMetrics = () => {
     {
       field: "contractNumber",
       headerName: "Contract#",
-      width: 120,
+      width: 150,
       renderCell: (params, index) => (
         <div>
           <span

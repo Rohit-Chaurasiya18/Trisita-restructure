@@ -435,7 +435,7 @@ const InsightMetricsV2 = () => {
             width: 120,
           },
         ]),
-
+    { field: "subs_start_date", headerName: "Subs Start Date", width: 120 },
     { field: "subs_end_date", headerName: "Subs End Date", width: 120 },
     { field: "productLineCode", headerName: "Product Line Code", width: 200 },
     { field: "subs_productLine", headerName: "Product Line", width: 200 },
