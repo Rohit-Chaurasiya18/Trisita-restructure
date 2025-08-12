@@ -45,7 +45,7 @@ export const LineChart = ({ data }) => {
   );
 };
 
-export const BarChart = ({ data }) => {
+export const BarChart = ({ data, isClient = false }) => {
   const [seriesData, setSeriesData] = useState([]);
   const [productLines, setProductLines] = useState([]);
 
@@ -54,61 +54,44 @@ export const BarChart = ({ data }) => {
       const productLineKeys = Object.keys(data);
       setProductLines(productLineKeys);
 
-      // Collect all unique cities, excluding "null"
-      const allCities = new Set();
-      productLineKeys.forEach((line) => {
-        Object.keys(data[line]).forEach((city) => {
-          // if (city !== "null")
-          allCities.add(city);
+      if (isClient) {
+        // Client: single series "Total Seats"
+        const seatsData = productLineKeys.map(
+          (line) => data[line]["Total Seats"] || 0
+        );
+        setSeriesData([{ name: "Total Seats", data: seatsData }]);
+      } else {
+        // Non-client: stacked by cities
+        const allCities = new Set();
+        productLineKeys.forEach((line) => {
+          Object.keys(data[line]).forEach((city) => allCities.add(city));
         });
-      });
 
-      // const cities = Array.from(allCities);
-      const cities = ["Mumbai", "Kolkata", "Delhi", "Bangalore", "null"];
-      // console.log(cities);
-      // Create series data for each city
-      const series = cities.map((city) => ({
-        name: city,
-        data: productLineKeys.map((line) => data[line][city] || 0),
-      }));
+        // Example fixed city order
+        const cities = ["Mumbai", "Kolkata", "Delhi", "Bangalore", "null"];
 
-      setSeriesData(series);
+        const series = cities.map((city) => ({
+          name: city,
+          data: productLineKeys.map((line) => data[line][city] || 0),
+        }));
+
+        setSeriesData(series);
+      }
     }
-  }, [data]);
+  }, [data, isClient]);
 
   const chartOptions = {
     chart: {
       id: "bar-chart",
       type: "bar",
       height: 400,
-      stacked: true,
-      toolbar: {
-        show: true,
-      },
-      zoom: {
-        enabled: true,
-      },
+      stacked: !isClient, // stacked only for non-client
+      toolbar: { show: true },
+      zoom: { enabled: true },
     },
-    // responsive: [
-    //   {
-    //     breakpoint: 480,
-    //     options: {
-    //       legend: {
-    //         position: "bottom",
-    //       },
-    //     },
-    //   },
-    // ],
-    xaxis: {
-      categories: productLines,
-    },
-    legend: {
-      position: "right",
-      offsetY: 40,
-    },
-    fill: {
-      opacity: 1,
-    },
+    xaxis: { categories: productLines },
+    legend: { position: "right", offsetY: 40 },
+    fill: { opacity: 1 },
   };
 
   return (
@@ -120,6 +103,7 @@ export const BarChart = ({ data }) => {
     />
   );
 };
+
 
 export const GeographyChart = ({ isDashboard = true }) => {
   return (

@@ -238,13 +238,38 @@ export const navLinks = [
     ],
   },
   {
+    name: "Knowledge Portal",
+    isLabel: true,
+    roles: [userType.client],
+    item: [
+      {
+        itemName: "Product Knowledge",
+        href: routesConstants?.PRODUCT_KNOWLEDGE,
+        iconUrl: <PersonOutlinedIcon />,
+        roles: [userType.client],
+      },
+      {
+        itemName: "Request Training Session",
+        href: routesConstants?.TRAINING_SESSION,
+        iconUrl: <CalendarTodayOutlinedIcon />,
+        roles: [userType.client],
+      },
+    ],
+  },
+  {
     name: "Pages",
     isLabel: true,
     roles: [userType.superadmin, userType.client],
     item: [
+      // {
+      //   itemName: "Profile Form",
+      //   href: routesConstants?.PROFILE_FORM,
+      //   iconUrl: <PersonOutlinedIcon />,
+      //   roles: [userType.superadmin, userType.client],
+      // },
       {
-        itemName: "Profile Form",
-        href: routesConstants?.PROFILE_FORM,
+        itemName: "Generate Ticket",
+        href: routesConstants?.GENERATE_TICKET,
         iconUrl: <PersonOutlinedIcon />,
         roles: [userType.superadmin, userType.client],
       },

@@ -150,3 +150,4 @@ export const Notifications = lazy(() =>
 export const ChangePassword = lazy(() =>
   import("@/modules/profile/components/ChangePassword")
 );
+export const ComingSoon = lazy(() => import("@/constants/CommingSoon"));

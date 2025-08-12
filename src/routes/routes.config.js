@@ -51,6 +51,7 @@ import {
   ExportedFile,
   DownloadHistory,
   UploadHistory,
+  ComingSoon,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -371,34 +372,49 @@ const routesConfig = {
       roles: [userType.superadmin],
     },
     {
-      path: routesConstants.PROFILE_FORM,
-      component: Get_usage,
+      path: routesConstants.PRODUCT_KNOWLEDGE,
+      component: ComingSoon,
+      roles: [userType.client],
+    },
+    {
+      path: routesConstants.TRAINING_SESSION,
+      component: ComingSoon,
+      roles: [userType.client],
+    },
+    // {
+    //   path: routesConstants.PROFILE_FORM,
+    //   component: Get_usage,
+    //   roles: [userType.superadmin, userType.client],
+    // },
+    {
+      path: routesConstants.GENERATE_TICKET,
+      component: ComingSoon,
       roles: [userType.superadmin, userType.client],
     },
     {
       path: routesConstants.CALENDAR,
-      component: Get_usage,
+      component: ComingSoon,
       roles: [userType.superadmin, userType.client],
     },
     {
       path: routesConstants.FAQ,
-      component: Get_usage,
+      component: ComingSoon,
       roles: [userType.superadmin, userType.client],
     },
     {
       path: routesConstants.PROFILE + `/:id`,
       component: Profile,
-      roles: [userType.superadmin],
+      roles: [userType.superadmin, userType.client],
     },
     {
       path: routesConstants?.CHANGE_PASSWORD,
       component: ChangePassword,
-      roles: [userType.superadmin],
+      roles: [userType.superadmin, userType.client],
     },
     {
       path: routesConstants?.NOTIFICATIONS,
       component: Notifications,
-      roles: [userType.superadmin],
+      roles: [userType.superadmin, userType.client],
     },
   ],
   public: [{ path: routesConstants?.LOGIN, component: Login }],

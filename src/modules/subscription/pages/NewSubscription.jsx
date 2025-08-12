@@ -834,8 +834,6 @@ const NewSubscription = () => {
     (filteredData || []).forEach((sub) => {
       const endMonth = dayjs(sub?.created_date).format("YYYY-MM");
       if (monthlyData[endMonth]) {
-        // monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
-        // monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;
         if (userDetail?.user_type === userType.client) {
           monthlyData[endMonth].seats_total += Number(sub?.seats) || 0;
         } else {

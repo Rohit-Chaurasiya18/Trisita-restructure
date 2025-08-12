@@ -27,6 +27,7 @@ import StoreMap from "../components/StoreMap";
 import { lazy, Suspense } from "react";
 import routesConstants from "@/routes/routesConstants";
 import { useNavigate } from "react-router-dom";
+import { userType } from "@/constants";
 const MapView = lazy(() => import("../components/MapView"));
 
 const Dashboard = () => {
@@ -40,6 +41,7 @@ const Dashboard = () => {
     dashboardChart,
     seatDateChartLoading,
     seatDateChart,
+    userDetail,
   } = useSelector((state) => ({
     filter: state?.layout?.filter,
     dashboardDataLoading: state?.dashboard?.dashboardDataLoading,
@@ -48,6 +50,7 @@ const Dashboard = () => {
     dashboardChart: state?.dashboard?.dashboardChart,
     seatDateChartLoading: state?.dashboard?.seatDateChartLoading,
     seatDateChart: state?.dashboard?.seatDateChart,
+    userDetail: state?.login?.userDetail,
   }));
   useEffect(() => {
     dispatch(
@@ -96,83 +99,132 @@ const Dashboard = () => {
         <SkeletonLoader />
       ) : (
         <>
-          <div className="dashboard-startCard">
-            <StatCard
-              icon={EmailIcon}
-              value={dashboardData?.renewal_count || 0}
-              title="Renewal Email Sent"
-              percentage={dashboardData?.renewal_percentage || 0}
-              isLink
-              path={routesConstants?.RENEW_HISTORY}
-            />
-            <StatCard
-              icon={ReceiptIcon}
-              value={dashboardData?.total_sales_invoice_amount_exc_gst || 0}
-              title="Sales Invoice Inc GST"
-              percentage={dashboardData?.sales_invoice_percentage || 0}
-            />
-            <StatCard
-              icon={PersonAddIcon}
-              value={dashboardData?.active_account || 0}
-              title="Active Accounts"
-              percentage={dashboardData?.active_account_percentage || 0}
-              isLink
-              handleNavigate={() => {
-                dispatch(setDashboardLoading("Active"));
-                navigate(routesConstants?.ACCOUNT);
-              }}
-            />
-            <StatCard
-              icon={PersonOffIcon}
-              value={dashboardData?.inactive_account || 0}
-              title="Inactive Accounts"
-              percentage={dashboardData?.expired_account_percentage || 0}
-              isLink
-              handleNavigate={() => {
-                dispatch(setDashboardLoading("Expired"));
-                navigate(routesConstants?.ACCOUNT);
-              }}
-            />
-          </div>
-          <div className="dashboard-startCard">
-            <StatCard
-              icon={PaymentIcon}
-              value={`₹${dashboardData?.payment_overdue || 0}`}
-              title="Payment Overdue"
-              percentage={dashboardData?.overdue_percentage || 0}
-              isLink
-              path={
-                routesConstants?.DASHBOARD + routesConstants?.PAYMENTS_OVERDUE
-              }
-            />
-            <StatCard
-              icon={PointOfSaleIcon}
-              value={`₹${dashboardData?.payment_outstanding || 0}`}
-              title="Payment Outstanding"
-              percentage={dashboardData?.payment_outstanding_percentage || 0}
-              path={
-                routesConstants?.DASHBOARD +
-                routesConstants?.PAYMENTS_OUTSTANDING
-              }
-              isLink
-            />
-            <StatCard
-              icon={CurrencyRupeeIcon}
-              value={`₹${dashboardData?.payment_received || 0}`}
-              title="Payment Received"
-              percentage={dashboardData?.payment_received_percentage || 0}
-            />
-            <StatCard
-              icon={PendingActionsIcon}
-              value={dashboardData?.invoice_pending || 0}
-              title="Invoice Pending"
-              percentage={dashboardData?.invoice_pending_percentage || 0}
-              isLink
-              path={
-                routesConstants?.DASHBOARD + routesConstants?.INVOICE_PENDING
-              }
-            />
-          </div>
+          {userDetail?.user_type === userType.client ? (
+            <>
+              <div className="dashboard-startCard">
+                <StatCard
+                  icon={EmailIcon}
+                  value={dashboardData?.subscriptions_last_30_days || 0}
+                  title="Renewal Due (Within 30 days)"
+                  percentage={dashboardData?.renewal_percentage || 0}
+                  // isLink
+                  // path={routesConstants?.RENEW_HISTORY}
+                />
+                <StatCard
+                  icon={ReceiptIcon}
+                  value={dashboardData?.total_sales_invoice_amount_exc_gst || 0}
+                  title="Total Annual License Amount (Exc GST)"
+                  percentage={dashboardData?.sales_invoice_percentage || 0}
+                />
+                <StatCard
+                  icon={PersonAddIcon}
+                  value={dashboardData?.active_account || 0}
+                  title="Active Accounts"
+                  percentage={dashboardData?.active_account_percentage || 0}
+                  isLink
+                  handleNavigate={() => {
+                    dispatch(setDashboardLoading("Active"));
+                    navigate(routesConstants?.ACCOUNT);
+                  }}
+                />
+                <StatCard
+                  icon={PersonOffIcon}
+                  value={dashboardData?.inactive_account || 0}
+                  title="Inactive Accounts"
+                  percentage={dashboardData?.expired_account_percentage || 0}
+                  isLink
+                  handleNavigate={() => {
+                    dispatch(setDashboardLoading("Expired"));
+                    navigate(routesConstants?.ACCOUNT);
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="dashboard-startCard">
+                <StatCard
+                  icon={EmailIcon}
+                  value={dashboardData?.renewal_count || 0}
+                  title="Renewal Email Sent"
+                  percentage={dashboardData?.renewal_percentage || 0}
+                  isLink
+                  path={routesConstants?.RENEW_HISTORY}
+                />
+                <StatCard
+                  icon={ReceiptIcon}
+                  value={dashboardData?.total_sales_invoice_amount_exc_gst || 0}
+                  title="Sales Invoice Inc GST"
+                  percentage={dashboardData?.sales_invoice_percentage || 0}
+                />
+                <StatCard
+                  icon={PersonAddIcon}
+                  value={dashboardData?.active_account || 0}
+                  title="Active Accounts"
+                  percentage={dashboardData?.active_account_percentage || 0}
+                  isLink
+                  handleNavigate={() => {
+                    dispatch(setDashboardLoading("Active"));
+                    navigate(routesConstants?.ACCOUNT);
+                  }}
+                />
+                <StatCard
+                  icon={PersonOffIcon}
+                  value={dashboardData?.inactive_account || 0}
+                  title="Inactive Accounts"
+                  percentage={dashboardData?.expired_account_percentage || 0}
+                  isLink
+                  handleNavigate={() => {
+                    dispatch(setDashboardLoading("Expired"));
+                    navigate(routesConstants?.ACCOUNT);
+                  }}
+                />
+              </div>
+              <div className="dashboard-startCard">
+                <StatCard
+                  icon={PaymentIcon}
+                  value={`₹${dashboardData?.payment_overdue || 0}`}
+                  title="Payment Overdue"
+                  percentage={dashboardData?.overdue_percentage || 0}
+                  isLink
+                  path={
+                    routesConstants?.DASHBOARD +
+                    routesConstants?.PAYMENTS_OVERDUE
+                  }
+                />
+                <StatCard
+                  icon={PointOfSaleIcon}
+                  value={`₹${dashboardData?.payment_outstanding || 0}`}
+                  title="Payment Outstanding"
+                  percentage={
+                    dashboardData?.payment_outstanding_percentage || 0
+                  }
+                  path={
+                    routesConstants?.DASHBOARD +
+                    routesConstants?.PAYMENTS_OUTSTANDING
+                  }
+                  isLink
+                />
+                <StatCard
+                  icon={CurrencyRupeeIcon}
+                  value={`₹${dashboardData?.payment_received || 0}`}
+                  title="Payment Received"
+                  percentage={dashboardData?.payment_received_percentage || 0}
+                />
+                <StatCard
+                  icon={PendingActionsIcon}
+                  value={dashboardData?.invoice_pending || 0}
+                  title="Invoice Pending"
+                  percentage={dashboardData?.invoice_pending_percentage || 0}
+                  isLink
+                  path={
+                    routesConstants?.DASHBOARD +
+                    routesConstants?.INVOICE_PENDING
+                  }
+                />
+              </div>
+            </>
+          )}
         </>
       )}
       <div className="dashboard-chart-section">
@@ -189,7 +241,10 @@ const Dashboard = () => {
             <SkeletonLoader />
           ) : (
             <div className="chart" key="bar">
-              <BarChart data={dashboardChart?.Response} />
+              <BarChart
+                data={dashboardChart?.Response}
+                isClient={userDetail?.user_type === userType.client}
+              />
             </div>
           )}
           <div className="chart geography-map" key="geography">

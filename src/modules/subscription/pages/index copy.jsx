@@ -1029,7 +1029,7 @@ const Subscription = () => {
 
     // Aggregate DTP and ACV by endDate month
     (filteredData || []).forEach((sub) => {
-      const endMonth = dayjs(sub?.endDate, "DD/MM/YY").format("YYYY-MM");
+      const endMonth = dayjs(sub?.endDate).format("YYYY-MM");
       if (monthlyData[endMonth]) {
         if (userDetail?.user_type === userType.client) {
           monthlyData[endMonth].seats_total += Number(sub?.seats) || 0;

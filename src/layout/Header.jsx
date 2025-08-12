@@ -17,8 +17,8 @@ import {
 } from "./slice/layoutSlice";
 import Logout from "@mui/icons-material/Logout";
 import useOutsideClick from "@/hooks/useOutsideClick";
-import { getAllNotifications } from "@/modules/notification/slice/notificationsSlice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import { userType } from "@/constants";
 
 const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -93,16 +93,18 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                 { value: "ADSK FY 2023", label: "ADSK FY 2023" },
               ]}
             />
-            <CommonSelect
-              value={filter?.csn}
-              onChange={handleFilterChange("csn")}
-              options={[
-                { value: "All CSN", label: "All CSN" },
-                { value: "5102086717", label: "5102086717" },
-                { value: "5117963549", label: "5117963549" },
-                { value: "1234567890", label: "1234567890" },
-              ]}
-            />
+            {userDetail?.user_type !== userType.client && (
+              <CommonSelect
+                value={filter?.csn}
+                onChange={handleFilterChange("csn")}
+                options={[
+                  { value: "All CSN", label: "All CSN" },
+                  { value: "5102086717", label: "5102086717" },
+                  { value: "5117963549", label: "5117963549" },
+                  { value: "1234567890", label: "1234567890" },
+                ]}
+              />
+            )}
           </div>
           <div className="profile_dropdown">
             <Badge badgeContent={count} color="error" overlap="circular">
