@@ -238,15 +238,15 @@ const Account = () => {
       ),
     },
     {
-      field: "account_type",
-      headerName: "Acccount Type",
+      field: "account_group",
+      headerName: "Acccount Group",
       width: 130,
     },
     ...(userDetail?.user_type !== userType.client
       ? [
           {
-            field: "account_group",
-            headerName: "Acccount Group",
+            field: "account_type",
+            headerName: "Acccount Type",
             width: 130,
           },
           ...(isThirdPartyAccount
@@ -305,12 +305,27 @@ const Account = () => {
     { field: "city", headerName: "City", width: 150 },
     { field: "email", headerName: "Email", width: 150 },
     { field: "phone", headerName: "Contact No", width: 150 },
-    { field: "status", headerName: "Autodesk Account Status", width: 120 },
-    {
-      field: "contract_status",
-      headerName: "Trisita Account Status",
-      width: 120,
-    },
+    ...(userDetail?.user_type === userType.client
+      ? [
+          {
+            field: "contract_status",
+            headerName: "Status",
+            width: 120,
+          },
+        ]
+      : [
+          {
+            field: "status",
+            headerName: "Autodesk Account Status",
+            width: 120,
+          },
+          {
+            field: "contract_status",
+            headerName: "Trisita Account Status",
+            width: 120,
+          },
+        ]),
+
     { field: "buyingReadinessScore", headerName: "Rediness Score", width: 130 },
 
     ...(userDetail?.user_type !== userType.client

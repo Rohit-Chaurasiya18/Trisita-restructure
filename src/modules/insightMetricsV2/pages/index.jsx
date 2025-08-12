@@ -323,10 +323,27 @@ const InsightMetricsV2 = () => {
 
   // Table Data
   const columns = [
+    // {
+    //   field: "id",
+    //   headerName: "Serial No.",
+    //   width: 120,
+    //   renderCell: (params, index) => (
+    //     <div>
+    //       <span
+    //         onClick={() =>
+    //           handleOpenModel(params?.row.id, params?.row?.contractNumber)
+    //         }
+    //         className="action-button bg-white text-black px-3 py-1 rounded border-0"
+    //       >
+    //         {params?.value}
+    //       </span>
+    //     </div>
+    //   ),
+    // },
     {
-      field: "id",
-      headerName: "Serial No.",
-      width: 120,
+      field: "contractNumber",
+      headerName: "Contract#",
+      width: 150,
       renderCell: (params, index) => (
         <div>
           <span
@@ -340,7 +357,7 @@ const InsightMetricsV2 = () => {
         </div>
       ),
     },
-    { field: "contractNumber", headerName: "Contract#", width: 150 },
+    // { field: "contractNumber", headerName: "Contract#", width: 150 },
     { field: "customerCSN", headerName: "customerCSN", width: 150 },
     ...(userDetail?.user_type !== userType.client
       ? [
@@ -398,19 +415,30 @@ const InsightMetricsV2 = () => {
         return <div>{Account}</div>;
       },
     },
-    {
-      field: "AccountStatus",
-      headerName: "Autodesk Account Status",
-      width: 120,
-    },
-    {
-      field: "contract_status",
-      headerName: "Trisita Account Status",
-      width: 120,
-    },
-    { field: "subs_end_date", headerName: "Subs End Date", width: 120 },
+    ...(userDetail?.user_type === userType.client
+      ? [
+          {
+            field: "contract_status",
+            headerName: "Status",
+            width: 120,
+          },
+        ]
+      : [
+          {
+            field: "AccountStatus",
+            headerName: "Autodesk Account Status",
+            width: 120,
+          },
+          {
+            field: "contract_status",
+            headerName: "Trisita Account Status",
+            width: 120,
+          },
+        ]),
 
-    { field: "productLineCode", headerName: "productLineCode", width: 200 },
+    { field: "subs_end_date", headerName: "Subs End Date", width: 120 },
+    { field: "productLineCode", headerName: "Product Line Code", width: 200 },
+    { field: "subs_productLine", headerName: "Product Line", width: 200 },
     { field: "seatsPurchased", headerName: "seatsPurchased", width: 200 },
     { field: "usersAssigned", headerName: "usersAssigned", width: 200 },
     { field: "seatsInUse", headerName: "seatsInUse", width: 200 },
