@@ -21,11 +21,7 @@ import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete"
 import dayjs from "dayjs";
 import moment from "moment";
 import CommonChart from "@/components/common/chart/CommonChart";
-import {
-  getEmptyBarChartConfig,
-  getEmptyPieChartConfig,
-  userType,
-} from "@/constants";
+import { getEmptyBarChartConfig, getEmptyPieChartConfig } from "@/constants";
 
 const SetAction = () => {
   return (
@@ -93,7 +89,6 @@ const NewSubscription = () => {
     newSubscriptionLastUpdated,
     newSubscriptionData,
     newSubscriptionDataLoading,
-    userDetail,
   } = useSelector((state) => ({
     branch_list: state?.insightMetrics?.branchList,
     branchListLoading: state?.insightMetrics?.branchListLoading,
@@ -103,7 +98,6 @@ const NewSubscription = () => {
     newSubscriptionLastUpdated: state?.subscription?.newSubscriptionLastUpdated,
     newSubscriptionData: state?.subscription?.newSubscriptionData,
     newSubscriptionDataLoading: state?.subscription?.newSubscriptionDataLoading,
-    userDetail: state?.login?.userDetail,
   }));
 
   const [filteredData, setFilteredData] = useState();
@@ -193,45 +187,44 @@ const NewSubscription = () => {
         field: "account_name",
         headerName: "Account Name",
         width: 200,
-        renderCell: (params) => <div>{params?.value}</div>,
+        renderCell: (params) => (
+          <div>
+            {params?.value}
+          </div>
+        ),
       },
-      { field: "account_csn", headerName: "Account CSN", width: 200 },
+      {
+        field: "third_party",
+        headerName: "Third Party Name",
+        width: 200,
+        renderCell: (params) => {
+          const { value: third_party_name } = params;
+          return <div>{third_party_name}</div>;
+        },
+      },
       { field: "part_number", headerName: "Part Number", width: 200 },
-      ...(userDetail?.user_type !== userType.client
-        ? [
-            {
-              field: "third_party",
-              headerName: "Third Party Name",
-              width: 200,
-              renderCell: (params) => {
-                const { value: third_party_name } = params;
-                return <div>{third_party_name}</div>;
-              },
-            },
-            {
-              field: "branch",
-              headerName: "Branch",
-              width: 100,
-              renderCell: ({ value }) =>
-                value ? value : <span style={{ color: "red" }}>Undefined</span>,
-            },
-            {
-              field: "bd_person",
-              headerName: "BD Person Name",
-              width: 200,
-              renderCell: ({ value }) =>
-                value ? value : <span style={{ color: "red" }}>Undefined</span>,
-            },
-            {
-              field: "renewal_person",
-              headerName: "Renewal Person Name",
-              width: 200,
-              renderCell: ({ value }) =>
-                value ? value : <span style={{ color: "red" }}>Undefined</span>,
-            },
-            { field: "account_type", headerName: "Account Type", width: 150 },
-          ]
-        : []),
+      { field: "account_csn", headerName: "Account CSN", width: 100 },
+      {
+        field: "bd_person",
+        headerName: "BD Person Name",
+        width: 200,
+        renderCell: ({ value }) =>
+          value ? value : <span style={{ color: "red" }}>Undefined</span>,
+      },
+      {
+        field: "renewal_person",
+        headerName: "Renewal Person Name",
+        width: 200,
+        renderCell: ({ value }) =>
+          value ? value : <span style={{ color: "red" }}>Undefined</span>,
+      },
+      {
+        field: "branch",
+        headerName: "Branch",
+        width: 100,
+        renderCell: ({ value }) =>
+          value ? value : <span style={{ color: "red" }}>Undefined</span>,
+      },
       {
         field: "contract_manager_email",
         headerName: "Contract Mgr. Email",
@@ -240,29 +233,42 @@ const NewSubscription = () => {
           <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>{value}</div>
         ),
       },
+      { field: "account_type", headerName: "Account Type", width: 150 },
       { field: "seats", headerName: "Seats", width: 70 },
-      { field: "startDate", headerName: "Subs Start Date", width: 200 },
-      { field: "endDate", headerName: "Subs End Date", width: 200 },
-      { field: "trisita_status", headerName: "Trisita Status", width: 200 },
+      { field: "startDate", headerName: "Subs Start Date", width: 130 },
+      { field: "endDate", headerName: "Subs End Date", width: 130 },
+      { field: "trisita_status", headerName: "Trisita Status", width: 130 },
+      { field: "subscriptionStatus", headerName: "Status", width: 100 },
       {
         field: "lastPurchaseDate",
         headerName: "Last Purchase Date",
-        width: 200,
+        width: 130,
       },
-
-      { field: "account_group", headerName: "Account Group", width: 200 },
-
+      { field: "account_group", headerName: "Account Group", width: 100 },
       {
         field: "subscriptionType",
         headerName: "Subscription Type",
-        width: 200,
+        width: 100,
       },
       {
         field: "contract_end_date",
         headerName: "Contract End Date",
-        width: 200,
+        width: 130,
       },
-      { field: "productLineCode", headerName: "Product Line Code", width: 200 },
+      {
+        field: "acv_price",
+        headerName: "Total ACV Price",
+        width: 130,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
+        field: "dtp_price",
+        headerName: "Total DTP Price",
+        width: 130,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
       {
         field: "productLine",
         headerName: "Product Line",
@@ -279,42 +285,19 @@ const NewSubscription = () => {
           <span>{new Date(value).toLocaleDateString()}</span>
         ),
       },
-      ...(userDetail?.user_type !== userType.client
-        ? [
-            { field: "subscriptionStatus", headerName: "Status", width: 100 },
-            {
-              field: "acv_price",
-              headerName: "Total ACV Price",
-              width: 130,
-              renderCell: (params) => (
-                <div>{Number(params.value).toFixed(2)}</div>
-              ),
-              sortComparator: (v1, v2) => Number(v1) - Number(v2),
-            },
-            {
-              field: "dtp_price",
-              headerName: "Total DTP Price",
-              width: 130,
-              renderCell: (params) => (
-                <div>{Number(params.value).toFixed(2)}</div>
-              ),
-              sortComparator: (v1, v2) => Number(v1) - Number(v2),
-            },
-            {
-              field: "action",
-              headerName: "Action",
-              width: 150,
-              renderCell: (params) => (
-                <span
-                  onClick={() => handleOpenModel(params?.row?.id, true)}
-                  className="assign-button text-black px-3 py-1 rounded border-0"
-                >
-                  Assign Trigger
-                </span>
-              ),
-            },
-          ]
-        : []),
+      {
+        field: "action",
+        headerName: "Action",
+        width: 150,
+        renderCell: (params) => (
+          <span
+            onClick={() => handleOpenModel(params?.row?.id, true)}
+            className="assign-button text-black px-3 py-1 rounded border-0"
+          >
+            Assign Trigger
+          </span>
+        ),
+      },
     ],
     []
   );
@@ -827,62 +810,27 @@ const NewSubscription = () => {
     // Previous 12 months
     for (let i = 11; i >= 0; i--) {
       const monthKey = baseMonth.subtract(i, "month").format("YYYY-MM");
-      monthlyData[monthKey] = { seats_total: 0, dtp_total: 0, acv_total: 0 };
+      monthlyData[monthKey] = { dtp_total: 0, acv_total: 0 };
     }
 
     // Aggregate DTP and ACV by endDate month
     (filteredData || []).forEach((sub) => {
       const endMonth = dayjs(sub?.created_date).format("YYYY-MM");
       if (monthlyData[endMonth]) {
-        // monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
-        // monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;
-        if (userDetail?.user_type === userType.client) {
-          monthlyData[endMonth].seats_total += Number(sub?.seats) || 0;
-        } else {
-          monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
-          monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;
-        }
+        monthlyData[endMonth].dtp_total += Number(sub?.dtp_price) || 0;
+        monthlyData[endMonth].acv_total += Number(sub?.acv_price) || 0;
       }
     });
 
     const categories = Object.keys(monthlyData);
-    // const dtpData = categories.map((month) =>
-    //   parseFloat(monthlyData[month].dtp_total.toFixed(2))
-    // );
-    // const acvData = categories.map((month) =>
-    //   parseFloat(monthlyData[month].acv_total.toFixed(2))
-    // );
+    const dtpData = categories.map((month) =>
+      parseFloat(monthlyData[month].dtp_total.toFixed(2))
+    );
+    const acvData = categories.map((month) =>
+      parseFloat(monthlyData[month].acv_total.toFixed(2))
+    );
 
-    // return { categories, dtpData, acvData };
-    if (userDetail?.user_type === userType.client) {
-      return {
-        categories,
-        series: [
-          {
-            name: "Total Seats",
-            data: categories.map((m) => monthlyData[m].seats_total),
-          },
-        ],
-      };
-    } else {
-      return {
-        categories,
-        series: [
-          {
-            name: "DTP Price",
-            data: categories.map((m) =>
-              parseFloat(monthlyData[m].dtp_total.toFixed(2))
-            ),
-          },
-          {
-            name: "ACV Price",
-            data: categories.map((m) =>
-              parseFloat(monthlyData[m].acv_total.toFixed(2))
-            ),
-          },
-        ],
-      };
-    }
+    return { categories, dtpData, acvData };
   }, [filteredData, filters?.startDate]);
 
   // ApexCharts config
@@ -894,14 +842,9 @@ const NewSubscription = () => {
         title: { text: "Months" },
       },
       yaxis: {
-        title: {
-          text: userDetail?.user_type === userType.client ? "Seats" : "Price",
-        },
+        title: { text: "Price" },
       },
-      colors:
-        userDetail?.user_type === userType.client
-          ? ["#007BFF"]
-          : ["#007BFF", "#FF5733"],
+      colors: ["#007BFF", "#FF5733"],
       plotOptions: {
         bar: {
           borderRadius: 5,
@@ -912,7 +855,10 @@ const NewSubscription = () => {
         enabled: false,
       },
     },
-    series: chartData.series,
+    series: [
+      { name: "DTP Price", data: chartData.dtpData },
+      { name: "ACV Price", data: chartData.acvData },
+    ],
   };
 
   // Total Subscriptions as per BD Person
@@ -1097,20 +1043,18 @@ const NewSubscription = () => {
               placeholderEnd="End date"
               disabled={newSubscriptionDataLoading}
             />
-            {userDetail?.user_type !== userType.client && (
-              <CommonAutocomplete
-                onChange={(event, newValue) => {
-                  setFilters((prev) => ({
-                    ...prev,
-                    branch: newValue,
-                  }));
-                }}
-                options={branch_list}
-                label="Select a Branch"
-                loading={branchListLoading}
-                value={filters?.branch}
-              />
-            )}
+            <CommonAutocomplete
+              onChange={(event, newValue) => {
+                setFilters((prev) => ({
+                  ...prev,
+                  branch: newValue,
+                }));
+              }}
+              options={branch_list}
+              label="Select a Branch"
+              loading={branchListLoading}
+              value={filters?.branch}
+            />
             <CommonSelect
               value={filters?.status}
               options={[
@@ -1190,24 +1134,16 @@ const NewSubscription = () => {
                 }
                 options={numberOfSeats?.options}
                 series={numberOfSeats?.series}
-                subCategory={
-                  userDetail?.user_type === userType.client
-                    ? [
-                        "By Product line",
-                        "By Account names",
-                        "By Last Purchase Year",
-                      ]
-                    : [
-                        "By Product line",
-                        "By Account names",
-                        "By Last Purchase Year",
-                        "By Team names",
-                      ]
-                }
+                subCategory={[
+                  "By Product line",
+                  "By Account names",
+                  "By Team names",
+                  "By Last Purchase Year",
+                ]}
                 onSubCategoryClick={(index) => {
                   if (index === 0) handleChartViewChange("byProductLine");
                   if (index === 1) handleChartViewChange("byAccountName");
-                  if (index === 2) handleChartViewChange("byLastYear");
+                  if (index === 3) handleChartViewChange("byLastYear");
                 }}
               />
             )}
@@ -1216,11 +1152,7 @@ const NewSubscription = () => {
             ) : (
               <div className="account-industry-chart-2 mt-4 new-subs-amountPerMonth">
                 <CommonChart
-                  title={
-                    userDetail?.user_type === userType.client
-                      ? "Total Subscription as per Months"
-                      : "Total Amount as per Months"
-                  }
+                  title="Total Amount as per Months"
                   options={amountPerMonth.options}
                   series={amountPerMonth.series}
                   className="chart-data-2"
@@ -1235,49 +1167,40 @@ const NewSubscription = () => {
                   title={getAccountGroupTitle()}
                   options={accountGroupBarChart?.options}
                   series={accountGroupBarChart?.series}
-                  className={`chart-data-1 ${
-                    userDetail?.user_type === userType.client && "w-100"
-                  }`}
-                  subCategory={
-                    userDetail?.user_type === userType.client
-                      ? []
-                      : ["Subscription", "DTP", "ACV"]
-                  }
+                  className="chart-data-1"
+                  subCategory={["Subscription", "DTP", "ACV"]}
                   onSubCategoryClick={(index) => {
                     if (index === 0) handleAccountGroupChange("subscription");
                     if (index === 1) handleAccountGroupChange("dtp_price");
                     if (index === 2) handleAccountGroupChange("acv_price");
                   }}
                 />
-                {userDetail?.user_type !== userType.client && (
-                  <div className="chart-section">
-                    <CommonChart
-                      title={getBdPersonTitle()}
-                      options={bdPersonPieChart?.options}
-                      series={bdPersonPieChart?.series}
-                      className="chart-data-2"
-                      subCategory={["Subscription", "DTP", "ACV"]}
-                      onSubCategoryClick={(index) => {
-                        if (index === 0) handleBdPersonChange("subscription");
-                        if (index === 1) handleBdPersonChange("dtp_price");
-                        if (index === 2) handleBdPersonChange("acv_price");
-                      }}
-                    />
-                    <CommonChart
-                      title={getAccountTypeTitle()}
-                      options={accountTypePieChart?.options}
-                      series={accountTypePieChart?.series}
-                      className="chart-data-2"
-                      subCategory={["Subscription", "DTP", "ACV"]}
-                      onSubCategoryClick={(index) => {
-                        if (index === 0)
-                          handleAccountTypeChange("subscription");
-                        if (index === 1) handleAccountTypeChange("dtp_price");
-                        if (index === 2) handleAccountTypeChange("acv_price");
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="chart-section">
+                  <CommonChart
+                    title={getBdPersonTitle()}
+                    options={bdPersonPieChart?.options}
+                    series={bdPersonPieChart?.series}
+                    className="chart-data-2"
+                    subCategory={["Subscription", "DTP", "ACV"]}
+                    onSubCategoryClick={(index) => {
+                      if (index === 0) handleBdPersonChange("subscription");
+                      if (index === 1) handleBdPersonChange("dtp_price");
+                      if (index === 2) handleBdPersonChange("acv_price");
+                    }}
+                  />
+                  <CommonChart
+                    title={getAccountTypeTitle()}
+                    options={accountTypePieChart?.options}
+                    series={accountTypePieChart?.series}
+                    className="chart-data-2"
+                    subCategory={["Subscription", "DTP", "ACV"]}
+                    onSubCategoryClick={(index) => {
+                      if (index === 0) handleAccountTypeChange("subscription");
+                      if (index === 1) handleAccountTypeChange("dtp_price");
+                      if (index === 2) handleAccountTypeChange("acv_price");
+                    }}
+                  />
+                </div>
               </div>
             )}
           </div>
