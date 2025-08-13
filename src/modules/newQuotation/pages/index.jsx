@@ -98,7 +98,11 @@ const NewQuotation = () => {
         field: "quotation_date",
         headerName: "Opportunity Date",
         width: 150,
-        renderCell: (params) => <span>{params?.value}</span>,
+        renderCell: (params) => (
+          <span>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </span>
+        ),
       },
       {
         field: "name",
@@ -224,24 +228,28 @@ const NewQuotation = () => {
         field: "valid_until",
         headerName: "Valid Until",
         width: 150,
-        renderCell: (params) => <span>{params?.value}</span>,
+        renderCell: (params) => (
+          <span>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </span>
+        ),
       },
       {
         field: "updated_at",
         headerName: "Updated At",
-        width: 150,
+        width: 200,
         renderCell: (params) => <span>{params?.value}</span>,
       },
       {
         field: "created_by_name",
         headerName: "Created By",
-        width: 150,
+        width: 200,
         renderCell: (params) => <span>{params?.value}</span>,
       },
       {
         field: "created_at",
         headerName: "Created At",
-        width: 150,
+        width: 200,
         renderCell: (params, index) => (
           <span
             title={moment(params?.row?.created_at).format(

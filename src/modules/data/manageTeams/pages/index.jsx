@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+import moment from "moment";
 
 const ManageTeams = () => {
   const dispatch = useDispatch();
@@ -48,14 +49,9 @@ const ManageTeams = () => {
       headerName: "Last Login Details",
       width: 300,
       renderCell: ({ value }) => {
-        const formattedDateTime = new Date(value).toLocaleString("en-US", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        });
+        const formattedDateTime = value
+          ? moment(value).format("DD/MM/YYYY [at] hh:mm:ss A")
+          : "-";
         return <Typography>{formattedDateTime}</Typography>;
       },
     },

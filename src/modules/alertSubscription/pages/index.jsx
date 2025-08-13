@@ -158,7 +158,7 @@ const AlertSubscription = () => {
       renderCell: ({ value }) => value,
     },
     { field: "part_number", headerName: "Part Number", width: 200 },
-    { field: "account_csn", headerName: "Account CSN", width: 100 },
+    { field: "account_csn", headerName: "Account CSN", width: 200 },
     {
       field: "bd_person",
       headerName: "BD Person Name",
@@ -183,16 +183,60 @@ const AlertSubscription = () => {
       width: 200,
       renderCell: ({ value }) => renderLimitedText(value),
     },
-    { field: "account_type", headerName: "Account Type", width: 70 },
-    { field: "seats", headerName: "Seats", width: 70 },
-    { field: "endDate", headerName: "Subs End Date", width: 130 },
-    { field: "startDate", headerName: "Subs Start Date", width: 130 },
+    { field: "account_type", headerName: "Account Type", width: 200 },
+    { field: "seats", headerName: "Seats", width: 100 },
+    {
+      field: "endDate",
+      headerName: "Subs End Date",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </div>
+        );
+      },
+    },
+    {
+      field: "startDate",
+      headerName: "Subs Start Date",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </div>
+        );
+      },
+    },
     { field: "trisita_status", headerName: "Trisita Status", width: 130 },
     { field: "subscriptionStatus", headerName: "Status", width: 100 },
-    { field: "lastPurchaseDate", headerName: "Last Purchase date", width: 130 },
-    { field: "account_group", headerName: "Account Group", width: 100 },
-    { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
-    { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
+    {
+      field: "lastPurchaseDate",
+      headerName: "Last Purchase Date",
+      width: 200,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </div>
+        );
+      },
+    },
+    { field: "account_group", headerName: "Account Group", width: 200 },
+    { field: "subscriptionType", headerName: "Subscription Type", width: 200 },
+    {
+      field: "contract_end_date",
+      headerName: "Contract EndDate",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </div>
+        );
+      },
+    },
     {
       field: "acv_price",
       headerName: "Total ACV Price",

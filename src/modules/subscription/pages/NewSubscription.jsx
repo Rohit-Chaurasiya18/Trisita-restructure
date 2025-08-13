@@ -241,13 +241,30 @@ const NewSubscription = () => {
         ),
       },
       { field: "seats", headerName: "Seats", width: 70 },
-      { field: "startDate", headerName: "Subs Start Date", width: 200 },
-      { field: "endDate", headerName: "Subs End Date", width: 200 },
+      {
+        field: "startDate",
+        headerName: "Subs Start Date",
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
+      {
+        field: "endDate",
+        headerName: "Subs End Date",
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
       { field: "trisita_status", headerName: "Trisita Status", width: 200 },
       {
         field: "lastPurchaseDate",
         headerName: "Last Purchase Date",
         width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
 
       { field: "account_group", headerName: "Account Group", width: 200 },
@@ -261,15 +278,16 @@ const NewSubscription = () => {
         field: "contract_end_date",
         headerName: "Contract End Date",
         width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       { field: "productLineCode", headerName: "Product Line Code", width: 200 },
       {
         field: "productLine",
         headerName: "Product Line",
         width: 250,
-        renderCell: ({ value }) => (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>{value}</div>
-        ),
+        renderCell: ({ value }) => <div>{value}</div>,
       },
       {
         field: "created_date",

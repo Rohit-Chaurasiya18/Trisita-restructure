@@ -6,6 +6,7 @@ import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import { getUniqueUsageUserCount } from "../slice/UsuagesSlice";
 import CommonChart from "@/components/common/chart/CommonChart";
+import moment from "moment";
 
 const UniqueUserCount = () => {
   const dispatch = useDispatch();
@@ -53,8 +54,12 @@ const UniqueUserCount = () => {
       name: code,
       data: allDates.map((date) => values[date] || 0),
     }));
-
-    return { series, categories: allDates };
+    return {
+      series,
+      categories: allDates?.map((i) =>
+        moment(i, "MM/DD/YYYY").format("DD/MM/YYYY")
+      ),
+    };
   }, [uniqueUsageUserLoginCounts]);
 
   // ApexCharts config

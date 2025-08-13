@@ -13,6 +13,7 @@ import {
   getCompareSubscriptionData,
 } from "../slice/subscriptionSlice";
 import CommonButton from "@/components/common/buttons/CommonButton";
+import moment from "moment";
 
 const subscriptionTypeData = {
   Deleted: 1,
@@ -153,13 +154,30 @@ const CompareSubscription = () => {
         },
       },
       { field: "seats", headerName: "Seats", width: 70 },
-      { field: "startDate", headerName: "Subs Start Date", width: 130 },
-      { field: "endDate", headerName: "Subs End Date ", width: 130 },
+      {
+        field: "startDate",
+        headerName: "Subs Start Date",
+        width: 130,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
+      {
+        field: "endDate",
+        headerName: "Subs End Date ",
+        width: 130,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
 
       {
         field: "lastPurchaseDate",
         headerName: "Last Purchase date",
         width: 130,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       { field: "account_group", headerName: "Account Group", width: 100 },
       {
@@ -169,8 +187,11 @@ const CompareSubscription = () => {
       },
       {
         field: "contract_end_date",
-        headerName: "Contract EndDate",
+        headerName: "Contract End Date",
         width: 130,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       {
         field: "acv_price",
@@ -276,8 +297,30 @@ const CompareSubscription = () => {
     },
     { field: "old_status", headerName: "Trisita Old Status", width: 130 },
     { field: "new_status", headerName: "Trisita New Status", width: 130 },
-    { field: "subs_start_date", headerName: "Subs Start Date", width: 130 },
-    { field: "subs_end_date", headerName: "Subs End Date", width: 130 },
+    {
+      field: "subs_start_date",
+      headerName: "Subs Start Date",
+      width: 130,
+      renderCell: (params) => (
+        <>
+          {params?.value
+            ? moment(params?.value, "DD/MM/YYYY").format("DD/MM/YYYY")
+            : ""}
+        </>
+      ),
+    },
+    {
+      field: "subs_end_date",
+      headerName: "Subs End Date",
+      width: 130,
+      renderCell: (params) => (
+        <>
+          {params?.value
+            ? moment(params?.value, "DD/MM/YYYY").format("DD/MM/YYYY")
+            : ""}
+        </>
+      ),
+    },
     { field: "seat", headerName: "Seats", width: 70 },
     {
       field: "acv_price",

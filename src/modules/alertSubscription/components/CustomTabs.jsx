@@ -1,4 +1,5 @@
 import routesConstants from "@/routes/routesConstants";
+import moment from "moment";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -103,7 +104,18 @@ const ContractTab = ({ data }) => {
         <DetailRow label="Term" value={contract?.contract_term} />
         <DetailRow label="Duration" value={contract?.contract} />
         <DetailRow label="Retention Health" value={data?.ews_retentionHealth} />
-        <DetailRow label="Sub end date" value={data?.endDate} />
+        <DetailRow
+          label="Sub Start date"
+          value={
+            data?.startDate ? moment(data?.startDate).format("DD/MM/YYYY") : ""
+          }
+        />
+        <DetailRow
+          label="Sub end date"
+          value={
+            data?.endDate ? moment(data?.endDate).format("DD/MM/YYYY") : ""
+          }
+        />
         <DetailRow label="Quantity" value={data?.quantity} />
       </div>
     </>

@@ -10,6 +10,7 @@ import { getBackupSubscriptionDetail } from "@/modules/subscription/slice/subscr
 import CommonModal from "@/components/common/modal/CommonModal";
 import SubscriptionDetail from "@/modules/subscription/components/SubscriptionDetail";
 import SetContent from "../components/SetContent";
+import moment from "moment";
 
 const SelectCampaignAudience = () => {
   const dispatch = useDispatch();
@@ -132,18 +133,18 @@ const SelectCampaignAudience = () => {
         </div>
       ),
     },
-    { field: "account_csn", headerName: "Account CSN", width: 100 },
+    { field: "account_csn", headerName: "Account CSN", width: 200 },
 
     {
       field: "retention_health_riskBand",
       headerName: "Retention Risk",
-      width: 100,
+      width: 200,
     },
 
     {
       field: "branch",
       headerName: "Branch",
-      width: 100,
+      width: 200,
       renderCell: (params) => (
         <div>
           {params.value && params.value ? (
@@ -164,18 +165,46 @@ const SelectCampaignAudience = () => {
         return <div>{email}</div>;
       },
     },
-    { field: "seats", headerName: "Seats", width: 70 },
-    { field: "startDate", headerName: "Subs Start Date", width: 130 },
-    { field: "endDate", headerName: "Subs End Date ", width: 130 },
-    { field: "trisita_status", headerName: "Trisita Status", width: 130 },
-    { field: "subscriptionStatus", headerName: "Status", width: 100 },
-    { field: "lastPurchaseDate", headerName: "Last Purchase date", width: 130 },
+    { field: "seats", headerName: "Seats", width: 100 },
+    {
+      field: "startDate",
+      headerName: "Subs Start Date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    {
+      field: "endDate",
+      headerName: "Subs End Date ",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    { field: "trisita_status", headerName: "Trisita Status", width: 200 },
+    { field: "subscriptionStatus", headerName: "Status", width: 200 },
+    {
+      field: "lastPurchaseDate",
+      headerName: "Last Purchase date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
 
-    { field: "account_group", headerName: "Account Group", width: 100 },
-    { field: "programType", headerName: "Program Type", width: 100 },
-    { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
-    { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
-    { field: "productLineCode", headerName: "Product Line Code", width: 130 },
+    { field: "account_group", headerName: "Account Group", width: 200 },
+    { field: "programType", headerName: "Program Type", width: 200 },
+    { field: "subscriptionType", headerName: "Subscription Type", width: 200 },
+    {
+      field: "contract_end_date",
+      headerName: "Contract End Date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    { field: "productLineCode", headerName: "Product Line Code", width: 200 },
 
     {
       field: "productLine",

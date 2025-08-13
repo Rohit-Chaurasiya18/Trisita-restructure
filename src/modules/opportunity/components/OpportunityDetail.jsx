@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getOpportunityDetail } from "../slice/opportunitySlice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import moment from "moment";
 
 const tabsData = [
   { id: "1", label: "End Customer" },
@@ -29,8 +30,15 @@ const TabSection = ({ title, details }) => (
   </>
 );
 
-const getData = (detail, path) =>
-  path.reduce((acc, key) => acc?.[key], detail) ?? null;
+const getData = (detail, path) => {
+  const value = path.reduce((acc, key) => acc?.[key], detail) ?? null;
+
+  // Format if it's a date
+  if (value && moment(value, "MM/DD/YYYY", true).isValid()) {
+    return moment(value, "MM/DD/YYYY").format("DD/MM/YYYY");
+  }
+  return value;
+};
 
 const OpportunityTab = ({ fields }) => {
   const { opportunityDetailLoading, opportunityDetail } = useSelector(

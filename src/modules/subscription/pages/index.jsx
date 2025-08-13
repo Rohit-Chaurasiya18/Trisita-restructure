@@ -262,8 +262,8 @@ const Subscription = () => {
 
     {
       field: "retention_health_riskBand",
-      headerName: "Retention health riskBand",
-      width: 100,
+      headerName: "Retention Health Risk",
+      width: 200,
     },
 
     {
@@ -276,18 +276,50 @@ const Subscription = () => {
       },
     },
     { field: "seats", headerName: "Seats", width: 70 },
-    { field: "startDate", headerName: "Subs Start Date", width: 130 },
-    { field: "endDate", headerName: "Subs End Date ", width: 130 },
-    { field: "trisita_status", headerName: "Trisita Status", width: 130 },
-    { field: "lastPurchaseDate", headerName: "Last Purchase date", width: 130 },
+    {
+      field: "startDate",
+      headerName: "Subs Start Date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    {
+      field: "endDate",
+      headerName: "Subs End Date ",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    { field: "trisita_status", headerName: "Trisita Status", width: 200 },
+    {
+      field: "lastPurchaseDate",
+      headerName: "Last Purchase date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
     { field: "account_group", headerName: "Account Group", width: 200 },
     { field: "programType", headerName: "Program Type", width: 100 },
-    { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
-    { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
-    { field: "productLineCode", headerName: "Product Line Code", width: 130 },
-    { field: "contract_term", headerName: "Contract Term", width: 130 },
-    { field: "switchType", headerName: "Switch Type", width: 130 },
-    { field: "switchYear", headerName: "Switch Year", width: 130 },
+    { field: "subscriptionType", headerName: "Subscription Type", width: 200 },
+    {
+      field: "contract_end_date",
+      headerName: "Contract End Date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    { field: "productLineCode", headerName: "Product Line Code", width: 200 },
+    {
+      field: "contract_term",
+      headerName: "Contract Term",
+      width: 200,
+    },
+    { field: "switchType", headerName: "Switch Type", width: 200 },
+    { field: "switchYear", headerName: "Switch Year", width: 200 },
     {
       field: "productLine",
       headerName: "Product Line",
@@ -304,7 +336,7 @@ const Subscription = () => {
           {
             field: "acv_price",
             headerName: "Total ACV Price",
-            width: 130,
+            width: 200,
             renderCell: (params) => (
               <div>{Number(params.value).toFixed(2)}</div>
             ),
@@ -313,7 +345,7 @@ const Subscription = () => {
           {
             field: "dtp_price",
             headerName: "Total DTP Price",
-            width: 130,
+            width: 200,
             renderCell: (params) => (
               <div>{Number(params.value).toFixed(2)}</div>
             ),

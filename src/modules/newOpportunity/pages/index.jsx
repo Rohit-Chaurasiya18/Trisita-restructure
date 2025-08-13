@@ -130,7 +130,11 @@ const NewOpportunity = () => {
         field: "contract_date",
         headerName: "Opportunity Date",
         width: 200,
-        renderCell: (params) => <div>{params?.value}</div>,
+        renderCell: (params) => (
+          <div>
+            {params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}
+          </div>
+        ),
       },
       { field: "branch_name", headerName: "Branch", width: 200 },
       {

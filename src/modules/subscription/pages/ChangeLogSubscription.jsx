@@ -13,6 +13,7 @@ import {
   getChangedLogSubscriptionDetail,
 } from "../slice/subscriptionSlice";
 import useDebounce from "@/hooks/useDebounce";
+import moment from "moment";
 
 const ChangedLogSubscription = () => {
   const dispatch = useDispatch();
@@ -127,11 +128,7 @@ const ChangedLogSubscription = () => {
         field: "account_name",
         headerName: "Account Name",
         width: 200,
-        renderCell: (params) => (
-          <div>
-            {params?.value}
-          </div>
-        ),
+        renderCell: (params) => <div>{params?.value}</div>,
       },
       {
         field: "third_party",
@@ -174,22 +171,39 @@ const ChangedLogSubscription = () => {
         ),
       },
       { field: "seats", headerName: "Seats", width: 70 },
-      { field: "startDate", headerName: "Subs Start Date", width: 130 },
-      { field: "endDate", headerName: "Subs End Date", width: 130 },
+      {
+        field: "startDate",
+        headerName: "Subs Start Date",
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
+      {
+        field: "endDate",
+        headerName: "Subs End Date",
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
       {
         field: "trisita_new_status",
         headerName: "Trisita New Status",
-        width: 130,
+        width: 200,
       },
       {
         field: "trisita_old_status",
         headerName: "Trisita Old Status",
-        width: 130,
+        width: 200,
       },
       {
         field: "lastPurchaseDate",
         headerName: "Last Purchase Date",
-        width: 130,
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       { field: "account_group", headerName: "Account Group", width: 100 },
       {
@@ -200,19 +214,22 @@ const ChangedLogSubscription = () => {
       {
         field: "contract_end_date",
         headerName: "Contract End Date",
-        width: 130,
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       {
         field: "acv_price",
         headerName: "Total ACV Price",
-        width: 130,
+        width: 200,
         renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
         sortComparator: (v1, v2) => Number(v1) - Number(v2),
       },
       {
         field: "dtp_price",
         headerName: "Total DTP Price",
-        width: 130,
+        width: 200,
         renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
         sortComparator: (v1, v2) => Number(v1) - Number(v2),
       },
@@ -227,7 +244,7 @@ const ChangedLogSubscription = () => {
       {
         field: "change_log_date",
         headerName: "Created Date",
-        width: 130,
+        width: 200,
         renderCell: ({ value }) => (
           <span>{new Date(value).toLocaleDateString()}</span>
         ),

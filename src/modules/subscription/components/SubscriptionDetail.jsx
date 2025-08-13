@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { useLocation } from "react-router-dom";
 import routesConstants from "@/routes/routesConstants";
+import moment from "moment";
 
 const tabsData = [
   { id: "1", label: "End Customer" },
@@ -172,8 +173,16 @@ const Contract = () => {
       <DetailRow label="Term" value={contract?.contract_term} />
       <DetailRow label="Duration" value={contract?.contract} />
       <DetailRow label="Retention Health" value={data?.ews_retentionHealth} />
-      <DetailRow label="Sub start date" value={data?.startDate} />
-      <DetailRow label="Sub end date" value={data?.endDate} />
+      <DetailRow
+        label="Sub start date"
+        value={
+          data?.startDate ? moment(data?.startDate).format("DD/MM/YYYY") : ""
+        }
+      />
+      <DetailRow
+        label="Sub end date"
+        value={data?.endDate ? moment(data?.endDate).format("DD/MM/YYYY") : ""}
+      />
       <DetailRow label="Quantity" value={data?.quantity} />
     </SectionWrapper>
   );

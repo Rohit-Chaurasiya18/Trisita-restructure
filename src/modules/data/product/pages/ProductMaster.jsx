@@ -8,9 +8,10 @@ import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import CommonSearchInput from "@/components/common/inputTextField/CommonSearch";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
-import { Tooltip } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import routesConstants from "@/routes/routesConstants";
+import moment from "moment";
 
 const statusOptions = [
   { value: "All Status", label: "All Status" },
@@ -111,10 +112,44 @@ const ProductMaster = () => {
       width: 250,
     },
     { field: "product_sku", headerName: "Product SKU", width: 150 },
-    { field: "startDate", headerName: "Start Date", width: 150 },
-    { field: "endDate", headerName: "End Date", width: 150 },
-    { field: "created_at", headerName: "Created At", width: 150 },
-    { field: "updated_at", headerName: "Updated At", width: 150 },
+    {
+      field: "startDate",
+      headerName: "Start Date",
+      width: 150,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    {
+      field: "endDate",
+      headerName: "End Date",
+      width: 150,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    {
+      field: "created_at",
+      headerName: "Created At",
+      width: 250,
+      renderCell: ({ value }) => {
+        const formattedDateTime = value
+          ? moment(value).format("DD/MM/YYYY [at] hh:mm:ss A")
+          : "-";
+        return <>{formattedDateTime}</>;
+      },
+    },
+    {
+      field: "updated_at",
+      headerName: "Updated At",
+      width: 200,
+      renderCell: ({ value }) => {
+        const formattedDateTime = value
+          ? moment(value).format("DD/MM/YYYY [at] hh:mm:ss A")
+          : "-";
+        return <>{formattedDateTime}</>;
+      },
+    },
   ];
 
   return (

@@ -182,14 +182,42 @@ const RAOrder = () => {
     },
     { field: "account_type", headerName: "Account Type", width: 150 },
     { field: "seats", headerName: "Seats", width: 70 },
-    { field: "endDate", headerName: "Subs End Date", width: 130 },
-    { field: "startDate", headerName: "Subs Start Date", width: 130 },
+    {
+      field: "startDate",
+      headerName: "Subs Start Date",
+      width: 130,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    {
+      field: "endDate",
+      headerName: "Subs End Date",
+      width: 130,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
     { field: "trisita_status", headerName: "Trisita Status", width: 130 },
     { field: "subscriptionStatus", headerName: "Status", width: 100 },
-    { field: "lastPurchaseDate", headerName: "Last Purchase date", width: 130 },
+    {
+      field: "lastPurchaseDate",
+      headerName: "Last Purchase date",
+      width: 130,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
     { field: "account_group", headerName: "Account Group", width: 100 },
     { field: "subscriptionType", headerName: "Subscription Type", width: 100 },
-    { field: "contract_end_date", headerName: "Contract EndDate", width: 130 },
+    {
+      field: "contract_end_date",
+      headerName: "Contract End Date",
+      width: 130,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
     {
       field: "acv_price",
       headerName: "Total ACV Price",

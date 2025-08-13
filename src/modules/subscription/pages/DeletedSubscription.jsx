@@ -197,13 +197,30 @@ const DeletedSubscription = () => {
         renderCell: ({ value }) => <div>{value}</div>,
       },
       { field: "seats", headerName: "Seats", width: 100 },
-      { field: "startDate", headerName: "Subs Start Date", width: 200 },
-      { field: "endDate", headerName: "Subs End Date", width: 200 },
+      {
+        field: "startDate",
+        headerName: "Subs Start Date",
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
+      {
+        field: "endDate",
+        headerName: "Subs End Date",
+        width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
+      },
       { field: "trisita_status", headerName: "Trisita Status", width: 200 },
       {
         field: "lastPurchaseDate",
         headerName: "Last Purchase Date",
         width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       { field: "account_group", headerName: "Account Group", width: 200 },
       {
@@ -215,6 +232,9 @@ const DeletedSubscription = () => {
         field: "contract_end_date",
         headerName: "Contract End Date",
         width: 200,
+        renderCell: (params) => (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        ),
       },
       {
         field: "productLineCode",

@@ -463,7 +463,7 @@ const InsightMetrics = () => {
         </div>
       ),
     },
-    { field: "customerCSN", headerName: "customerCSN", width: 150 },
+    { field: "customerCSN", headerName: "Customer CSN", width: 150 },
     ...(userDetail?.user_type !== userType.client
       ? [
           {
@@ -541,23 +541,41 @@ const InsightMetrics = () => {
             width: 120,
           },
         ]),
-    { field: "subs_start_date", headerName: "Subs Start Date", width: 120 },
-    { field: "subs_end_date", headerName: "Subs End Date", width: 120 },
+    {
+      field: "subs_start_date",
+      headerName: "Subs Start Date",
+      width: 120,
+      renderCell: (params) => {
+        return (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        );
+      },
+    },
+    {
+      field: "subs_end_date",
+      headerName: "Subs End Date",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+        );
+      },
+    },
     { field: "productLineCode", headerName: "Product Line Code", width: 200 },
     { field: "subs_productLine", headerName: "Product Line", width: 200 },
-    { field: "seatsPurchased", headerName: "seatsPurchased", width: 200 },
-    { field: "usersAssigned", headerName: "usersAssigned", width: 200 },
-    { field: "seatsInUse", headerName: "seatsInUse", width: 200 },
-    { field: "assignmentRate", headerName: "assignmentRate", width: 200 },
-    { field: "utilisationRate", headerName: "utilisationRate", width: 200 },
-    { field: "usageRate", headerName: "usageRate", width: 200 },
-    { field: "riskCategory", headerName: "riskCategory", width: 200 },
+    { field: "seatsPurchased", headerName: "Seats Purchased", width: 200 },
+    { field: "usersAssigned", headerName: "Users Assigned", width: 200 },
+    { field: "seatsInUse", headerName: "Seats In Use", width: 200 },
+    { field: "assignmentRate", headerName: "Assignment Rate", width: 200 },
+    { field: "utilisationRate", headerName: "Utilisation Rate", width: 200 },
+    { field: "usageRate", headerName: "Usage Rate", width: 200 },
+    { field: "riskCategory", headerName: "Risk Category", width: 200 },
     {
       field: "engagementCategory",
-      headerName: "engagementCategory",
+      headerName: "Engagement Category",
       width: 200,
     },
-    { field: "tenantId", headerName: "tenantId", width: 200 },
+    { field: "tenantId", headerName: "Tenant Id", width: 200 },
   ];
 
   const handleSelectionChange = (selectedRows) => {

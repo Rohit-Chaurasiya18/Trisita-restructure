@@ -189,7 +189,16 @@ const Opportunity = () => {
     },
 
     { field: "status", headerName: "Status", width: 100 },
-    { field: "subscription_end_date", headerName: "Sub end date", width: 150 },
+    {
+      field: "subscription_end_date",
+      headerName: "Sub end date",
+      width: 150,
+      renderCell: (parmas) => (
+        <div>
+          {parmas?.value ? moment(parmas?.value).format("DD/MM/YYYY") : ""}
+        </div>
+      ),
+    },
     { field: "total_quantity", headerName: "Quantity", width: 100 },
     { field: "contract_number", headerName: "Contract Number", width: 150 },
     {

@@ -7,6 +7,7 @@ import ExportToExcel from "@/components/common/buttons/ExportToExcel";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import routesConstants from "@/routes/routesConstants";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const Product = () => {
   const dispatch = useDispatch();
@@ -27,22 +28,52 @@ const Product = () => {
   const columns = [
     { field: "name", headerName: "Name" },
     { field: "serial_number", headerName: "Serial Number", width: 200 },
-    { field: "account_name", headerName: "Account Name" },
-    { field: "manufacturer", headerName: "Manufacturer" },
-    { field: "product_type", headerName: "Product Type", width: 150 },
-    { field: "product_category", headerName: "Product Category", width: 150 },
-    { field: "price", headerName: "Price", width: 150 },
-    { field: "product_status", headerName: "Product Status", width: 150 },
+    { field: "account_name", headerName: "Account Name", width: 200 },
+    { field: "manufacturer", headerName: "Manufacturer", width: 200 },
+    { field: "product_type", headerName: "Product Type", width: 200 },
+    { field: "product_category", headerName: "Product Category", width: 200 },
+    { field: "price", headerName: "Price", width: 200 },
+    { field: "product_status", headerName: "Product Status", width: 200 },
     {
       field: "warrenty_startDate",
       headerName: "Warrenty Start Date",
-      width: 150,
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
     },
-    { field: "warrenty_endDate", headerName: "Warrenty End Date", width: 150 },
-    { field: "warrenty_period", headerName: "Warrenty Period", width: 150 },
-    { field: "assigned_to", headerName: "Assigned To", width: 150 },
-    { field: "created_at", headerName: "Created At", width: 150 },
-    { field: "updated_at", headerName: "Updated At", width: 150 },
+    {
+      field: "warrenty_endDate",
+      headerName: "Warrenty End Date",
+      width: 200,
+      renderCell: (params) => (
+        <>{params?.value ? moment(params?.value).format("DD/MM/YYYY") : ""}</>
+      ),
+    },
+    { field: "warrenty_period", headerName: "Warrenty Period", width: 200 },
+    { field: "assigned_to", headerName: "Assigned To", width: 200 },
+    {
+      field: "created_at",
+      headerName: "Created At",
+      width: 250,
+      renderCell: ({ value }) => {
+        const formattedDateTime = value
+          ? moment(value).format("DD/MM/YYYY [at] hh:mm:ss A")
+          : "-";
+        return <>{formattedDateTime}</>;
+      },
+    },
+    {
+      field: "updated_at",
+      headerName: "Updated At",
+      width: 250,
+      renderCell: ({ value }) => {
+        const formattedDateTime = value
+          ? moment(value).format("DD/MM/YYYY [at] hh:mm:ss A")
+          : "-";
+        return <>{formattedDateTime}</>;
+      },
+    },
   ];
   const exportedData = useMemo(
     () => productData?.filter((item) => selectedId.includes(item?.id)),

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
+import moment from "moment";
 
 const tabsData = [
   { id: "1", label: "End Customer" },
@@ -116,8 +117,22 @@ const Contract = () => {
         label="Retention Health"
         value={data?.[0]?.ews_retentionHealth}
       />
-      <DetailRow label="Sub start date" value={data?.[0]?.startDate} />
-      <DetailRow label="Sub end date" value={data?.[0]?.endDate} />
+      <DetailRow
+        label="Sub start date"
+        value={
+          data?.[0]?.startDate
+            ? moment(data?.[0]?.startDate).format("DD/MM/YYYY")
+            : ""
+        }
+      />
+      <DetailRow
+        label="Sub end date"
+        value={
+          data?.[0]?.endDate
+            ? moment(data?.[0]?.endDate).format("DD/MM/YYYY")
+            : ""
+        }
+      />
       <DetailRow label="Quantity" value={data?.[0]?.quantity} />
     </SectionWrapper>
   );
