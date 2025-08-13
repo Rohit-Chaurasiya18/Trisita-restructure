@@ -378,6 +378,11 @@ const routesConfig = {
       roles: [userType.superadmin],
     },
     {
+      path: routesConstants.LEARNING_LAB,
+      component: ComingSoon,
+      roles: [userType.client],
+    },
+    {
       path: routesConstants.PRODUCT_KNOWLEDGE,
       component: ComingSoon,
       roles: [userType.client],

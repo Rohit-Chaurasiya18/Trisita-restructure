@@ -243,6 +243,12 @@ export const navLinks = [
     roles: [userType.client],
     item: [
       {
+        itemName: "Learning Lab",
+        href: routesConstants?.LEARNING_LAB,
+        iconUrl: <PersonOutlinedIcon />,
+        roles: [userType.client],
+      },
+      {
         itemName: "Product Knowledge",
         href: routesConstants?.PRODUCT_KNOWLEDGE,
         iconUrl: <PersonOutlinedIcon />,

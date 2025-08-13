@@ -50,6 +50,7 @@ const routesConstants = {
   CONTACT_INFORMATION: "/contact_information",
   RENEW_DUE: "/renew_due",
   RENEW_HISTORY: "/renew_history",
+  LEARNING_LAB: "/learning_lab",
   GENERATE_TICKET: "/generate_ticket",
   PROFILE_FORM: "/form",
   CALENDAR: "/calendar",
