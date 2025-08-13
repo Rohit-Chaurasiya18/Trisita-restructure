@@ -48,6 +48,7 @@ const routesConstants = {
   FINAL_CAMPAIGN: "/final_campaign",
   CAMPAIGN_HISTORY: "/campaign_history",
   CONTACT_INFORMATION: "/contact_information",
+  RENEW_DUE: "/renew_due",
   RENEW_HISTORY: "/renew_history",
   GENERATE_TICKET: "/generate_ticket",
   PROFILE_FORM: "/form",

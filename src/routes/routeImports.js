@@ -12,6 +12,9 @@ export const InvoicePending = lazy(() =>
 export const RenewalEmailSent = lazy(() =>
   import("@/modules/dashboard/pages/RenewalEmailSent")
 );
+export const RenewalDue = lazy(() =>
+  import("@/modules/dashboard/pages/RenewalDue")
+);
 export const Insight_metrics = lazy(() =>
   import("@/modules/insightMetrics/pages/index")
 );

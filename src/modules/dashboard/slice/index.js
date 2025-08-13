@@ -9,6 +9,7 @@ import {
   GET_ORDER_LOADING_HO,
   GET_PAYMENTS_OUTSTANDING_LIST,
   GET_PAYMENTS_OVERDUE_LIST,
+  GET_RENEWAL_DUE,
   GET_RENEWAL_EMAIL_LIST,
   UPDATE_LOCK_UNLOCK_OREDER_LOADING,
 } from "@/services/url";
@@ -171,6 +172,19 @@ export const updateLockUnlockStatus = createAsyncThunk(
     }
   }
 );
+
+export const getRenewalDue = createAsyncThunk(
+  `dashboard/getRenewalDue`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_RENEWAL_DUE);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 const dashboardState = {
   loading: false,
   dashboardDataLoading: false,
@@ -192,6 +206,8 @@ const dashboardState = {
   invoicePendingListLoading: false,
   orderLoadingHoDetail: null,
   orderLoadingHoDetailLoading: false,
+  renewalDueList: [],
+  renewalDueListLoading: false,
 };
 
 const dashboardSlice = createSlice({
@@ -348,6 +364,20 @@ const dashboardSlice = createSlice({
     builder.addCase(getOrderLoadingPo.rejected, (state) => {
       state.orderLoadingHoDetail = null;
       state.orderLoadingHoDetailLoading = false;
+    });
+
+    //getRenewalDue
+    builder.addCase(getRenewalDue.pending, (state) => {
+      state.renewalDueList = [];
+      state.renewalDueListLoading = true;
+    });
+    builder.addCase(getRenewalDue.fulfilled, (state, action) => {
+      state.renewalDueList = action?.payload?.data?.subscriptions;
+      state.renewalDueListLoading = false;
+    });
+    builder.addCase(getRenewalDue.rejected, (state) => {
+      state.renewalDueList = [];
+      state.renewalDueListLoading = false;
     });
   },
 });

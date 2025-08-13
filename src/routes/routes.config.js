@@ -52,6 +52,7 @@ import {
   DownloadHistory,
   UploadHistory,
   ComingSoon,
+  RenewalDue,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -85,6 +86,11 @@ const routesConfig = {
           roles: [userType.superadmin],
         },
       ],
+    },
+    {
+      path: routesConstants.RENEW_DUE,
+      component: RenewalDue,
+      roles: [userType.client],
     },
     {
       path: routesConstants.INSIGHT_METRICS,

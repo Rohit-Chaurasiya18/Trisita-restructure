@@ -107,8 +107,8 @@ const Dashboard = () => {
                   value={dashboardData?.subscriptions_last_30_days || 0}
                   title="Renewal Due (Within 30 days)"
                   percentage={dashboardData?.renewal_percentage || 0}
-                  // isLink
-                  // path={routesConstants?.RENEW_HISTORY}
+                  isLink
+                  path={routesConstants?.RENEW_DUE}
                 />
                 <StatCard
                   icon={ReceiptIcon}
@@ -233,6 +233,9 @@ const Dashboard = () => {
             <SkeletonLoader />
           ) : (
             <div className="chart" key="line">
+              {userDetail?.user_type === userType.client && (
+                <label className="fw-bold">Licence Asset Graph</label>
+              )}
               <LineChart data={seatDateChart} />
             </div>
           )}
@@ -241,6 +244,9 @@ const Dashboard = () => {
             <SkeletonLoader />
           ) : (
             <div className="chart" key="bar">
+              {userDetail?.user_type === userType.client && (
+                <label className="fw-bold">Seat Quantity</label>
+              )}
               <BarChart
                 data={dashboardChart?.Response}
                 isClient={userDetail?.user_type === userType.client}
