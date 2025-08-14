@@ -293,4 +293,18 @@ export const navLinks = [
       },
     ],
   },
+
+  {
+    name: "Backup Operation",
+    isLabel: true,
+    roles: [userType.superadmin],
+    item: [
+      {
+        itemName: "Backup Operation",
+        href: routesConstants?.BACKUP_OPERATION,
+        iconUrl: <PersonOutlinedIcon />,
+        roles: [userType.superadmin],
+      },
+    ],
+  },
 ];

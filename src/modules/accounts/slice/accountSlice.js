@@ -15,8 +15,9 @@ import {
   GET_SUBS_BY_THIRD_PARTY,
   GET_THIRD_PARTY_ACCOUNT,
   INSIGHT_METRICS_CSN,
+  UPDATE_DOWNLOAD_PERMISSION,
 } from "@/services/url";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 // Get All User
@@ -25,6 +26,23 @@ export const getAllUser = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.get(GET_ALL_USER);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+//Update Download Permission
+export const updateDownloadPermission = createAsyncThunk(
+  `account/updateDownloadPermission`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        UPDATE_DOWNLOAD_PERMISSION,
+        payload
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -313,6 +331,20 @@ const accountSlice = createSlice({
       state.allUserData = null;
     });
 
+    //updateDownloadPermission
+    builder.addCase(updateDownloadPermission.pending, (state) => {});
+    builder.addCase(updateDownloadPermission.fulfilled, (state, action) => {
+      state.allUserData = {
+        ...current(state.allUserData),
+        User: current(state.allUserData)?.User?.map((i) =>
+          i?.id === action.meta.arg?.user_id
+            ? { ...i, is_download_allow: !i?.is_download_allow }
+            : i
+        ),
+      };
+    });
+    
+    builder.addCase(updateDownloadPermission.rejected, (state) => {});
     // getExportedAccount
     builder.addCase(getExportedAccount.pending, (state) => {
       state.exportedAccountData = [];

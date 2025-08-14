@@ -1,10 +1,12 @@
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  BACKUP_OPERATION,
   CITIES_MAP_URL,
   DASHBOARD_CHART,
   DASHBOARD_DATA,
   DASHBOARD_SEAT_DATE_CHART,
+  GET_DELETED_COUNT,
   GET_INVOICE_PENDING_LIST,
   GET_ORDER_LOADING_HO,
   GET_PAYMENTS_OUTSTANDING_LIST,
@@ -178,6 +180,34 @@ export const getRenewalDue = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.get(GET_RENEWAL_DUE);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const getDeletedData = createAsyncThunk(
+  `dashboard/getDeletedData`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_DELETED_COUNT + `?date=${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const backupOperation = createAsyncThunk(
+  `dashboard/BackupOperation`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(BACKUP_OPERATION, payload);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

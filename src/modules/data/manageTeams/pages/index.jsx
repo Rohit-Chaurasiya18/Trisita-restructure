@@ -1,5 +1,8 @@
 import CommonTable from "@/components/common/dataTable/CommonTable";
-import { getAllUser } from "@/modules/accounts/slice/accountSlice";
+import {
+  getAllUser,
+  updateDownloadPermission,
+} from "@/modules/accounts/slice/accountSlice";
 import { Typography } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +10,7 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import moment from "moment";
+import { toast } from "react-toastify";
 
 const ManageTeams = () => {
   const dispatch = useDispatch();
@@ -23,6 +27,34 @@ const ManageTeams = () => {
     { field: "last_name", headerName: "Last Name" },
     { field: "phone", headerName: "Phone Number", width: 250 },
     { field: "designation", headerName: "Designation", width: 250 },
+    {
+      field: "is_download_allow",
+      headerName: "Download Permission",
+      width: 160,
+      renderCell: (params) => {
+        return (
+          <input
+            type="checkbox"
+            style={{
+              height: "20px",
+              width: "100%",
+              textAlign: "center  ",
+            }}
+            checked={params?.value}
+            onChange={() => {
+              dispatch(
+                updateDownloadPermission({ user_id: params?.row?.id })
+              ).then((res) => {
+                if (res?.payload?.status === 200) {
+                  toast.success("Download permission update.");
+                }
+              });
+            }}
+          />
+        );
+      },
+    },
+
     {
       field: "user_type",
       headerName: "Access Level",

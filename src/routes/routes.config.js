@@ -53,6 +53,7 @@ import {
   UploadHistory,
   ComingSoon,
   RenewalDue,
+  BackupOperation,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -426,6 +427,11 @@ const routesConfig = {
       path: routesConstants?.NOTIFICATIONS,
       component: Notifications,
       roles: [userType.superadmin, userType.client],
+    },
+    {
+      path: routesConstants?.BACKUP_OPERATION,
+      component: BackupOperation,
+      roles: [userType.superadmin],
     },
   ],
   public: [{ path: routesConstants?.LOGIN, component: Login }],

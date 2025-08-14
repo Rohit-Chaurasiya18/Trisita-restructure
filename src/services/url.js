@@ -124,3 +124,6 @@ export const GET_NEW_SUBS_BY_THIRDPARTY = "/v1/api/new_get_subs_by_thirdparty/";
 export const GET_EXPORT_EXCEL_FILES = "/v1/api/get_export_excel_files/";
 export const GET_UPLOADED_FILES = "/v1/product/get_uploaded_files/";
 export const GET_RENEWAL_DUE = "/v1/api/get_renewal_due_subscriptions/";
+export const UPDATE_DOWNLOAD_PERMISSION = "/v1/disable_download/";
+export const GET_DELETED_COUNT = "/v1/api/get_deletion_counts/";
+export const BACKUP_OPERATION = "/v1/api/new_trigger_backup/";
