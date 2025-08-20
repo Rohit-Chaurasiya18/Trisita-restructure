@@ -2,10 +2,7 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   BACKUP_OPERATION,
-  CITIES_MAP_URL,
-  DASHBOARD_CHART,
   DASHBOARD_DATA,
-  DASHBOARD_SEAT_DATE_CHART,
   GET_DELETED_COUNT,
   GET_INVOICE_PENDING_LIST,
   GET_ORDER_LOADING_HO,
@@ -24,57 +21,6 @@ export const GetDashboardData = createAsyncThunk(
     try {
       let url = DASHBOARD_DATA;
       if (payload?.id) {
-        url = url + `/${payload?.id}`;
-      }
-      const response = await axiosReact.get(url, payload);
-      return response;
-    } catch (err) {
-      toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
-    }
-  }
-);
-
-export const GetDashboardChart = createAsyncThunk(
-  `dashboard/GetDashboardChartThunk`,
-  async (payload, thunkAPI) => {
-    try {
-      let url = DASHBOARD_CHART;
-      if (payload?.id) {
-        url = url + `/${payload?.id}`;
-      }
-      const response = await axiosReact.get(url, payload);
-      return response;
-    } catch (err) {
-      toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
-    }
-  }
-);
-
-export const GetSeatDateChart = createAsyncThunk(
-  `dashboard/GetSeatDateChartThunk`,
-  async (payload, thunkAPI) => {
-    try {
-      let url = DASHBOARD_SEAT_DATE_CHART;
-      if (payload) {
-        url = url + `/${payload?.id}`;
-      }
-      const response = await axiosReact.get(url, payload);
-      return response;
-    } catch (err) {
-      toast.error(err?.response?.data?.detail || somethingWentWrong);
-      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
-    }
-  }
-);
-
-export const GetCitiesMap = createAsyncThunk(
-  `dashboard/GetCitiesMap`,
-  async (payload, thunkAPI) => {
-    try {
-      let url = CITIES_MAP_URL;
-      if (payload) {
         url = url + `/${payload?.id}`;
       }
       const response = await axiosReact.get(url, payload);
@@ -256,56 +202,32 @@ const dashboardSlice = createSlice({
     builder.addCase(GetDashboardData.pending, (state) => {
       state.dashboardDataLoading = true;
       state.dashboardData = null;
-    });
-    builder.addCase(GetDashboardData.fulfilled, (state, action) => {
-      state.dashboardDataLoading = false;
-      state.dashboardData = action?.payload?.data;
-    });
-    builder.addCase(GetDashboardData.rejected, (state) => {
-      state.dashboardDataLoading = false;
-      state.dashboardData = null;
-    });
-
-    // Get Dashboard Chart
-    builder.addCase(GetDashboardChart.pending, (state) => {
       state.dashboardChart = null;
       state.dashboardChartLoading = true;
-    });
-    builder.addCase(GetDashboardChart.fulfilled, (state, action) => {
-      state.dashboardChart = action?.payload?.data;
-      state.dashboardChartLoading = false;
-    });
-    builder.addCase(GetDashboardChart.rejected, (state) => {
-      state.dashboardChart = null;
-      state.dashboardChartLoading = false;
-    });
-
-    // Get Seat Date Chart
-    builder.addCase(GetSeatDateChart.pending, (state) => {
       state.seatDateChart = null;
       state.seatDateChartLoading = true;
-    });
-    builder.addCase(GetSeatDateChart.fulfilled, (state, action) => {
-      state.seatDateChart = action?.payload?.data;
-      state.seatDateChartLoading = false;
-    });
-    builder.addCase(GetSeatDateChart.rejected, (state) => {
-      state.seatDateChart = null;
-      state.seatDateChartLoading = false;
-    });
-
-    // Get Cities Map Data
-    builder.addCase(GetCitiesMap.pending, (state) => {
       state.citiesMapChart = [];
       state.citiesMapLoading = true;
     });
-    builder.addCase(GetCitiesMap.fulfilled, (state, action) => {
-      state.citiesMapChart = action?.payload?.data?.topCities;
+    builder.addCase(GetDashboardData.fulfilled, (state, action) => {
+      state.dashboardDataLoading = false;
+      state.dashboardChartLoading = false;
+      state.seatDateChartLoading = false;
       state.citiesMapLoading = false;
+      state.citiesMapChart = action?.payload?.data?.cityData?.topCities;
+      state.seatDateChart = action?.payload?.data?.seatWithDateChart;
+      state.dashboardData = action?.payload?.data?.gridBoxData;
+      state.dashboardChart = action?.payload?.data?.seatQuantityChart;
     });
-    builder.addCase(GetCitiesMap.rejected, (state) => {
-      state.citiesMapChart = [];
+    builder.addCase(GetDashboardData.rejected, (state) => {
+      state.dashboardDataLoading = false;
+      state.dashboardChartLoading = false;
+      state.seatDateChartLoading = false;
       state.citiesMapLoading = false;
+      state.citiesMapChart = [];
+      state.seatDateChart = null;
+      state.dashboardData = null;
+      state.dashboardChart = null;
     });
 
     // Get Renewal Email Sent List

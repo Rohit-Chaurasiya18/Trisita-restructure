@@ -20,6 +20,7 @@ import RaOrderReducer from "@/modules/orderLoadingApi/pages/RAOrder/slice/RAOrde
 import ContactInformationReducer from "@/modules/data/contactInformation/slice/ContactInfoSlice";
 import LicenseOptimizationReducer from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
 import CampaignReducer from "@/modules/data/campaign/slice/CampaignSlice";
+import superAdminConsoleReducer from "@/modules/superAdminConsole/slice/index";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -43,5 +44,6 @@ const reducer = combineReducers({
   ContactInformation: ContactInformationReducer,
   LicenseOptimization: LicenseOptimizationReducer,
   Campaign: CampaignReducer,
+  superAdminConsole: superAdminConsoleReducer,
 });
 export default reducer;

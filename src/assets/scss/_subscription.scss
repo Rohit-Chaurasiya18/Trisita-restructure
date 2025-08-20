@@ -247,3 +247,21 @@
     cursor: pointer !important;
   }
 }
+.subscription-bdPerson-industry-chart {
+  display: flex;
+  gap: 10px;
+  @media (max-width: 985px) {
+    display: grid;
+    .w-50 {
+      width: 100% !important;
+    }
+  }
+}
+.new-subscription-industry-container {
+  display: flex;
+  gap: 10px;
+  @media (max-width: 985px) {
+    display: grid;
+    
+  }
+}

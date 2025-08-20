@@ -11,6 +11,7 @@ import {
   Routes as ReactRouterDomRoutes,
   Navigate,
 } from "react-router-dom";
+import Cookies from "@/services/cookies";
 
 const Common = (route) => (
   <Suspense fallback={<Loader />}>
@@ -36,8 +37,9 @@ Public.prototype = {
 
 const Private = (route) => {
   const { component: Component } = route;
-  const { userDetail } = useSelector((state) => ({
+  const { userDetail, user } = useSelector((state) => ({
     userDetail: state?.login?.userDetail,
+    user: state?.profile?.userDetail,
   }));
 
   // Check role access
@@ -82,8 +84,46 @@ const createNestedRoutes = (routes, RouteType) => {
 };
 
 const Routes = () => {
-  const { isAuth } = useSelector((state) => state.login);
+  const { isAuth, user } = useSelector((state) => ({
+    isAuth: state?.login?.isAuth,
+    user: state?.profile?.userDetail,
+  }));
   const { common, private: privateRoutes, public: publicRoutes } = routesConfig;
+  
+  const generateRoute = (arr, ids) => {
+    function filterRoutesByModuleId(routes, allowedIds) {
+      return routes
+        .map((route) => {
+          // filter children recursively (if any)
+          const children = route.children
+            ? filterRoutesByModuleId(route.children, allowedIds)
+            : undefined;
+
+          // check if this route should be included
+          const include =
+            route.moduleId === undefined ||
+            allowedIds?.includes(route.moduleId);
+
+          if (!include) return null;
+
+          return {
+            ...route,
+            ...(children ? { children } : {}),
+          };
+        })
+        .filter(Boolean); // remove nulls
+    }
+
+    // usage
+    const filteredPrivateRoutes = filterRoutesByModuleId(arr, ids);
+    return filteredPrivateRoutes;
+  };
+
+  const filteredPrivateRoutes = generateRoute(
+    privateRoutes,
+    Cookies.get("user")?.module_assigned_id
+  );
+
   return (
     <ReactRouterDomRoutes>
       {isAuth ? (
@@ -94,7 +134,7 @@ const Routes = () => {
             element={<Navigate to={routesConstants?.DASHBOARD} />}
           />
           <Route path="/" element={<Layout />}>
-            {createNestedRoutes(privateRoutes, Private)}
+            {createNestedRoutes(filteredPrivateRoutes, Private)}
           </Route>
           <Route
             path="*"

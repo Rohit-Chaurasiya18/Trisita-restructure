@@ -1,10 +1,7 @@
 export const LOGIN = "/v1/login/";
 export const PROFILE = "/v1/user/";
 export const CHANGED_PASSWORD = "/v1/change_password";
-export const DASHBOARD_DATA = "/v1/api/get_dashboard_data";
-export const DASHBOARD_CHART = "/v1/api/get_dashboard_chart";
-export const CITIES_MAP_URL = "/v1/api/get_top_city_data";
-export const DASHBOARD_SEAT_DATE_CHART = "/v1/api/get_seats_date_chart";
+export const DASHBOARD_DATA = "/v1/api/new_get_dashboard_data";
 export const GET_ALL_BRANCH = "/v1/api/get_all_branch/";
 export const GET_ALL_ACCOUNT = "/v1/api/account_dropdown/";
 export const INSIGHT_METRICS_CUSTOMER =
@@ -127,3 +124,5 @@ export const GET_RENEWAL_DUE = "/v1/api/get_renewal_due_subscriptions/";
 export const UPDATE_DOWNLOAD_PERMISSION = "/v1/disable_download/";
 export const GET_DELETED_COUNT = "/v1/api/get_deletion_counts/";
 export const BACKUP_OPERATION = "/v1/api/new_trigger_backup/";
+export const GET_ALL_USERLIST = "/v1/new_get_user/";
+export const UPDATE_USER_PERMISSION = "/v1/toggle_user_module/";

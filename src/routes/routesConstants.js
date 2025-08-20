@@ -52,6 +52,7 @@ const routesConstants = {
   RENEW_HISTORY: "/renew_history",
   LEARNING_LAB: "/learning_lab",
   BACKUP_OPERATION: "/backup_operation",
+  PERMISSION_PROFILE: "/permission_profile",
   GENERATE_TICKET: "/generate_ticket",
   PROFILE_FORM: "/form",
   CALENDAR: "/calendar",

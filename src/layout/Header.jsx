@@ -19,6 +19,8 @@ import Logout from "@mui/icons-material/Logout";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import { userType } from "@/constants";
+import { getUserProfile } from "@/modules/profile/slice/profileSlice";
+import Cookies, { cookieKeys } from "@/services/cookies";
 
 const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -29,11 +31,12 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
 
-  const { filter, userDetail } = useSelector((state) => ({
+  const { filter, userDetail, user } = useSelector((state) => ({
     filter: state?.layout?.filter,
     userDetail: state?.login?.userDetail,
+    user: state?.profile?.userDetail,
   }));
-
+  
   // Toggle profile dropdown
   const toggleProfileDropdown = () => {
     setProfileDropdownOpen(!isProfileDropdownOpen);
@@ -66,7 +69,13 @@ const Header = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
 
   useEffect(() => {
     dispatch(fetchNotifications());
-  }, []);
+    let user = Cookies.get("user");
+    dispatch(getUserProfile(user?.id)).then((res) => {
+      if (res?.payload?.data) {
+        Cookies.set(cookieKeys?.USER, res?.payload?.data);
+      }
+    });
+  }, [location.pathname]);
 
   return (
     <header className="header_block">

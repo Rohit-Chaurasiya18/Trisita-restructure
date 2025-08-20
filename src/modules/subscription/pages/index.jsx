@@ -205,6 +205,9 @@ const Subscription = () => {
     { field: "part_number", headerName: "Part Number", width: 200 },
     ...(userDetail?.user_type !== userType.client
       ? [
+          { field: "industry", headerName: "Industry", width: 200 },
+          { field: "segment", headerName: "Segment", width: 200 },
+          { field: "sub_segment", headerName: "Sub Segment", width: 200 },
           {
             field: "third_party",
             headerName: "Third Party Name",
@@ -1384,6 +1387,395 @@ const Subscription = () => {
   const handleBdPersonChange = (viewType) => {
     setBdPersonType(viewType);
   };
+
+  // Total Subscription as per Industry
+  const [industryType, setIndustryType] = useState("subscription");
+  const [industryLegend, setindustryLegend] = useState("");
+
+  const handleIndustryLegendClick = (data) => {
+    let allData;
+    const isSameColor = industryLegend === data;
+    if (isSameColor) {
+      allData = handleFilter(subscriptionData);
+    } else {
+      allData = filteredData;
+    }
+    setindustryLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item?.industry === data);
+
+    setFilteredData(updatedData);
+  };
+  const industryBarChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const industryGroups = {};
+      filteredData.forEach((item) => {
+        const group = item?.industry;
+        // Initialize group if not exists
+        if (!industryGroups[group]) {
+          industryGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+        // Aggregate values
+        industryGroups[group].count += 1;
+        industryGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        industryGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+      // Convert to arrays for the chart
+      const labels = Object.keys(industryGroups);
+      let series;
+
+      switch (industryType) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(industryGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(industryGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => industryGroups[group].count);
+      }
+
+      // Optional: sort labels and series based on value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 500,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleIndustryLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === industryLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200,
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, industryType]);
+
+  const handleIndustryChange = (viewType) => {
+    setIndustryType(viewType);
+  };
+
+  // Total Subscription as per Segment
+  const [segmentType, setSegmentType] = useState("subscription");
+  const [segmentLegend, setSegmentLegend] = useState("");
+
+  const handleSegmentLegendClick = (data) => {
+    let allData;
+    const isSameColor = segmentLegend === data;
+    if (isSameColor) {
+      allData = handleFilter(subscriptionData);
+    } else {
+      allData = filteredData;
+    }
+    setSegmentLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item?.segment === data);
+
+    setFilteredData(updatedData);
+  };
+  const segmentBarChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const segmentGroups = {};
+      filteredData.forEach((item) => {
+        const group = item?.segment;
+        // Initialize group if not exists
+        if (!segmentGroups[group]) {
+          segmentGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+        // Aggregate values
+        segmentGroups[group].count += 1;
+        segmentGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        segmentGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+      // Convert to arrays for the chart
+      const labels = Object.keys(segmentGroups);
+      let series;
+
+      switch (segmentType) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(segmentGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(segmentGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => segmentGroups[group].count);
+      }
+
+      // Optional: sort labels and series based on value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 500,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleSegmentLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === segmentLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: "100%",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, segmentType]);
+
+  const handleSegmentChange = (viewType) => {
+    setSegmentType(viewType);
+  };
+
+  // Total Subscription as per Sub Segment
+  const [subSegmentType, setSubSegmentType] = useState("subscription");
+  const [subSegmentLegend, setSubSegmentLegend] = useState("");
+
+  const handleSubSegmentLegendClick = (data) => {
+    let allData;
+    const isSameColor = subSegmentLegend === data;
+    if (isSameColor) {
+      allData = handleFilter(subscriptionData);
+    } else {
+      allData = filteredData;
+    }
+    setSubSegmentLegend(isSameColor ? "" : data);
+    const updatedData = isSameColor
+      ? allData
+      : allData?.filter((item) => item?.sub_segment === data);
+
+    setFilteredData(updatedData);
+  };
+  const subSegmentBarChart = useMemo(() => {
+    if (filteredData?.length) {
+      // Aggregate data by account_group based on selected type
+      const subSegmentGroups = {};
+      filteredData.forEach((item) => {
+        const group = item?.sub_segment;
+        // Initialize group if not exists
+        if (!subSegmentGroups[group]) {
+          subSegmentGroups[group] = {
+            count: 0,
+            dtp: 0,
+            acv: 0,
+          };
+        }
+        // Aggregate values
+        subSegmentGroups[group].count += 1;
+        subSegmentGroups[group].dtp += parseFloat(item.dtp_price) || 0;
+        subSegmentGroups[group].acv += parseFloat(item.acv_price) || 0;
+      });
+
+      // Convert to arrays for the chart
+      const labels = Object.keys(subSegmentGroups);
+      let series;
+
+      switch (subSegmentType) {
+        case "dtp_price":
+          series = labels.map((group) =>
+            parseFloat(subSegmentGroups[group].dtp.toFixed(2))
+          );
+          break;
+        case "acv_price":
+          series = labels.map((group) =>
+            parseFloat(subSegmentGroups[group].acv.toFixed(2))
+          );
+          break;
+        case "subscription":
+        default:
+          series = labels.map((group) => subSegmentGroups[group].count);
+      }
+
+      // Optional: sort labels and series based on value
+      const sortedData = labels.map((label, index) => ({
+        label,
+        value: series[index],
+      }));
+
+      sortedData.sort((a, b) => b.value - a.value);
+
+      const sortedLabels = sortedData.map((item) => item.label);
+      const sortedSeries = sortedData.map((item) => item.value);
+      return {
+        options: {
+          chart: {
+            type: "pie",
+            height: 500,
+            events: {
+              legendClick: (chartContext, seriesIndex) => {
+                const clickedLegend = sortedLabels[seriesIndex];
+                if (clickedLegend) {
+                  handleSubSegmentLegendClick(clickedLegend);
+                }
+              },
+            },
+          },
+          labels: sortedLabels,
+          legend: {
+            position: "bottom",
+            onItemClick: {
+              toggleDataSeries: true, // Enable toggling of data series
+            },
+            onItemHover: {
+              highlightDataSeries: true, // Highlight the hovered series
+            },
+            formatter: (seriesName, opts) => {
+              const isHighlighted = seriesName === subSegmentLegend;
+              const count = opts.w.globals.series[opts.seriesIndex];
+              return `<span style="color: ${
+                isHighlighted ? "black" : "black"
+              };">${seriesName} - ${count}</span>`;
+            },
+          },
+          plotOptions: {
+            pie: {
+              distributed: true, // Distribute colors across bars
+            },
+          },
+          responsive: [
+            {
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: "100%",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            },
+          ],
+        },
+        series: sortedSeries,
+      };
+    } else {
+      return getEmptyPieChartConfig();
+    }
+  }, [filteredData, subSegmentType]);
+
+  const handleSubSegmentChange = (viewType) => {
+    setSubSegmentType(viewType);
+  };
+
   return (
     <>
       <div>
@@ -1629,35 +2021,81 @@ const Subscription = () => {
                 </div>
               </div>
             )}
+            {userDetail?.user_type !== userType.client &&
+            subscriptionDataLoading ? (
+              <SkeletonLoader />
+            ) : (
+              userDetail?.user_type !== userType.client && (
+                <>
+                  <div className="subscription-bdPerson-industry-chart">
+                    <CommonChart
+                      title={"Total Subscription as per Industry"}
+                      options={industryBarChart?.options}
+                      series={industryBarChart?.series}
+                      subCategory={["Subscription", "DTP", "ACV"]}
+                      onSubCategoryClick={(index) => {
+                        if (index === 0) handleIndustryChange("subscription");
+                        if (index === 1) handleIndustryChange("dtp_price");
+                        if (index === 2) handleIndustryChange("acv_price");
+                      }}
+                      className={"w-50"}
+                    />
+                    <CommonChart
+                      title={getBdPersonTitle()}
+                      options={bdPersonPieChart?.options}
+                      series={bdPersonPieChart?.series}
+                      className="w-50"
+                      subCategory={["Subscription", "DTP", "ACV"]}
+                      onSubCategoryClick={(index) => {
+                        if (index === 0) handleBdPersonChange("subscription");
+                        if (index === 1) handleBdPersonChange("dtp_price");
+                        if (index === 2) handleBdPersonChange("acv_price");
+                      }}
+                    />
+                  </div>
+                  <div className="subscription-bdPerson-industry-chart">
+                    <CommonChart
+                      title={"Total Subscription as per Segment"}
+                      options={segmentBarChart?.options}
+                      series={segmentBarChart?.series}
+                      subCategory={["Subscription", "DTP", "ACV"]}
+                      onSubCategoryClick={(index) => {
+                        if (index === 0) handleSegmentChange("subscription");
+                        if (index === 1) handleSegmentChange("dtp_price");
+                        if (index === 2) handleSegmentChange("acv_price");
+                      }}
+                      className={"w-50"}
+                    />
+                    <CommonChart
+                      title={"Total Subscription as per Sub Segment"}
+                      options={subSegmentBarChart?.options}
+                      series={subSegmentBarChart?.series}
+                      subCategory={["Subscription", "DTP", "ACV"]}
+                      onSubCategoryClick={(index) => {
+                        if (index === 0) handleSubSegmentChange("subscription");
+                        if (index === 1) handleSubSegmentChange("dtp_price");
+                        if (index === 2) handleSubSegmentChange("acv_price");
+                      }}
+                      className={"w-50"}
+                    />
+                  </div>
+                </>
+              )
+            )}
             {subscriptionDataLoading ? (
               <SkeletonLoader />
             ) : (
               <div className="account-industry-chart-2 mt-4">
-                {userDetail?.user_type !== userType.client && (
-                  <CommonChart
-                    title={getBdPersonTitle()}
-                    options={bdPersonPieChart?.options}
-                    series={bdPersonPieChart?.series}
-                    className="chart-data-1"
-                    subCategory={["Subscription", "DTP", "ACV"]}
-                    onSubCategoryClick={(index) => {
-                      if (index === 0) handleBdPersonChange("subscription");
-                      if (index === 1) handleBdPersonChange("dtp_price");
-                      if (index === 2) handleBdPersonChange("acv_price");
-                    }}
-                  />
-                )}
                 <CommonChart
                   title="On boarding Health adoption report"
                   options={onBoardHealthChart.options}
                   series={onBoardHealthChart.series}
-                  className={`chart-data-2 ${
-                    userDetail?.user_type === userType.client
-                  } w-100`}
+                  className={`chart-data-2 w-100`}
                 />
               </div>
             )}
           </div>
+
           {subscriptionDataLoading ? (
             <SkeletonLoader />
           ) : (

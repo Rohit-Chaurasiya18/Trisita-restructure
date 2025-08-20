@@ -145,9 +145,11 @@ export const UploadHistory = lazy(() =>
   import("@/modules/data/uploadHistory/pages/index")
 );
 export const BackupOperation = lazy(() =>
-  import("@/modules/backupOperation/index")
+  import("@/modules/superAdminConsole/pages/BackupOperation")
 );
-
+export const PermissionProfile = lazy(() =>
+  import("@/modules/superAdminConsole/pages/PermissionProfile")
+);
 export const _404 = lazy(() => import("@/components/common/_404"));
 export const Login = lazy(() => import("@/modules/login/pages"));
 export const Profile = lazy(() => import("@/modules/profile/index"));

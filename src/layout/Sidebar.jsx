@@ -11,8 +11,9 @@ import { setDashboardLoading } from "@/modules/dashboard/slice";
 const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
   const location = useLocation();
   const dispatch = useDispatch();
-  const { userDetail } = useSelector((state) => ({
+  const { userDetail, user } = useSelector((state) => ({
     userDetail: state?.login?.userDetail,
+    user: state?.profile?.userDetail,
   }));
 
   // Handle screen resize
@@ -64,41 +65,51 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                   <>
                     {link?.isLabel ? (
                       <>
-                        <h4 key={index} className="mb-3 mt-4">
-                          {link?.name}
-                        </h4>
+                        {link?.modules?.filter((i) =>
+                          user?.module_assigned_id?.includes(i)
+                        )?.length > 0 && (
+                          <h4 key={index} className="mb-3 mt-4">
+                            {link?.name}
+                          </h4>
+                        )}
                         {link?.item?.map((item, ind) => (
                           <>
-                            {item?.roles?.includes(userDetail?.user_type) && (
-                              <li
-                                key={ind}
-                                onClick={() => handleItemClick(item?.href)}
-                                className="mb-3"
-                              >
-                                <Tooltip
-                                  title={item?.itemName}
-                                  arrow
-                                  TransitionComponent={Zoom}
-                                  placement="right"
-                                  disableHoverListener={isOpen}
+                            {item?.roles?.includes(userDetail?.user_type) &&
+                              user?.module_assigned_id?.includes(
+                                item?.moduleId
+                              ) && (
+                                <li
                                   key={ind}
+                                  onClick={() => handleItemClick(item?.href)}
+                                  className="mb-3"
                                 >
-                                  <Link
-                                    to={item?.href}
+                                  <Tooltip
+                                    title={item?.itemName}
+                                    arrow
+                                    TransitionComponent={Zoom}
+                                    placement="right"
+                                    disableHoverListener={isOpen}
                                     key={ind}
-                                    className={`${
-                                      location.pathname === item?.href &&
-                                      "active-link"
-                                    }`}
                                   >
-                                    {item?.iconUrl && item?.iconUrl}
-                                    <span className="menu-item-text" key={ind}>
-                                      {item?.itemName}
-                                    </span>
-                                  </Link>
-                                </Tooltip>
-                              </li>
-                            )}
+                                    <Link
+                                      to={item?.href}
+                                      key={ind}
+                                      className={`${
+                                        location.pathname === item?.href &&
+                                        "active-link"
+                                      }`}
+                                    >
+                                      {item?.iconUrl && item?.iconUrl}
+                                      <span
+                                        className="menu-item-text"
+                                        key={ind}
+                                      >
+                                        {item?.itemName}
+                                      </span>
+                                    </Link>
+                                  </Tooltip>
+                                </li>
+                              )}
                           </>
                         ))}
                       </>

@@ -81,4 +81,6 @@ export const getEmptyBarChartConfig = ({
 export const userType = {
   superadmin: "Superadmin",
   client: "Client",
+  bdManager: "BDManager",
+  primaryAdmin: "Primaryadmin",
 };

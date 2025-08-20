@@ -2,7 +2,7 @@ import CommonButton from "@/components/common/buttons/CommonButton";
 import CommonDatePicker from "@/components/common/date/CommonDatePicker";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { backupOperation, getDeletedData } from "../dashboard/slice";
+import { backupOperation, getDeletedData } from "../../dashboard/slice";
 import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 import moment from "moment";
 import { toast } from "react-toastify";

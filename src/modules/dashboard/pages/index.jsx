@@ -11,13 +11,7 @@ import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import { BarChart, GeographyChart, LineChart } from "../components";
 import { Tooltip } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  GetCitiesMap,
-  GetDashboardChart,
-  GetDashboardData,
-  GetSeatDateChart,
-  setDashboardLoading,
-} from "../slice";
+import { GetDashboardData, setDashboardLoading } from "../slice";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
@@ -55,15 +49,6 @@ const Dashboard = () => {
   useEffect(() => {
     dispatch(
       GetDashboardData({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
-    );
-    dispatch(
-      GetDashboardChart({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
-    );
-    dispatch(
-      GetSeatDateChart({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
-    );
-    dispatch(
-      GetCitiesMap({ id: filter?.csn === "All CSN" ? "" : filter?.csn })
     );
   }, [filter?.csn]);
 
@@ -248,7 +233,7 @@ const Dashboard = () => {
                 <label className="fw-bold">Seat Quantity</label>
               )}
               <BarChart
-                data={dashboardChart?.Response}
+                data={dashboardChart}
                 isClient={userDetail?.user_type === userType.client}
               />
             </div>

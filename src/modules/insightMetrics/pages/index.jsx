@@ -508,6 +508,9 @@ const InsightMetrics = () => {
               </div>
             ),
           },
+          { field: "industry", headerName: "Industry", width: 200 },
+          { field: "segment", headerName: "Segment", width: 200 },
+          { field: "sub_segment", headerName: "Sub Segment", width: 200 },
         ]
       : []),
 

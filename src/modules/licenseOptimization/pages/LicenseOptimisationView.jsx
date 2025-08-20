@@ -40,7 +40,7 @@ const LicenseOptimisationView = () => {
       end_date: params?.endDate,
     };
     dispatch(getLicenseOptimisation(payload));
-  }, [params]);
+  }, []);
 
   const openModal = (features) =>
     setModal({ show: true, features: features || [] });
