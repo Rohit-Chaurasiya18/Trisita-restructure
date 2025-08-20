@@ -996,7 +996,7 @@ const AlertSubscription = () => {
     let allData;
     const isSameColor = industryLegend === data;
     if (isSameColor) {
-      allData = handleFilter(subscriptionData);
+      allData = handleFilter(alertSubscriptionList);
     } else {
       allData = filteredData;
     }
@@ -1125,7 +1125,7 @@ const AlertSubscription = () => {
     let allData;
     const isSameColor = segmentLegend === data;
     if (isSameColor) {
-      allData = handleFilter(subscriptionData);
+      allData = handleFilter(alertSubscriptionList);
     } else {
       allData = filteredData;
     }
@@ -1254,7 +1254,7 @@ const AlertSubscription = () => {
     let allData;
     const isSameColor = subSegmentLegend === data;
     if (isSameColor) {
-      allData = handleFilter(subscriptionData);
+      allData = handleFilter(alertSubscriptionList);
     } else {
       allData = filteredData;
     }

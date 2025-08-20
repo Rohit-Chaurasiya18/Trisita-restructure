@@ -21,6 +21,7 @@ import ProductDetailModal from "../component/ProductDetailModal";
 import AddProductDetail from "../component/AddProductDetail";
 import ConfirmationModal from "@/components/common/modal/ConfirmationModal";
 import { toast } from "react-toastify";
+import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 
 const orderTypeOptions = [
   { value: "New", label: "New" },
@@ -44,6 +45,8 @@ const AddEditOrderLoadingHO = () => {
     () => state?.user?.value === "ThirdParty",
     [state]
   );
+  const [bdOptions, setBdOptions] = useState([]);
+  const [accountOption, setAccountOption] = useState([]);
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -85,11 +88,12 @@ const AddEditOrderLoadingHO = () => {
 
   const validationSchema = Yup.object().shape({
     orderLoadingDate: Yup.string().required("Order Loading Date is required"),
-    orderType: Yup.object().required("Order Type is required"),
-    branch: Yup.object().required("Branch is required"),
+    orderType: Yup.string().required("Order Type is required"),
+    branch: Yup.string().required("Branch is required"),
     bdPerson: Yup.array()
-      .min(1, "At least one BD Person is required")
-      .required("BD Person is required"),
+      .of(Yup.mixed()) // or Yup.number(), Yup.string(), depending on type
+      .min(1, "At least one value must be selected")
+      .required("This field is required"),
     account: Yup.object().required("Account is required"),
     thirdPartyAccount: isThirdParty
       ? Yup.object().required("Third Party Account is required")
@@ -261,6 +265,61 @@ const AddEditOrderLoadingHO = () => {
     setShowConfirm(false);
   };
 
+  const handleBranchChange = (branchId, bdIds = values?.bdPerson) => {
+    if (branchId) {
+      dispatch(
+        getBdPersonByBranch({
+          value: branchId,
+          orderType: values?.orderType,
+        })
+      ).then((res) => {
+        let bdPersonArray = res.payload.data?.bd_person?.map((item) => ({
+          label: item?.first_name + " " + item?.last_name,
+          value: item?.id,
+        }));
+        setBdOptions(bdPersonArray);
+        if (bdIds?.length > 0) {
+          let drr = bdIds?.filter((i) =>
+            bdPersonArray?.map((itm) => itm?.value)?.includes(i)
+          );
+          setFieldValue("bdPerson", drr);
+        } else {
+          setFieldValue("bdPerson", []);
+        }
+      });
+    } else {
+      setBdOptions([]);
+      setFieldValue("bdPerson", []);
+      setAccountOption([]);
+      setFieldValue("account", "");
+    }
+  };
+
+  const handeleBdChange = (bdIds) => {
+    if (bdIds?.length > 0) {
+      dispatch(
+        getAccountByBdPerson({
+          value: bdIds?.join(","),
+          orderType: values?.orderType,
+        })
+      ).then((res) => {
+        if (res?.payload?.data?.accounts?.length > 0) {
+          debugger;
+          let formattedOptions = res?.payload?.data?.accounts?.map((item) => ({
+            value: item?.id,
+            label: `${item?.name} (${item?.csn})`,
+            bdIds: item?.bd_person_ids,
+          }));
+          setAccountOption(formattedOptions);
+        } else {
+          setAccountOption([]);
+        }
+      });
+    } else {
+      setFieldValue("account", "");
+    }
+  };
+  console.log(values);
   return (
     <div className="">
       <div className="">
@@ -309,17 +368,11 @@ const AddEditOrderLoadingHO = () => {
               name="orderType"
               placeholder="Select a Order Type"
               options={orderTypeOptions}
-              value={values?.orderType}
+              value={orderTypeOptions?.find(
+                (item) => item?.value === values?.orderType
+              )}
               onChange={(selectedOption) => {
-                setFieldValue("orderType", selectedOption);
-                setFieldValue("branch", "");
-                setFieldValue("bdPerson", "");
-                setFieldValue("account", "");
-                if (selectedOption?.value) {
-                  setFieldTouched("orderType", false);
-                } else {
-                  setFieldTouched("orderType", true);
-                }
+                setFieldValue("orderType", selectedOption?.value);
               }}
               error={errors?.orderType && touched?.orderType}
               errorText={errors.orderType}
@@ -329,64 +382,83 @@ const AddEditOrderLoadingHO = () => {
               label="Branch"
               required
               name="branch"
-              value={values?.branch}
-              onChange={(selectedOption) => {
-                setFieldValue("branch", selectedOption);
-                if (selectedOption?.value) {
-                  setFieldTouched("branch", false);
-                } else {
-                  setFieldTouched("branch", true);
-                }
-                setFieldValue("bdPerson", "");
-                setFieldValue("account", "");
-                dispatch(
-                  getBdPersonByBranch({
-                    value: selectedOption?.value,
-                    orderType: values?.orderType?.value,
-                  })
-                );
-              }}
               options={allBranch}
+              value={allBranch?.filter(
+                (item) => item?.value === values?.branch
+              )}
+              onChange={(selectedOption) => {
+                if (values?.orderType) {
+                  if (values?.bdPerson?.length > 0) {
+                    CustomSweetAlert(
+                      "Change Branch?",
+                      "Changing the branch will update the BD Person(s) and Account based on the selected branch. Do you want to continue?",
+                      "Warning",
+                      true,
+                      "Yes, Change Branch",
+                      "Cancel",
+                      (result) => {
+                        if (result.isConfirmed) {
+                          setFieldValue("branch", selectedOption?.value);
+                          handleBranchChange(selectedOption?.value);
+                        }
+                      }
+                    );
+                  } else {
+                    setFieldValue("branch", selectedOption?.value);
+                    handleBranchChange(selectedOption?.value);
+                  }
+                } else {
+                  toast.error(
+                    "Please select Order Type first then select branch."
+                  );
+                }
+              }}
               placeholder="Select a Branch"
               error={errors?.branch && touched?.branch}
               errorText={errors?.branch}
-              isDisabled={!values?.orderType?.value || branchListLoading}
             />
             <CustomSelect
               label="BD Person"
               required
               name="bdPerson"
               placeholder="Select a BD Person"
-              value={values?.bdPerson}
+              options={bdOptions}
+              value={bdOptions?.filter((item) =>
+                values?.bdPerson?.includes(item?.value)
+              )}
               onChange={(selectedOption) => {
-                let payload = selectedOption
-                  ?.map((item) => item?.value)
-                  .join(",");
-                dispatch(
-                  getAccountByBdPerson({
-                    value: payload,
-                    orderType: values?.orderType?.value,
-                  })
-                );
-                setFieldValue("bdPerson", selectedOption);
-                setFieldValue("account", "");
-                setFieldValue("thirdPartyAccount", "");
-
-                if (selectedOption?.length > 0) {
-                  setFieldTouched("bdPerson", false);
+                if (values?.account) {
                 } else {
-                  setFieldTouched("bdPerson", true);
+                  let bdIds = selectedOption?.map((item) => item?.value);
+                  setFieldValue("bdPerson", bdIds);
+                  handeleBdChange(bdIds);
                 }
+                // let payload = selectedOption
+                //   ?.map((item) => item?.value)
+                //   .join(",");
+                // dispatch(
+                //   getAccountByBdPerson({
+                //     value: payload,
+                //     orderType: values?.orderType?.value,
+                //   })
+                // );
+                // setFieldValue("bdPerson", selectedOption);
+                // setFieldValue("account", "");
+                // setFieldValue("thirdPartyAccount", "");
+                // if (selectedOption?.length > 0) {
+                //   setFieldTouched("bdPerson", false);
+                // } else {
+                //   setFieldTouched("bdPerson", true);
+                // }
               }}
               isMulti
-              options={bdPersonByBranch}
               error={errors?.bdPerson && touched?.bdPerson}
               errorText={errors?.bdPerson}
-              isDisabled={
-                !values?.branch?.value ||
-                branchListLoading ||
-                bdPersonByBranchLoading
-              }
+              // isDisabled={
+              //   !values?.branch?.value ||
+              //   branchListLoading ||
+              //   bdPersonByBranchLoading
+              // }
             />
             <CustomSelect
               label="Account"
@@ -395,73 +467,54 @@ const AddEditOrderLoadingHO = () => {
               placeholder="Select a Account"
               value={values?.account}
               onChange={(selectedOption) => {
-                setShowConfirm({ isShow: true, type: 1 });
-                setFieldValue("account", selectedOption);
-                if (selectedOption?.value) {
-                  setFieldTouched("account", false);
-                } else {
-                  setFieldTouched("account", true);
-                }
+                // setShowConfirm({ isShow: true, type: 1 });
+                // setFieldValue("account", selectedOption);
+                // if (selectedOption?.value) {
+                //   setFieldTouched("account", false);
+                // } else {
+                //   setFieldTouched("account", true);
+                // }
               }}
               options={accountByBdPerson}
               error={errors?.account && touched?.account}
               errorText={errors?.account}
-              isDisabled={
-                !values?.branch?.value ||
-                branchListLoading ||
-                bdPersonByBranchLoading ||
-                values?.bdPerson?.length === 0 ||
-                accountByBdPersonLoading
-              }
+              // isDisabled={
+              //   !values?.branch?.value ||
+              //   branchListLoading ||
+              //   bdPersonByBranchLoading ||
+              //   values?.bdPerson?.length === 0 ||
+              //   accountByBdPersonLoading
+              // }
             />
-            <CommonInputTextField
-              labelName="PO Number"
-              id="poNumber"
-              name="poNumber"
-              className="input"
-              mainDiv="form-group"
-              labelClass="label"
-              placeHolder="Enter PO Number"
-              required
-              value={values?.poNumber}
-              isInvalid={errors?.poNumber && touched?.poNumber}
-              errorText={errors?.poNumber}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              requiredText
-            />
-            <CommonDatePicker
-              label="PO Date"
-              name="poDate"
-              required
-              value={values?.poDate}
-              onChange={(date) => setFieldValue("poDate", date)}
-              error={touched?.poDate && !!errors?.poDate}
-              errorText={errors?.poDate}
-            />
-            <div className="form-group">
-              <label className="form-label label requiredText">
-                {isThirdParty && "Third Party"} PO Copy
-                <span className="text-danger"> *</span>
-              </label>
-              <input
-                ref={poCopyRef}
-                type="file"
-                className={`form-control ${
-                  errors?.poCopy && touched?.poCopy ? "is-invalid" : ""
-                } input`}
-                name="poCopy"
-                id="poCopy"
-                onBlur={handleBlur}
-                onChange={(e) => setFieldValue("poCopy", e.target.files[0])}
-              />
-              {errors?.poCopy && touched?.poCopy && (
-                <div className="invalid-feedback ">{errors?.poCopy}</div>
-              )}
-            </div>
-
             {isThirdParty && (
               <>
+                <CustomSelect
+                  label="Third Party Account"
+                  required
+                  name="thirdPartyAccount"
+                  placeholder="Select a Account"
+                  value={values?.thirdPartyAccount}
+                  onChange={(selectedOption) => {
+                    // setFieldValue("thirdPartyAccount", selectedOption);
+                    // if (selectedOption?.value) {
+                    //   setFieldTouched("thirdPartyAccount", false);
+                    // } else {
+                    //   setFieldTouched("thirdPartyAccount", true);
+                    // }
+                  }}
+                  options={thirdPartyAccountByBdPerson}
+                  error={
+                    errors?.thirdPartyAccount && touched?.thirdPartyAccount
+                  }
+                  errorText={errors?.thirdPartyAccount}
+                  // isDisabled={
+                  //   !values?.branch?.value ||
+                  //   branchListLoading ||
+                  //   bdPersonByBranchLoading ||
+                  //   values?.bdPerson?.length === 0 ||
+                  //   thirdPartyAccountByBdPersonLoading
+                  // }
+                />
                 <div className="form-group">
                   <label className="form-label label requiredText">
                     Client Party PO Copy
@@ -488,35 +541,53 @@ const AddEditOrderLoadingHO = () => {
                     </div>
                   )}
                 </div>
-                <CustomSelect
-                  label="Third Party Account"
-                  required
-                  name="thirdPartyAccount"
-                  placeholder="Select a Account"
-                  value={values?.thirdPartyAccount}
-                  onChange={(selectedOption) => {
-                    setFieldValue("thirdPartyAccount", selectedOption);
-                    if (selectedOption?.value) {
-                      setFieldTouched("thirdPartyAccount", false);
-                    } else {
-                      setFieldTouched("thirdPartyAccount", true);
-                    }
-                  }}
-                  options={thirdPartyAccountByBdPerson}
-                  error={
-                    errors?.thirdPartyAccount && touched?.thirdPartyAccount
-                  }
-                  errorText={errors?.thirdPartyAccount}
-                  isDisabled={
-                    !values?.branch?.value ||
-                    branchListLoading ||
-                    bdPersonByBranchLoading ||
-                    values?.bdPerson?.length === 0 ||
-                    thirdPartyAccountByBdPersonLoading
-                  }
-                />
               </>
             )}
+            <div className="form-group">
+              <label className="form-label label requiredText">
+                {isThirdParty && "Third Party"} PO Copy
+                <span className="text-danger"> *</span>
+              </label>
+              <input
+                ref={poCopyRef}
+                type="file"
+                className={`form-control ${
+                  errors?.poCopy && touched?.poCopy ? "is-invalid" : ""
+                } input`}
+                name="poCopy"
+                id="poCopy"
+                onBlur={handleBlur}
+                onChange={(e) => setFieldValue("poCopy", e.target.files[0])}
+              />
+              {errors?.poCopy && touched?.poCopy && (
+                <div className="invalid-feedback ">{errors?.poCopy}</div>
+              )}
+            </div>
+            <CommonInputTextField
+              labelName="PO Number"
+              id="poNumber"
+              name="poNumber"
+              className="input"
+              mainDiv="form-group"
+              labelClass="label"
+              placeHolder="Enter PO Number"
+              required
+              value={values?.poNumber}
+              isInvalid={errors?.poNumber && touched?.poNumber}
+              errorText={errors?.poNumber}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              requiredText
+            />
+            <CommonDatePicker
+              label="PO Date"
+              name="poDate"
+              required
+              value={values?.poDate}
+              onChange={(date) => setFieldValue("poDate", date)}
+              error={touched?.poDate && !!errors?.poDate}
+              errorText={errors?.poDate}
+            />
             <CommonInputTextField
               labelName="Billing Address"
               id="billingAddress"
