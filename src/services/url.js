@@ -34,7 +34,8 @@ export const GET_INSIGHT_METRICS_CONTRACT =
   "/v1/api/get_insight_metrics_contract";
 export const GET_INSIGHT_METRICS_V2_CONTRACT =
   "/v1/api/get_insight_metrics_v2_pop_up";
-export const GET_USUAGE_DATA = "/v1/api/new_get_usage_data/";
+export const GET_USUAGE_DATA = "/v1/api/new_get_usage_data_celery/";
+export const GET_TASK_USAGES_DATA = "/v1/api/new_get_usage_task_result/";
 export const GET_USUAGE_PRODUCT_FEATURE_CHART =
   "/v1/api/new_get_usage_product_feature_chart/";
 export const GET_UNIQUE_USAGE_USER_COUNT = "/v1/api/new_usage_user_count/";
@@ -94,7 +95,9 @@ export const GET_SUBS_BY_THIRD_PARTY = "/v1/api/get_subs_by_thirdparty/";
 export const GET_BRANCH_ACCOUNT_PRODUCTLINE =
   "/v1/api/get_branch_accounts_and_productlines/";
 export const GET_LICENSE_OPTIMISATION =
-  "/v1/api/get_account_optimization_list/";
+  "/v1/api/get_license_optimization_celery/";
+export const GET_TASK_LICENSE_OPTIMISE_DATA =
+  "/v1/api/get_license_optimization_result/";
 export const GET_NEW_QUOTATION = "/v1/product/get_new_quotation/";
 export const LOCK_UNLOCK_QUOTATION = "/v1/product/get_quotation_lock_unlock/";
 export const GET_ALL_BD_PERSON_BY_BRANCH = "/v1/api/get_branch_wise_bd_person/";

@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Tooltip } from "@mui/material";
 
-import { getLicenseOptimisation } from "../slice/LicenseOptimizationSlice";
+import {
+  getLicenseOptimisation,
+  getTaskLicenseData,
+} from "../slice/LicenseOptimizationSlice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonModal from "@/components/common/modal/CommonModal";
@@ -31,6 +34,28 @@ const LicenseOptimisationView = () => {
 
   const [modal, setModal] = useState({ show: false, features: [] });
 
+  const fetchLicenseOptimiseData = (taskId) => {
+    const pollInterval = 3000; // 3 seconds interval, you can adjust
+
+    const poll = () => {
+      dispatch(getTaskLicenseData(taskId)).then((res) => {
+        const status = res?.payload?.data?.status;
+
+        if (status !== "SUCCESS" && status !== "FAILED") {
+          // setCurrentState("PENDING");
+          setTimeout(poll, pollInterval); // keep polling
+        } else if (status === "SUCCESS") {
+          // setCurrentState("SUCCESS");
+          // you might want to update your data here if needed
+        } else {
+          // setCurrentState("FAILED");
+          console.error("Task failed or returned unexpected status:", status);
+        }
+      });
+    };
+
+    poll();
+  };
   useEffect(() => {
     const payload = {
       branch_id: params?.branchId,
@@ -39,7 +64,14 @@ const LicenseOptimisationView = () => {
       start_date: params?.startDate,
       end_date: params?.endDate,
     };
-    dispatch(getLicenseOptimisation(payload));
+    dispatch(getLicenseOptimisation(payload)).then((res) => {
+      if (
+        res?.payload?.data?.task_id &&
+        res?.payload?.data?.status === "PROCESSING"
+      ) {
+        fetchLicenseOptimiseData(res?.payload?.data?.task_id);
+      }
+    });
   }, []);
 
   const openModal = (features) =>

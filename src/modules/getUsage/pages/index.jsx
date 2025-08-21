@@ -110,11 +110,17 @@ const GetUsage = () => {
                 : "get-usuage-btn-active"
             }`}
           onClick={() =>
-            navigate(
-              `/get_usage/usage/${filters?.account?.map((item) => item?.csn)}/${
-                filters?.startDate
-              }/${filters?.endDate}`
-            )
+            // navigate(
+            //   `/get_usage/usage/${filters?.account?.map((item) => item?.csn)}/${
+            //     filters?.startDate
+            //   }/${filters?.endDate}`
+            // )
+            {
+              const url = `/get_usage/usage/${filters?.account?.map(
+                (item) => item?.csn
+              )}/${filters?.startDate}/${filters?.endDate}`;
+              window.open(url, "_blank");
+            }
           }
           isDisabled={checkFilters()}
         >

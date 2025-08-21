@@ -140,15 +140,24 @@ const LicenseOptization = () => {
       dispatch(getLicenseOptimisation(payload)).then((res) => {
         setIsSubmit(false);
       });
-      navigate(
+      // navigate(
+      //   routesConstants?.LICENSE_OPTIMIZATION +
+      //     routesConstants?.VIEW_LICENSE_OPTIMIZATION +
+      //     `/${filters?.account?.map((item) => item?.csn)}` +
+      //     `/${filters?.branch?.value}` +
+      //     `/${filters?.productLineCode?.map((item) => item?.value)}` +
+      //     `/${filters?.startDate}` +
+      //     `/${filters?.endDate}`
+      // );
+      const url =
         routesConstants?.LICENSE_OPTIMIZATION +
-          routesConstants?.VIEW_LICENSE_OPTIMIZATION +
-          `/${filters?.account?.map((item) => item?.csn)}` +
-          `/${filters?.branch?.value}` +
-          `/${filters?.productLineCode?.map((item) => item?.value)}` +
-          `/${filters?.startDate}` +
-          `/${filters?.endDate}`
-      );
+        routesConstants?.VIEW_LICENSE_OPTIMIZATION +
+        `/${filters?.account?.map((item) => item?.csn)}` +
+        `/${filters?.branch?.value}` +
+        `/${filters?.productLineCode?.map((item) => item?.value)}` +
+        `/${filters?.startDate}` +
+        `/${filters?.endDate}`;
+      window.open(url, "_blank");
     }
   };
   return (

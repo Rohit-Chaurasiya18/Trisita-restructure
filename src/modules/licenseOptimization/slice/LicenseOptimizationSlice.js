@@ -7,6 +7,7 @@ import {
   GET_BRANCH_ACCOUNT_PRODUCTLINE,
   GET_LICENSE_OPTIMISATION,
   GET_RA_ORDER,
+  GET_TASK_LICENSE_OPTIMISE_DATA,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -85,6 +86,21 @@ export const getLicenseOptimisation = createAsyncThunk(
   }
 );
 
+export const getTaskLicenseData = createAsyncThunk(
+  `LicenseOptimization/getTaskLicenseData`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_TASK_LICENSE_OPTIMISE_DATA + `?task_id=${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const LicenseOptimizationState = {
   licenseOptimizationData: null,
   licenseOptimizationLoading: false,
@@ -99,24 +115,32 @@ const LicenseOptimizationSlice = createSlice({
   initialState: LicenseOptimizationState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getLicenseOptimisation.pending, (state) => {
+    builder.addCase(getTaskLicenseData.pending, (state) => {
       state.licenseOptimizationLoading = true;
       state.licenseOptimizationData = null;
     });
-    builder.addCase(getLicenseOptimisation.fulfilled, (state, action) => {
-      state.licenseOptimizationLoading = false;
-      state.licenseOptimizationData = action.payload.data?.data?.map((i) => ({
-        ...i,
-        productLineCode: i?.product_lines?.map((ix) => ix?.code)?.join(", "),
-        licensedType: i?.product_lines?.map((ix) => ix?.name)?.join(", "),
-      }));
-      state.totalLicenseCount = action.payload.data?.total_license_count;
-      state.totalUniqueUser = action.payload.data?.total_unique_user;
-      state.freeLicenseCount = action.payload.data?.free_license_count;
-      state.totalLicenseOptimized =
-        action.payload.data?.total_license_optimized;
+    builder.addCase(getTaskLicenseData.fulfilled, (state, action) => {
+      if (action.payload.data?.status === "SUCCESS") {
+        state.licenseOptimizationLoading = false;
+        state.licenseOptimizationData = action.payload.data?.result?.data?.map(
+          (i) => ({
+            ...i,
+            productLineCode: i?.product_lines
+              ?.map((ix) => ix?.code)
+              ?.join(", "),
+            licensedType: i?.product_lines?.map((ix) => ix?.name)?.join(", "),
+          })
+        );
+        state.totalLicenseCount =
+          action.payload.data?.result?.total_license_count;
+        state.totalUniqueUser = action.payload.data?.result?.total_unique_user;
+        state.freeLicenseCount =
+          action.payload.data?.result?.free_license_count;
+        state.totalLicenseOptimized =
+          action.payload.data?.result?.total_license_optimized;
+      }
     });
-    builder.addCase(getLicenseOptimisation.rejected, (state) => {
+    builder.addCase(getTaskLicenseData.rejected, (state) => {
       state.licenseOptimizationLoading = false;
       state.licenseOptimizationData = null;
     });

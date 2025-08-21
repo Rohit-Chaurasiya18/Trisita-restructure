@@ -1,6 +1,7 @@
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  GET_TASK_USAGES_DATA,
   GET_UNIQUE_USAGE_USER_COUNT,
   GET_USUAGE_DATA,
   GET_USUAGE_PRODUCT_FEATURE_CHART,
@@ -17,6 +18,21 @@ export const getAllUsuages = createAsyncThunk(
         url = `${GET_USUAGE_DATA}${payload?.csn}`;
       }
       const response = await axiosReact.post(url, payload?.payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+//Fetch Usuages Data
+export const getTaskUsagesData = createAsyncThunk(
+  `usuages/getTaskUsagesData`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_TASK_USAGES_DATA + `?task_id=${payload}`
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -79,17 +95,19 @@ const usuagesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     // getAllUsuages
-    builder.addCase(getAllUsuages.pending, (state) => {
+    builder.addCase(getTaskUsagesData.pending, (state) => {
       state.usuagesDataLoading = true;
       state.usuagesData = [];
     });
-    builder.addCase(getAllUsuages.fulfilled, (state, action) => {
-      state.usuagesDataLoading = false;
-      state.usuagesData = action.payload.data?.usages;
-      state.productLineCode = action.payload.data?.product_line_codes;
-      state.login_counts = action.payload.data?.login_counts;
+    builder.addCase(getTaskUsagesData.fulfilled, (state, action) => {
+      if (action.payload.data?.status === "success") {
+        state.usuagesDataLoading = false;
+        state.usuagesData = action.payload.data?.data?.usages;
+        state.productLineCode = action.payload.data?.data?.product_line_codes;
+        state.login_counts = action.payload.data?.data?.login_counts;
+      }
     });
-    builder.addCase(getAllUsuages.rejected, (state, action) => {
+    builder.addCase(getTaskUsagesData.rejected, (state, action) => {
       state.usuagesDataLoading = false;
       state.usuagesData = [];
     });

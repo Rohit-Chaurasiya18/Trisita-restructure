@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   getAllUsuages,
+  getTaskUsagesData,
   getUsageProductFeatureChart,
 } from "../slice/UsuagesSlice";
 import CommonTable from "@/components/common/dataTable/CommonTable";
@@ -20,14 +21,15 @@ const Usuage = () => {
     usuagesDataLoading,
     login_counts,
     productLineCode,
+    userDetail,
   } = useSelector((state) => ({
     filter: state?.layout?.filter,
     usuagesData: state?.usuages?.usuagesData,
     usuagesDataLoading: state?.usuages?.usuagesDataLoading,
     login_counts: state?.usuages?.login_counts,
     productLineCode: state?.usuages?.productLineCode,
+    userDetail: state?.login?.userDetail,
   }));
-
   const [filteredData, setFilteredData] = useState([]);
   const [filters, setFilters] = useState({ product_line_code: null });
   const [featureNameCharts, setFeatureNameCharts] = useState([]);
@@ -66,10 +68,32 @@ const Usuage = () => {
     setFilteredData(usuagesData);
   }, [usuagesData]);
 
+  const fetchUsagesData = (taskId) => {
+    const pollInterval = 3000; // 3 seconds interval, you can adjust
+
+    const poll = () => {
+      dispatch(getTaskUsagesData(taskId)).then((res) => {
+        const status = res?.payload?.data?.status;
+
+        if (status !== "success" && status !== "failed") {
+          // setCurrentState("PENDING");
+          setTimeout(poll, pollInterval); // keep polling
+        } else if (status === "success") {
+          // setCurrentState("SUCCESS");
+          // you might want to update your data here if needed
+        } else {
+          // setCurrentState("FAILED");
+          console.error("Task failed or returned unexpected status:", status);
+        }
+      });
+    };
+
+    poll();
+  };
+
   // Effect: Initial data fetch
   useEffect(() => {
     const selectedCsn = filter?.csn !== "All CSN" ? filter?.csn : "";
-
     dispatch(
       getAllUsuages({
         csn: selectedCsn,
@@ -79,9 +103,17 @@ const Usuage = () => {
           from_date,
           to_date,
           product_line_code: "",
+          user_id: userDetail?.id,
         },
       })
-    );
+    ).then((res) => {
+      if (
+        res?.payload?.data?.task_id &&
+        res?.payload?.data?.status === "PENDING"
+      ) {
+        fetchUsagesData(res?.payload?.data?.task_id);
+      }
+    });
   }, [csn, from_date, to_date, filter?.csn]);
 
   // Login Chart data
