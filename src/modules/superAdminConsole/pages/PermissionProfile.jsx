@@ -304,9 +304,16 @@ const PermissionProfile = () => {
       <div className="d-flex gap-3 flex-wrap">
         <CommonAutocomplete
           onChange={(event, newValue) => {
-            setUserList(
-              allUserList?.filter((item) => item?.user_type === newValue?.value)
-            );
+            if (newValue?.value) {
+              setUserList(
+                allUserList?.filter(
+                  (item) => item?.user_type === newValue?.value
+                )
+              );
+            } else {
+              setUserList([]);
+              setSelectedUser(null);
+            }
           }}
           options={[
             { value: userType.primaryAdmin, label: "Primary Admin" },

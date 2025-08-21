@@ -1221,12 +1221,12 @@ const NewOpportunity = () => {
       </div>
       <div className="subscription-header mb-4 opportunity-filter">
         <div className="subscription-filter">
-          <Tooltip
+          {/* <Tooltip
             title={moment(last_updated).format("MMMM D, YYYY [at] h:mm:ss A")}
             placement="top"
           >
             <span>Last Updated</span>
-          </Tooltip>
+          </Tooltip> */}
           <CommonButton
             className="common-green-btn"
             onClick={() => {

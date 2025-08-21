@@ -420,27 +420,31 @@ const Account = () => {
                 },
               ]
             : []),
-          {
-            field: "action",
-            headerName: "Action",
-            width: 150,
-            renderCell: (params, index) => (
-              <span
-                onClick={() =>
-                  setModal((prev) => ({
-                    ...prev,
-                    id: params?.row?.id,
-                    isOpen: true,
-                    isAssign: true,
-                    type: null,
-                  }))
-                }
-                className="assign-button text-black px-3 py-1 rounded border-0"
-              >
-                Assign
-              </span>
-            ),
-          },
+          ...(userDetail?.user_type === userType.superadmin
+            ? [
+                {
+                  field: "action",
+                  headerName: "Action",
+                  width: 150,
+                  renderCell: (params, index) => (
+                    <span
+                      onClick={() =>
+                        setModal((prev) => ({
+                          ...prev,
+                          id: params?.row?.id,
+                          isOpen: true,
+                          isAssign: true,
+                          type: null,
+                        }))
+                      }
+                      className="assign-button text-black px-3 py-1 rounded border-0"
+                    >
+                      Assign
+                    </span>
+                  ),
+                },
+              ]
+            : []),
         ]
       : []),
   ];
