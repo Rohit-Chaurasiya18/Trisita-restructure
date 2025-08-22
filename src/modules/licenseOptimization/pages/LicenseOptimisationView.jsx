@@ -41,15 +41,17 @@ const LicenseOptimisationView = () => {
       dispatch(getTaskLicenseData(taskId)).then((res) => {
         const status = res?.payload?.data?.status;
 
-        if (status !== "SUCCESS" && status !== "FAILED") {
-          // setCurrentState("PENDING");
-          setTimeout(poll, pollInterval); // keep polling
-        } else if (status === "SUCCESS") {
+        if (status === "SUCCESS") {
+          console.log("Task completed successfully");
           // setCurrentState("SUCCESS");
-          // you might want to update your data here if needed
-        } else {
+          return; // ✅ stop polling
+        } else if (status === "FAILED") {
+          console.error("Task failed");
           // setCurrentState("FAILED");
-          console.error("Task failed or returned unexpected status:", status);
+          return; // ✅ stop polling
+        } else if (status === "PENDING") {
+          console.log("Task still in process... polling again");
+          setTimeout(poll, pollInterval); // ✅ keep polling
         }
       });
     };
