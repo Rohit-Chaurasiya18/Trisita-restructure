@@ -160,7 +160,7 @@ const LicenseOptimisationView = () => {
 
   return (
     <>
-      <div className="commom-header-title mb-0">License Optimisation</div>
+      <div className="commom-header-title mb-0">License Optimization</div>
       <span className="common-breadcrum-msg">Welcome to your Team</span>
 
       <div className="license-optimise-widgets">
@@ -189,7 +189,7 @@ const LicenseOptimisationView = () => {
               getRowId={(row) => row?.user_id}
               toolbar
               exportFileName="license_optimise"
-              moduleName="License Optimisation"
+              moduleName="License Optimization"
             />
           </div>
         )}
@@ -207,7 +207,7 @@ const LicenseOptimisationView = () => {
           getRowId={(row) => row?.id}
           toolbar
           exportFileName="features"
-          moduleName="License Optimisation"
+          moduleName="License Optimization"
         />
       </CommonModal>
     </>

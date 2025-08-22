@@ -162,7 +162,7 @@ const LicenseOptization = () => {
   };
   return (
     <>
-      <div className="commom-header-title mb-0">License Optimisation</div>
+      <div className="commom-header-title mb-0">License Optimization</div>
       <span className="common-breadcrum-msg">Welcome to you Team</span>
       <div className="get-usuage-filter license-optimise">
         {userDetail?.user_type !== userType.client && (
@@ -293,7 +293,7 @@ const LicenseOptization = () => {
           }}
           isDisabled={checkFilters() || isSubmit}
         >
-          License Optimisation
+          License Optimization
         </CommonButton>
       </div>
     </>
