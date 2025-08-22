@@ -107,6 +107,14 @@ const PermissionProfile = () => {
                 ...prev,
                 [name]: !prev[name],
               }));
+              if (name === "account") {
+                if (permissions?.addAccount && permissions?.account) {
+                  setPermissions((prev) => ({
+                    ...prev,
+                    addAccount: false,
+                  }));
+                }
+              }
               dispatch(getAllUserList());
             }
           });
@@ -290,7 +298,7 @@ const PermissionProfile = () => {
       setPermissions(resetPermissions);
     }
   };
-
+  console.log(permissions);
   return (
     <>
       <div className="mb-5">
@@ -310,6 +318,7 @@ const PermissionProfile = () => {
                   (item) => item?.user_type === newValue?.value
                 )
               );
+              setSelectedUser(null);
             } else {
               setUserList([]);
               setSelectedUser(null);
