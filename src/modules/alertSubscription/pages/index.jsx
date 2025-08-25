@@ -1060,7 +1060,7 @@ const AlertSubscription = () => {
         options: {
           chart: {
             type: "pie",
-            height: 500,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];
@@ -1189,7 +1189,7 @@ const AlertSubscription = () => {
         options: {
           chart: {
             type: "pie",
-            height: 500,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];
@@ -1319,7 +1319,7 @@ const AlertSubscription = () => {
         options: {
           chart: {
             type: "pie",
-            height: 500,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];

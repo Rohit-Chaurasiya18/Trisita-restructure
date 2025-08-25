@@ -883,10 +883,11 @@ const DeletedSubscription = () => {
         },
       },
     },
-    series: [
-      { name: "DTP Price", data: chartData.dtpData },
-      { name: "ACV Price", data: chartData.acvData },
-    ],
+    // series: [
+    //   { name: "DTP Price", data: chartData.dtpData },
+    //   { name: "ACV Price", data: chartData.acvData },
+    // ],
+    series: chartData.series,
   };
 
   // Total Subscriptions as per BD Person
@@ -1099,7 +1100,7 @@ const DeletedSubscription = () => {
         options: {
           chart: {
             type: "pie",
-            height: 500,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];
@@ -1228,7 +1229,7 @@ const DeletedSubscription = () => {
         options: {
           chart: {
             type: "pie",
-            height: 500,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];
@@ -1358,7 +1359,7 @@ const DeletedSubscription = () => {
         options: {
           chart: {
             type: "pie",
-            height: 500,
+            height: 350,
             events: {
               legendClick: (chartContext, seriesIndex) => {
                 const clickedLegend = sortedLabels[seriesIndex];

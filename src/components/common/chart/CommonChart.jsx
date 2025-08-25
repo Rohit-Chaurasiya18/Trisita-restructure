@@ -1,4 +1,5 @@
-import { useState } from "react";
+import Cookies from "@/services/cookies";
+import { useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
 const CommonChart = ({
@@ -10,6 +11,19 @@ const CommonChart = ({
   onSubCategoryClick,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const isDownloadAllow = useMemo(
+    () => Cookies.get("user")?.is_download_allow,
+    []
+  );
+  const updatedOptions = {
+    ...options,
+    chart: {
+      ...options.chart,
+      toolbar: {
+        show: isDownloadAllow,
+      },
+    },
+  };
   return (
     <div className={`insight-metrics-chart ${className}`}>
       <div className="chart-data">
@@ -31,7 +45,7 @@ const CommonChart = ({
           </div>
         </div>
         <ReactApexChart
-          options={options}
+          options={updatedOptions}
           series={series}
           type={options.chart.type}
           height={options.chart.height}
