@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getAllNotifications,
+  getNewAllNotifications,
   updateMarkAllAsRead,
   updateMarkAsRead,
 } from "../slice/notificationsSlice";
@@ -10,6 +10,8 @@ import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete"
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonButton from "@/components/common/buttons/CommonButton";
 import { fetchNotifications } from "@/layout/slice/layoutSlice";
+import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
+import useDebounce from "@/hooks/useDebounce";
 
 const Notification = () => {
   const dispatch = useDispatch();
@@ -20,19 +22,32 @@ const Notification = () => {
       notificationsData: state?.notifications?.notificationsData,
       notificationsDataLoading: state?.notifications?.notificationsDataLoading,
     }));
-
+  const [dateRange, setDateRange] = useState([null, null]);
   const [filters, setFilters] = useState({
     user: null,
+    startDate: "",
+    endDate: "",
   });
+  const debounce = useDebounce(filters?.endDate, 500);
 
   useEffect(() => {
-    dispatch(
-      getAllNotifications({
-        isUser: filters?.user ? filters?.user?.value : false,
-      })
-    );
+    let payload = {
+      userId: filters?.user ? filters?.user?.value : "",
+    };
+
+    if (debounce) {
+      payload.startDate = filters?.startDate;
+      payload.endDate = debounce;
+    } else {
+      payload.startDate = null;
+      payload.endDate = null;
+    }
+    dispatch(getNewAllNotifications(payload));
+  }, [filters?.user, debounce]);
+
+  useEffect(() => {
     dispatch(getAllUser());
-  }, [filters?.user]);
+  }, []);
 
   const userArray = useMemo(
     () =>
@@ -59,11 +74,29 @@ const Notification = () => {
     });
   };
 
+  const handleChange = (newValue) => {
+    const [start, end] = newValue;
+    setFilters((prev) => ({
+      ...prev,
+      startDate: start?.format("YYYY-MM-DD") || null,
+      endDate: end ? end.format("YYYY-MM-DD") : "",
+    }));
+
+    setDateRange(newValue);
+  };
   return (
     <>
       <div className="notification-header">
         <div className="commom-header-title">All Notifications</div>
         <div className="notification-filter">
+          <CommonDateRangePicker
+            value={dateRange}
+            onChange={handleChange}
+            width="180px"
+            placeholderStart="Start date"
+            placeholderEnd="End date"
+            disabled={notificationsDataLoading}
+          />
           <CommonAutocomplete
             onChange={(event, newValue) => {
               setFilters((prev) => ({ ...prev, user: newValue }));

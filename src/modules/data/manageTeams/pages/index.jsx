@@ -4,19 +4,22 @@ import {
   updateDownloadPermission,
 } from "@/modules/accounts/slice/accountSlice";
 import { Typography } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import moment from "moment";
 import { toast } from "react-toastify";
+import CommonSelect from "@/components/common/dropdown/CommonSelect";
 
 const ManageTeams = () => {
   const dispatch = useDispatch();
   const { User } = useSelector((state) => ({
     User: state?.account?.allUserData?.User,
   }));
+  const [status, setStatus] = useState("All");
+
   useEffect(() => {
     dispatch(getAllUser());
   }, []);
@@ -91,13 +94,35 @@ const ManageTeams = () => {
   return (
     <>
       <div className="manage-teams-container">
-        <div className="manage-team-header">
-          <div className="commom-header-title mb-0">TEAM</div>
-          <span className="common-breadcrum-msg">welcome to you Team</span>
+        <div className="manage-team-header d-flex align-items-center justify-content-between flex-wrap">
+          <div>
+            <div className="commom-header-title mb-0">TEAM</div>
+            <span className="common-breadcrum-msg">welcome to you Team</span>
+          </div>
+          <CommonSelect
+            value={status}
+            options={[
+              { value: "All", label: "All User Role" },
+              { value: "Superadmin", label: "Super Admin" },
+              { value: "BDManager", label: "BD Manager" },
+              { value: "Primaryadmin", label: "Primary Admin" },
+              { value: "Admin", label: "Admin" },
+            ]}
+            onChange={(e) => {
+              setStatus(e.target.value);
+            }}
+          />
         </div>
+
         <div className="manage-team-table">
           <CommonTable
-            rows={User?.length > 0 ? User : []}
+            rows={
+              User?.length > 0
+                ? User?.filter((item) =>
+                    status !== "All" ? item?.user_type === status : item
+                  )
+                : []
+            }
             columns={columns}
             getRowId={(row) => row.id}
             toolbar

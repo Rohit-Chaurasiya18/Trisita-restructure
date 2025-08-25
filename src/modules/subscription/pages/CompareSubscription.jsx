@@ -248,7 +248,7 @@ const CompareSubscription = () => {
       },
     },
     {
-      field: "third_party",
+      field: "third_party_names",
       headerName: "Third Party Name",
       width: 200,
       renderCell: (params) => {
@@ -258,13 +258,13 @@ const CompareSubscription = () => {
     },
     { field: "part_number", headerName: "Part Number", width: 200 },
     {
-      field: "bd_person",
+      field: "bd_person_first_names",
       headerName: "BD Person Name",
       width: 160,
       renderCell: (params) => (
         <div>
-          {Array.isArray(params.value) && params.value.length > 0 ? (
-            params.value.join(", ")
+          {params?.value ? (
+            params?.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
           )}
@@ -272,13 +272,13 @@ const CompareSubscription = () => {
       ),
     },
     {
-      field: "renewal_person",
+      field: "renewal_person_first_names",
       headerName: "Renewal Person Name",
       width: 160,
       renderCell: (params) => (
         <div>
-          {Array.isArray(params.value) && params.value.length > 0 ? (
-            params.value.join(", ")
+          {params?.value ? (
+            params?.value
           ) : (
             <span style={{ color: "red" }}>Undefined</span>
           )}
@@ -467,7 +467,17 @@ const CompareSubscription = () => {
             />
             <h3 className="common-insight-title">Subscription Change Log</h3>
             <CommonTable
-              rows={compareSubscriptionData?.changed_entries}
+              rows={compareSubscriptionData?.changed_entries?.map((item) => ({
+                ...item,
+                bd_person_first_names: item?.bd_person_first_names?.join(", "),
+                renewal_person_first_names:
+                  item?.renewal_person_first_names?.join(", "),
+                third_party_names: item?.third_party_names?.join(", "),
+                subs_end_date: moment(item?.subs_end_date).format("DD/MM/YYYY"),
+                subs_start_date: moment(item?.subs_start_date).format(
+                  "DD/MM/YYYY"
+                ),
+              }))}
               columns={status_columns}
               getRowId={getRowId}
               checkboxSelection

@@ -2,22 +2,23 @@ import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   GET_ALL_NOTIFICATIONS,
-  GET_USER_WISE_NOTIFICATION,
+  GET_FILTERED_NOTIFICATIONS,
   MARK_ALL_AS_READ_URL,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-// Get All Notifications
-export const getAllNotifications = createAsyncThunk(
-  `notifications/getAllNotifications`,
+// Get New All Notifications
+export const getNewAllNotifications = createAsyncThunk(
+  `notifications/getNewAllNotifications`,
   async (payload, thunkAPI) => {
     try {
-      let url;
-      if (payload?.isUser) {
-        url = GET_USER_WISE_NOTIFICATION + payload?.isUser;
-      } else {
-        url = GET_ALL_NOTIFICATIONS;
+      let url = GET_FILTERED_NOTIFICATIONS;
+      if (payload?.userId) {
+        url = `${url}${payload?.userId}/`;
+      }
+      if (payload?.startDate && payload?.endDate) {
+        url = `${url}?from_date=${payload?.startDate}&to_date=${payload?.endDate}`;
       }
       const response = await axiosReact.get(url);
       return response;
@@ -69,15 +70,15 @@ const notificationsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     // Get All Notifications
-    builder.addCase(getAllNotifications.pending, (state) => {
+    builder.addCase(getNewAllNotifications.pending, (state) => {
       state.notificationsDataLoading = true;
       state.notificationsData = [];
     });
-    builder.addCase(getAllNotifications.fulfilled, (state, action) => {
+    builder.addCase(getNewAllNotifications.fulfilled, (state, action) => {
       state.notificationsDataLoading = false;
       state.notificationsData = action.payload.data?.notifications;
     });
-    builder.addCase(getAllNotifications.rejected, (state) => {
+    builder.addCase(getNewAllNotifications.rejected, (state) => {
       state.notificationsDataLoading = false;
       state.notificationsData = null;
     });

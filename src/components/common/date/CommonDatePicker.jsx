@@ -14,6 +14,7 @@ const CommonDatePicker = ({
   disabled = false,
   error = false,
   errorText = "",
+  maxDate = null,
 }) => {
   return (
     <div style={{ marginBottom: "1rem" }}>
@@ -56,6 +57,7 @@ const CommonDatePicker = ({
               },
             },
           }}
+          maxDate={maxDate}
         />
       </LocalizationProvider>
     </div>

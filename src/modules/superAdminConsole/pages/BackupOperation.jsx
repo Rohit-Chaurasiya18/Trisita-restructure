@@ -6,6 +6,7 @@ import { backupOperation, getDeletedData } from "../../dashboard/slice";
 import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 import moment from "moment";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 const BackupOperation = () => {
   const dispatch = useDispatch();
@@ -59,6 +60,7 @@ const BackupOperation = () => {
         <CommonDatePicker
           value={selectedData}
           onChange={(date) => setSelectedData(date)}
+          maxDate={dayjs()}
         />
         <CommonButton isDisabled={!selectedData} onClick={handleTriger}>
           Trigger Backup
