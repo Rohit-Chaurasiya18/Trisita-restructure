@@ -20,6 +20,7 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import SetTrigger from "@/modules/subscription/components/SetTrigger";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import { FaLock, FaUnlock } from "react-icons/fa";
+import DownloadQuotation from "../components/DownloadQuotation";
 
 const NewQuotation = () => {
   const dispatch = useDispatch();
@@ -265,30 +266,14 @@ const NewQuotation = () => {
         headerName: "Download Quotation",
         width: 200,
         cellClassName: "",
-        renderCell: (params, index) => (
-          <span
-            onClick={() => {
-              dispatch(downloadQuotation(params?.row?.id)).then((res) => {
-                if (res?.payload) {
-                  const blob = new Blob([res.payload], {
-                    type: "application/pdf",
-                  });
-                  const url = URL.createObjectURL(blob);
+        renderCell: (params, index,) => (
 
-                  // ✅ Open in new tab
-                  window.open(url, "_blank");
 
-                  // Optional: Revoke object URL after use
-                  setTimeout(() => URL.revokeObjectURL(url), 500);
-                } else {
-                  toast.error("Failed to download quotation.");
-                }
-              });
-            }}
-            className="assign-button text-black px-3 py-1 rounded border-0"
-          >
-            Download Quotation
-          </span>
+          <DownloadQuotation
+           className="assign-button text-black px-3 py-1 rounded border-0"
+            params={params}
+          
+          />
         ),
       },
 
