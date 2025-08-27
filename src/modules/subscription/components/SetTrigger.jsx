@@ -74,8 +74,14 @@ const SetTrigger = ({ modal, handleClose, isQuotation = false }) => {
         id: modal?.id,
         cc_emails: values?.cc_emails,
       };
+
+      const formData = new FormData();
+      formData.append("trigger_choices_new", values.triggerChoice?.value);
+      formData.append("id", modal?.id);
+      formData.append("cc_emails", values?.cc_emails);
+      formData.append("pdf", modal?.file);
       const action = isQuotation
-        ? handleSendQuotation(payload)
+        ? handleSendQuotation(formData)
         : handleTriggerTemplate(payload);
 
       dispatch(action).then((res) => {

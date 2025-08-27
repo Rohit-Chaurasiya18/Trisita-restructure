@@ -21,6 +21,7 @@ import ContactInformationReducer from "@/modules/data/contactInformation/slice/C
 import LicenseOptimizationReducer from "@/modules/licenseOptimization/slice/LicenseOptimizationSlice";
 import CampaignReducer from "@/modules/data/campaign/slice/CampaignSlice";
 import superAdminConsoleReducer from "@/modules/superAdminConsole/slice/index";
+import pagesReducer from "@/modules/pages/slice/index";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -45,5 +46,6 @@ const reducer = combineReducers({
   LicenseOptimization: LicenseOptimizationReducer,
   Campaign: CampaignReducer,
   superAdminConsole: superAdminConsoleReducer,
+  pages: pagesReducer,
 });
 export default reducer;

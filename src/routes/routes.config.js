@@ -55,6 +55,7 @@ import {
   RenewalDue,
   BackupOperation,
   PermissionProfile,
+  Calendar,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -644,7 +645,7 @@ const routesConfig = {
     },
     {
       path: routesConstants.CALENDAR,
-      component: ComingSoon,
+      component: Calendar,
       roles: [
         userType.superadmin,
         userType.client,

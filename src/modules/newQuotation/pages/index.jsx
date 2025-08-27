@@ -20,7 +20,8 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import SetTrigger from "@/modules/subscription/components/SetTrigger";
 import CommonSelect from "@/components/common/dropdown/CommonSelect";
 import { FaLock, FaUnlock } from "react-icons/fa";
-import DownloadQuotation from "../components/DownloadQuotation";
+import DownloadQuotation, { MyDocument } from "../components/DownloadQuotation";
+import { pdf } from "@react-pdf/renderer";
 
 const NewQuotation = () => {
   const dispatch = useDispatch();
@@ -47,6 +48,7 @@ const NewQuotation = () => {
     id: null,
     type: null,
     productDetails: [],
+    file: null,
   });
 
   useEffect(() => {
@@ -266,13 +268,10 @@ const NewQuotation = () => {
         headerName: "Download Quotation",
         width: 200,
         cellClassName: "",
-        renderCell: (params, index,) => (
-
-
+        renderCell: (params, index) => (
           <DownloadQuotation
-           className="assign-button text-black px-3 py-1 rounded border-0"
+            className="assign-button text-black px-3 py-1 rounded border-0"
             params={params}
-          
           />
         ),
       },
@@ -284,12 +283,19 @@ const NewQuotation = () => {
         cellClassName: "",
         renderCell: (params, index) => (
           <span
-            onClick={() => {
+            onClick={async () => {
+              const blob = await pdf(<MyDocument params={params} />).toBlob();
+              const file = new File(
+                [blob],
+                `${params?.row?.quotation_no || "quotation"}.pdf`,
+                { type: "application/pdf" }
+              );
               setModal({
                 show: true,
                 id: params?.row?.id,
                 type: 1,
                 productDetails: [],
+                file,
               });
             }}
             className="assign-button text-black px-3 py-1 rounded border-0"

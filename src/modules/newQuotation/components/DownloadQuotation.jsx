@@ -319,10 +319,8 @@ const TermsAndConditions = ({
   );
 };
 
-// ===== Main Component =====
-const DownloadQuotation = ({ params }) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-
+// ===== PDF Document Component =====
+export const MyDocument = ({ params }) => {
   const tableData = (params?.row?.product_details || []).map((item, i) => {
     const sellingAmount = parseFloat(item.selling_amount) || 0;
     const quantity = parseInt(item.quantity) || 0;
@@ -351,51 +349,54 @@ const DownloadQuotation = ({ params }) => {
   );
 
   const formattedGrandTotal = `₹${grandTotalValue.toFixed(2)}`;
-  const MyDocument = () => {
-    const isMumbai = params?.row?.branch_name === "Mumbai";
+  const isMumbai = params?.row?.branch_name === "Mumbai";
 
-    return (
-      <Document>
-        <Page size="A4" style={styles.page}>
-          {isMumbai ? <MumbaiHeader /> : <KolkataHeader />}
-          <View style={styles.contentContainer}>
-            <DetailsTable
-              quotation_no={params?.row?.quotation_no}
-              quotation_date={params?.row?.quotation_date}
-              name={params?.row?.name}
-              account_name={params?.row?.account_name}
-            />
-            <Text style={styles.greetingText}>Dear Sir,</Text>
-            <Text style={styles.quoteText}>
-              We are pleased to quote the Commercial prices as follows:
-            </Text>
-            <View style={styles.table}>
-              <TableHeader />
-              <View wrap>
-                {tableData.map((row, idx) => (
-                  <TableRow key={`row-${idx}`} row={row} />
-                ))}
-                <GrandTotalRow total={formattedGrandTotal} />
-              </View>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {isMumbai ? <MumbaiHeader /> : <KolkataHeader />}
+        <View style={styles.contentContainer}>
+          <DetailsTable
+            quotation_no={params?.row?.quotation_no}
+            quotation_date={params?.row?.quotation_date}
+            name={params?.row?.name}
+            account_name={params?.row?.account_name}
+          />
+          <Text style={styles.greetingText}>Dear Sir,</Text>
+          <Text style={styles.quoteText}>
+            We are pleased to quote the Commercial prices as follows:
+          </Text>
+          <View style={styles.table}>
+            <TableHeader />
+            <View wrap>
+              {tableData.map((row, idx) => (
+                <TableRow key={`row-${idx}`} row={row} />
+              ))}
+              <GrandTotalRow total={formattedGrandTotal} />
             </View>
-            <TermsAndConditions
-              bd_person_name={params?.row?.bd_person_name}
-              bd_person_phone={params?.row?.bd_person_phone}
-              purchase_payment_terms={params?.row?.purchase_payment_terms}
-              valid_until={params?.row?.valid_until}
-              branch_name={params?.row?.branch_name}
-            />
           </View>
-          {isMumbai ? <MumbaiFooter /> : <KolkataFooter />}
-        </Page>
-      </Document>
-    );
-  };
+          <TermsAndConditions
+            bd_person_name={params?.row?.bd_person_name}
+            bd_person_phone={params?.row?.bd_person_phone}
+            purchase_payment_terms={params?.row?.purchase_payment_terms}
+            valid_until={params?.row?.valid_until}
+            branch_name={params?.row?.branch_name}
+          />
+        </View>
+        {isMumbai ? <MumbaiFooter /> : <KolkataFooter />}
+      </Page>
+    </Document>
+  );
+};
+
+// ===== Main Component =====
+const DownloadQuotation = ({ params }) => {
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePdf = async () => {
     setIsGenerating(true);
     try {
-      const blob = await pdf(<MyDocument />).toBlob();
+      const blob = await pdf(<MyDocument params={params} />).toBlob();
       return URL.createObjectURL(blob);
     } catch (error) {
       console.error("Error generating PDF:", error);

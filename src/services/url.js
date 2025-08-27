@@ -129,3 +129,4 @@ export const GET_DELETED_COUNT = "/v1/api/get_deletion_counts/";
 export const BACKUP_OPERATION = "/v1/api/new_trigger_backup/";
 export const GET_ALL_USERLIST = "/v1/new_get_user/";
 export const UPDATE_USER_PERMISSION = "/v1/toggle_user_module/";
+export const CALENDAR_LIST = "/v1/api/calendar_subs/";

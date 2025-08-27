@@ -24,18 +24,11 @@ const CheckboxWithLabel = ({ label, name, checked, onChange }) => {
       style={{
         marginBottom: "1.5rem",
         display: "flex",
-        alignItems: "baseline",
+        alignItems: "center",
         gap: "0.5rem",
       }}
     >
-      <input
-        type="checkbox"
-        id={name}
-        name={name}
-        checked={checked}
-        onChange={onChange}
-        style={{ width: "16px", height: "16px" }}
-      />
+      {" "}
       <label
         htmlFor={name}
         style={{
@@ -47,6 +40,14 @@ const CheckboxWithLabel = ({ label, name, checked, onChange }) => {
       >
         {label}
       </label>
+      <input
+        type="checkbox"
+        id={name}
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        style={{ width: "16px", height: "16px" }}
+      />
     </div>
   );
 };
@@ -58,9 +59,9 @@ const validationSchema = Yup.object({
     .typeError("Parent Account CSN must be a number.")
     .required("Parent Account CSN is required."),
 
-  csn: Yup.number()
-    .typeError("CSN must be a number.")
-    .required("CSN is required."),
+  // csn: Yup.number()
+  //   .typeError("CSN must be a number.")
+  //   .required("CSN is required."),
 
   accountName: Yup.string().required("Account name is required."),
 
@@ -172,7 +173,6 @@ const AddAccount = () => {
   const [accountDetail, setAccountDetail] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [accountOptions, setAccountOptions] = useState([]);
   const { allBranch, filter, exportedAccountData, exportedAccountDataLoading } =
     useSelector((state) => ({
       allBranch: state?.insightMetrics?.branchList,
@@ -304,11 +304,18 @@ const AddAccount = () => {
         accountDetail?.renewal_person.includes(option?.value)
       ) || "",
     readinessScore: accountDetail?.buyingReadinessScore || "",
-    segment:
-      allSegmentList?.find((item) => item?.value === accountDetail?.segment) ||
-      "",
-    accountType:
-      allAccountList?.find((item) => item?.value === accountDetail?.type) || "",
+    segment: allSegmentList?.find(
+      (item) => item?.value === accountDetail?.segment
+    ) || {
+      value: "Territory",
+      label: "Territory",
+    },
+    accountType: allAccountList?.find(
+      (item) => item?.value === accountDetail?.type
+    ) || {
+      value: "Reseller",
+      label: "Reseller",
+    },
     addressLine1: accountDetail?.address1 || "",
     addressLine2: accountDetail?.address2 || "",
     addressLine3: accountDetail?.address3 || "",
@@ -316,18 +323,24 @@ const AddAccount = () => {
     country: accountDetail?.country || "",
     countryCode: accountDetail?.countryCode || "",
     county: accountDetail?.county || "",
-    geo: allGeoList?.find((item) => item?.value === accountDetail?.geo) || "",
+    geo: allGeoList?.find((item) => item?.value === accountDetail?.geo) || {
+      value: "APAC",
+      label: "APAC",
+    },
     industry: accountDetail?.industry || "",
     phoneNumber: accountDetail?.phoneNumber || "",
     stateProvince: accountDetail?.stateProvince || "",
     postalCode: accountDetail?.postal || "",
-    parentAccountCSN: accountDetail?.parentAccountCsn || "",
+    parentAccountCSN: accountDetail?.parentAccountCsn || "1111111111",
     autodeskMainContact: accountDetail?.autodeskMainContact || "",
     autodeskMainContactEmail: accountDetail?.autodeskMainContactEmail || "",
     salesRegion: accountDetail?.salesRegion || "",
-    status:
-      allStatusList?.find((item) => item?.value === accountDetail?.status) ||
-      "",
+    status: allStatusList?.find(
+      (item) => item?.value === accountDetail?.status
+    ) || {
+      value: "Active",
+      label: "Active",
+    },
     language: accountDetail?.language || "",
     website: accountDetail?.website || "",
     industryGroup:
@@ -406,20 +419,6 @@ const AddAccount = () => {
     });
   };
 
-  // const handleAccount = (selectedOptionId) => {
-  //   dispatch(getAccountByBdPerson(selectedOptionId)).then((res) => {
-  //     if (res?.payload?.data?.length > 0) {
-  //       let Arr = res?.payload?.data?.map((item) => ({
-  //         value: item?.id,
-  //         label: `${item?.name} (${item?.csn})`,
-  //       }));
-  //       setAccountOptions(Arr);
-  //     } else {
-  //       setAccountOptions([]);
-  //     }
-  //   });
-  // };
-
   useEffect(() => {
     if (id) {
       setIsLoading(true);
@@ -439,7 +438,7 @@ const AddAccount = () => {
       setAccountDetail(null);
     }
   }, [id]);
-
+  
   return (
     <>
       {isLoading ? (
@@ -450,6 +449,12 @@ const AddAccount = () => {
           <div className="add-account-form">
             <h2 className="title">{id ? "Update" : "Add"} Account</h2>
             <form className="">
+              <CheckboxWithLabel
+                label="Third Party"
+                name="thirdParty"
+                checked={values?.thirdParty}
+                onChange={(e) => handleCheckboxChange("thirdParty", e)}
+              />
               <CustomSelect
                 label="Partner CSN"
                 required
@@ -463,22 +468,25 @@ const AddAccount = () => {
                 error={errors?.partnerCSN && touched?.partnerCSN}
                 errorText={errors.partnerCSN}
               />
-              <CommonInputTextField
-                labelName="CSN"
-                id="csn"
-                name="csn"
-                className="input"
-                required
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.csn}
-                placeHolder="Enter CSN"
-                isInvalid={errors.csn && touched.csn}
-                errorText={errors.csn}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                requiredText
-              />
+
+              {!values?.thirdParty && (
+                <CommonInputTextField
+                  labelName="CSN"
+                  id="csn"
+                  name="csn"
+                  className="input"
+                  // required
+                  mainDiv="form-group"
+                  labelClass="label"
+                  value={values?.csn}
+                  placeHolder="Enter CSN"
+                  isInvalid={errors.csn && touched.csn}
+                  errorText={errors.csn}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  // requiredText
+                />
+              )}
               <CommonInputTextField
                 labelName="Account Name"
                 id="accountName"
@@ -543,20 +551,22 @@ const AddAccount = () => {
                 error={errors?.renewalPerson && touched?.renewalPerson}
                 errorText={errors?.renewalPerson}
               />
-              <CommonInputTextField
-                labelName="Buying Readiness Score"
-                id="readinessScore"
-                name="readinessScore"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.readinessScore}
-                placeHolder="Enter buying readiness score"
-                isInvalid={errors.readinessScore && touched.readinessScore}
-                errorText={errors.readinessScore}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
+              {!values?.thirdParty && (
+                <CommonInputTextField
+                  labelName="Buying Readiness Score"
+                  id="readinessScore"
+                  name="readinessScore"
+                  className="input"
+                  mainDiv="form-group"
+                  labelClass="label"
+                  value={values?.readinessScore}
+                  placeHolder="Enter buying readiness score"
+                  isInvalid={errors.readinessScore && touched.readinessScore}
+                  errorText={errors.readinessScore}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+              )}
               <CustomSelect
                 label="Segment"
                 required
@@ -640,6 +650,20 @@ const AddAccount = () => {
                 onBlur={handleBlur}
               />
               <CommonInputTextField
+                labelName="Postal Code"
+                id="postalCode"
+                name="postalCode"
+                className="input"
+                mainDiv="form-group"
+                labelClass="label"
+                value={values?.postalCode}
+                placeHolder="Enter postal Code"
+                isInvalid={errors.postalCode && touched.postalCode}
+                errorText={errors.postalCode}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <CommonInputTextField
                 labelName="Country"
                 id="country"
                 name="country"
@@ -667,20 +691,22 @@ const AddAccount = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              <CommonInputTextField
-                labelName="County"
-                id="county"
-                name="county"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.county}
-                placeHolder="Enter county"
-                isInvalid={errors.county && touched.county}
-                errorText={errors.county}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
+              {!values?.thirdParty && (
+                <CommonInputTextField
+                  labelName="County"
+                  id="county"
+                  name="county"
+                  className="input"
+                  mainDiv="form-group"
+                  labelClass="label"
+                  value={values?.county}
+                  placeHolder="Enter county"
+                  isInvalid={errors.county && touched.county}
+                  errorText={errors.county}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+              )}
               <CustomSelect
                 label="Geo"
                 required
@@ -722,34 +748,23 @@ const AddAccount = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              <CommonInputTextField
-                labelName="State/Province"
-                id="stateProvince"
-                name="stateProvince"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.stateProvince}
-                placeHolder="Enter state / province"
-                isInvalid={errors.stateProvince && touched.stateProvince}
-                errorText={errors.stateProvince}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <CommonInputTextField
-                labelName="Postal Code"
-                id="postalCode"
-                name="postalCode"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.postalCode}
-                placeHolder="Enter postal Code"
-                isInvalid={errors.postalCode && touched.postalCode}
-                errorText={errors.postalCode}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
+              {!values?.thirdParty && (
+                <CommonInputTextField
+                  labelName="State/Province"
+                  id="stateProvince"
+                  name="stateProvince"
+                  className="input"
+                  mainDiv="form-group"
+                  labelClass="label"
+                  value={values?.stateProvince}
+                  placeHolder="Enter state / province"
+                  isInvalid={errors.stateProvince && touched.stateProvince}
+                  errorText={errors.stateProvince}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+              )}
+
               <CommonInputTextField
                 labelName="Parent Account CSN"
                 id="parentAccountCSN"
@@ -826,34 +841,39 @@ const AddAccount = () => {
                 error={errors?.status && touched?.status}
                 errorText={errors?.status}
               />
-              <CommonInputTextField
-                labelName="Language"
-                id="language"
-                name="language"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.language}
-                placeHolder="Enter language"
-                isInvalid={errors.language && touched.language}
-                errorText={errors.language}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <CommonInputTextField
-                labelName="Website"
-                id="website"
-                name="website"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.website}
-                placeHolder="Enter website"
-                isInvalid={errors.website && touched.website}
-                errorText={errors.website}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
+              {!values?.thirdParty && (
+                <>
+                  <CommonInputTextField
+                    labelName="Language"
+                    id="language"
+                    name="language"
+                    className="input"
+                    mainDiv="form-group"
+                    labelClass="label"
+                    value={values?.language}
+                    placeHolder="Enter language"
+                    isInvalid={errors.language && touched.language}
+                    errorText={errors.language}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  <CommonInputTextField
+                    labelName="Website"
+                    id="website"
+                    name="website"
+                    className="input"
+                    mainDiv="form-group"
+                    labelClass="label"
+                    value={values?.website}
+                    placeHolder="Enter website"
+                    isInvalid={errors.website && touched.website}
+                    errorText={errors.website}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                </>
+              )}
+
               <CustomSelect
                 label="Industry Group"
                 name="industryGroup"
@@ -865,64 +885,70 @@ const AddAccount = () => {
                 placeholder="Select a Status"
                 isClearable
               />
-              <CommonInputTextField
-                labelName="Industry Segment"
-                id="industrySegment"
-                name="industrySegment"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.industrySegment}
-                placeHolder="Enter industry segment"
-                isInvalid={errors.industrySegment && touched.industrySegment}
-                errorText={errors.industrySegment}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <CommonInputTextField
-                labelName="Industry Sub-Segment"
-                id="industrySubSegment"
-                name="industrySubSegment"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.industrySubSegment}
-                placeHolder="Enter industry sub-segment"
-                isInvalid={
-                  errors.industrySubSegment && touched.industrySubSegment
-                }
-                errorText={errors.industrySubSegment}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <CommonInputTextField
-                labelName="Local Name"
-                id="localName"
-                name="localName"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.localName}
-                placeHolder="Enter local name"
-                isInvalid={errors.localName && touched.localName}
-                errorText={errors.localName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <CommonInputTextField
-                labelName="Victim CSNs"
-                id="victimCSNs"
-                name="victimCSNs"
-                className="input"
-                mainDiv="form-group"
-                labelClass="label"
-                value={values?.victimCSNs}
-                placeHolder="Enter victim CSNs"
-                isInvalid={errors.victimCSNs && touched.victimCSNs}
-                errorText={errors.victimCSNs}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
+              {!values?.thirdParty && (
+                <>
+                  <CommonInputTextField
+                    labelName="Industry Segment"
+                    id="industrySegment"
+                    name="industrySegment"
+                    className="input"
+                    mainDiv="form-group"
+                    labelClass="label"
+                    value={values?.industrySegment}
+                    placeHolder="Enter industry segment"
+                    isInvalid={
+                      errors.industrySegment && touched.industrySegment
+                    }
+                    errorText={errors.industrySegment}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  <CommonInputTextField
+                    labelName="Industry Sub-Segment"
+                    id="industrySubSegment"
+                    name="industrySubSegment"
+                    className="input"
+                    mainDiv="form-group"
+                    labelClass="label"
+                    value={values?.industrySubSegment}
+                    placeHolder="Enter industry sub-segment"
+                    isInvalid={
+                      errors.industrySubSegment && touched.industrySubSegment
+                    }
+                    errorText={errors.industrySubSegment}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  <CommonInputTextField
+                    labelName="Local Name"
+                    id="localName"
+                    name="localName"
+                    className="input"
+                    mainDiv="form-group"
+                    labelClass="label"
+                    value={values?.localName}
+                    placeHolder="Enter local name"
+                    isInvalid={errors.localName && touched.localName}
+                    errorText={errors.localName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  <CommonInputTextField
+                    labelName="Victim CSNs"
+                    id="victimCSNs"
+                    name="victimCSNs"
+                    className="input"
+                    mainDiv="form-group"
+                    labelClass="label"
+                    value={values?.victimCSNs}
+                    placeHolder="Enter victim CSNs"
+                    isInvalid={errors.victimCSNs && touched.victimCSNs}
+                    errorText={errors.victimCSNs}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                </>
+              )}
               <CommonInputTextField
                 labelName="Latitude"
                 id="latitude"
@@ -983,12 +1009,6 @@ const AddAccount = () => {
                   onChange={(e) =>
                     handleCheckboxChange("parentIsNamedAccount", e)
                   }
-                />
-                <CheckboxWithLabel
-                  label="Third Party"
-                  name="thirdParty"
-                  checked={values?.thirdParty}
-                  onChange={(e) => handleCheckboxChange("thirdParty", e)}
                 />
               </div>
               {values?.thirdParty && (
