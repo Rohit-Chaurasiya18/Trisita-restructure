@@ -49,6 +49,10 @@ const useContractData = () => {
       ),
     [location?.pathname]
   );
+  const isCalendar = useMemo(
+    () => location.pathname.startsWith(routesConstants?.CALENDAR),
+    [location?.pathname]
+  );
 
   return useSelector((state) => ({
     loading: isSubscription
@@ -59,6 +63,8 @@ const useContractData = () => {
       ? state?.subscription?.changedLogSubscriptionDetailsLoading
       : isCompareSubscription
       ? state?.subscription?.compareSubscriptionDetailsLoading
+      : isCalendar
+      ? state?.pages?.calendarSubscriptionLoading
       : state?.subscription?.newSubscriptionDetailsLoading,
     data: isSubscription
       ? state?.subscription?.subscriptionDetails
@@ -68,12 +74,15 @@ const useContractData = () => {
       ? state?.subscription?.changedLogSubscriptionDetails
       : isCompareSubscription
       ? state?.subscription?.compareSubscriptionDetails
+      : isCalendar
+      ? state?.pages?.calendarSubscriptionData
       : state?.subscription?.newSubscriptionDetails,
     isDeletedSubscription,
     isChangedLogSubscription,
     isCompareSubscription,
     isSubscription,
     isNewSubscription,
+    isCalendar,
   }));
 };
 
