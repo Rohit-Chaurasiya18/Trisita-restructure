@@ -1,0 +1,9 @@
+.generate-ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .common-btn {
+    background-color: rgb(141, 190, 134);
+    color: black;
+  }
+}

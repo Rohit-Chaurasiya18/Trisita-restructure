@@ -163,3 +163,6 @@ export const ComingSoon = lazy(() => import("@/constants/CommingSoon"));
 export const Calendar = lazy(() =>
   import("@/modules/pages/calendar/pages/index")
 );
+export const GenerateTicket = lazy(() =>
+  import("@/modules/pages/generateTickets/pages/index")
+);

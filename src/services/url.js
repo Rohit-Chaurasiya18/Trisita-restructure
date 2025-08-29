@@ -132,3 +132,6 @@ export const UPDATE_USER_PERMISSION = "/v1/toggle_user_module/";
 export const CALENDAR_LIST = "/v1/api/calendar_subs/";
 export const GET_CALENDAR_SUBSCRIPTION_DETAILS =
   "/v1/api/get_calender_subscription_detail/";
+export const GET_TICKET_ISSUES = "/v1/api/get_ticket_issues/";
+export const GENERATE_TICKET = "/v1/api/get_generate_ticket/";
+export const GET_SUBSCRIPTION_TICKET = "/v1/api/get_subscription_for_ticket/";

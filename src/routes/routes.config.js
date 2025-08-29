@@ -56,6 +56,7 @@ import {
   BackupOperation,
   PermissionProfile,
   Calendar,
+  GenerateTicket,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -634,7 +635,7 @@ const routesConfig = {
     // },
     {
       path: routesConstants.GENERATE_TICKET,
-      component: ComingSoon,
+      component: GenerateTicket,
       roles: [
         userType.superadmin,
         userType.client,
