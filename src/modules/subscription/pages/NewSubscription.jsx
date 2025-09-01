@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getNewSubscriptionData,
   getNewSubscriptionDetail,
+  getSubscriptionAcquiredType,
+  getUpdateSubscriptionAcquired,
 } from "../slice/subscriptionSlice";
 import { Autocomplete, TextField, Tooltip, Typography } from "@mui/material";
 import CommonButton from "@/components/common/buttons/CommonButton";
@@ -26,24 +28,70 @@ import {
   getEmptyPieChartConfig,
   userType,
 } from "@/constants";
+import { toast } from "react-toastify";
 
-const SetAction = () => {
+const SetAction = ({
+  id,
+  handleClose,
+  subscription_acquired_type_id,
+  handleFallback,
+}) => {
+  console.log(subscription_acquired_type_id);
+  const dispatch = useDispatch();
+  const [subscriptionAcquiredType, setSubscriptionAcquiredType] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+  useEffect(() => {
+    dispatch(getSubscriptionAcquiredType()).then((res) => {
+      if (res?.payload?.status === 200) {
+        setSubscriptionAcquiredType(
+          res?.payload?.data?.map((i) => ({
+            value: i?.id,
+            label: i?.name,
+          }))
+        );
+      }
+    });
+  }, []);
+  const handleAction = () => {
+    dispatch(
+      getUpdateSubscriptionAcquired({
+        subscription_id: id,
+        subscription_acquired_type: selectedType,
+      })
+    ).then((res) => {
+      if (res?.payload?.status === 200) {
+        toast.success("Subscription Acquired Type Updated Successfully");
+      }
+      handleClose();
+      handleFallback(
+        id,
+        subscriptionAcquiredType?.find((i) => i.value === selectedType)
+      );
+    });
+  };
+  useEffect(() => {
+    if (subscription_acquired_type_id) {
+      setSelectedType(subscription_acquired_type_id);
+    }
+  }, [subscription_acquired_type_id]);
   return (
     <>
       <div className="col-12 d-flex my-2">
         <div className="col-6 fw-bold">Subscription Acquired :</div>
         <div className="col-6">
           <Autocomplete
-            disablePortal
-            multiple
-            options={[]}
-            // value={filters?.account}
-            getOptionLabel={(option) => option?.name}
+            options={subscriptionAcquiredType || []}
+            value={
+              subscriptionAcquiredType?.find((i) => i.value === selectedType) ||
+              null
+            }
+            getOptionLabel={(option) => option?.label}
             sx={{
               width: 300,
             }}
             onChange={(event, newValues) => {
               console.log(newValues);
+              setSelectedType(newValues?.value);
             }}
             loading={false}
             renderInput={(params) => (
@@ -72,7 +120,15 @@ const SetAction = () => {
       <div className="d-flex justify-content-center mt-4">
         <CommonButton
           className={"w-auto"}
-          style={{ background: "rgb(21, 149, 221)" }}
+          style={{
+            background: selectedType
+              ? "rgb(21, 149, 221)"
+              : "rgb(192, 205, 212)",
+          }}
+          isDisabled={!selectedType}
+          onClick={() => {
+            handleAction();
+          }}
         >
           Action
         </CommonButton>
@@ -123,6 +179,7 @@ const NewSubscription = () => {
     show: false,
     id: null,
     isAssign: false,
+    subscription_acquired_type_id: null,
   });
 
   useEffect(() => {
@@ -168,8 +225,17 @@ const NewSubscription = () => {
   };
 
   // Handle modal open
-  const handleOpenModel = (id, isAssign = false) => {
-    setModal({ show: true, id, isAssign });
+  const handleOpenModel = (
+    id,
+    isAssign = false,
+    subscription_acquired_type_id
+  ) => {
+    setModal({
+      show: true,
+      id,
+      isAssign,
+      subscription_acquired_type_id: subscription_acquired_type_id,
+    });
     dispatch(getNewSubscriptionDetail({ id }));
   };
 
@@ -182,7 +248,13 @@ const NewSubscription = () => {
         width: 150,
         renderCell: (params) => (
           <span
-            onClick={() => handleOpenModel(params?.row.id, false)}
+            onClick={() =>
+              handleOpenModel(
+                params?.row.id,
+                false,
+                params?.row?.subscription_acquired_type_id
+              )
+            }
             className="action-button bg-white text-black px-3 py-1 rounded border-0"
           >
             {params?.value}
@@ -303,6 +375,7 @@ const NewSubscription = () => {
       ...(userDetail?.user_type !== userType.client
         ? [
             { field: "subscriptionStatus", headerName: "Status", width: 100 },
+            { field: "subscription_acquired_types", headerName: "Subscription Acquired Type", width: 200 },
             {
               field: "acv_price",
               headerName: "Total ACV Price",
@@ -327,7 +400,13 @@ const NewSubscription = () => {
               width: 150,
               renderCell: (params) => (
                 <span
-                  onClick={() => handleOpenModel(params?.row?.id, true)}
+                  onClick={() =>
+                    handleOpenModel(
+                      params?.row?.id,
+                      true,
+                      params?.row?.subscription_acquired_type_id
+                    )
+                  }
                   className="assign-button text-black px-3 py-1 rounded border-0"
                 >
                   Assign Trigger
@@ -349,12 +428,16 @@ const NewSubscription = () => {
       data = data?.filter((item) => item?.trisita_status === filters?.status);
     }
     if (filters?.account?.length > 0) {
+      // data = data?.filter((item) => {
+      //   const name = item["account_name"];
+      //   return filters?.account.some(
+      //     (value) =>
+      //       name && name.toLowerCase().includes(value.label.toLowerCase())
+      //   );
+      // });
       data = data?.filter((item) => {
-        const name = item["account_name"];
-        return filters?.account.some(
-          (value) =>
-            name && name.toLowerCase().includes(value.label.toLowerCase())
-        );
+        const name = item["account_csn"];
+        return filters?.account.some((value) => name === value.csn);
       });
     }
     return data;
@@ -853,7 +936,7 @@ const NewSubscription = () => {
 
     // Aggregate DTP and ACV by endDate month
     (filteredData || []).forEach((sub) => {
-      const endMonth = dayjs(sub?.created_date).format("YYYY-MM");
+      const endMonth = dayjs(sub?.lastPurchaseDate).format("YYYY-MM");
       if (monthlyData[endMonth]) {
         if (userDetail?.user_type === userType.client) {
           monthlyData[endMonth].seats_total += Number(sub?.seats) || 0;
@@ -1459,6 +1542,18 @@ const NewSubscription = () => {
   const handleSubSegmentChange = (viewType) => {
     setSubSegmentType(viewType);
   };
+  const handleFallback = (id, selectedType) => {
+    const updatedData = filteredData?.map((item) =>
+      item?.id === id
+        ? {
+            ...item,
+            subscription_acquired_type_id: selectedType?.value,
+            subscription_acquired_types: selectedType?.label,
+          }
+        : { ...item }
+    );
+    setFilteredData(updatedData);
+  };
   return (
     <>
       <div>
@@ -1752,11 +1847,34 @@ const NewSubscription = () => {
       </div>
       <CommonModal
         isOpen={modal.show}
-        handleClose={() => setModal({ show: false, id: null, isAssign: false })}
-        scrollable
+        handleClose={() =>
+          setModal({
+            show: false,
+            id: null,
+            isAssign: false,
+            subscription_acquired_type_id: null,
+          })
+        }
+        scrollable={modal?.isAssign ? false : true}
         title={modal.isAssign ? "Set Action" : "New Subscription Detail"}
       >
-        {modal?.isAssign ? <SetAction /> : <SubscriptionDetail />}
+        {modal?.isAssign ? (
+          <SetAction
+            id={modal?.id}
+            handleClose={() =>
+              setModal({
+                show: false,
+                id: null,
+                isAssign: false,
+                subscription_acquired_type_id: null,
+              })
+            }
+            subscription_acquired_type_id={modal?.subscription_acquired_type_id}
+            handleFallback={handleFallback}
+          />
+        ) : (
+          <SubscriptionDetail />
+        )}
       </CommonModal>
     </>
   );

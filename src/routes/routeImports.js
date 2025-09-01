@@ -166,3 +166,7 @@ export const Calendar = lazy(() =>
 export const GenerateTicket = lazy(() =>
   import("@/modules/pages/generateTickets/pages/index")
 );
+
+export const ViewTicket = lazy(() =>
+  import("@/modules/pages/generateTickets/components/ViewTicket")
+);

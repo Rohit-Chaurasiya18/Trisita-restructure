@@ -464,6 +464,20 @@ const InsightMetrics = () => {
       ),
     },
     { field: "customerCSN", headerName: "Customer CSN", width: 150 },
+    {
+      field: "contract_manager_email",
+      headerName: "Contract Manager Email",
+      width: 200,
+      renderCell: (params) => (
+        <div>
+          {params.value && params.value ? (
+            params.value
+          ) : (
+            <span style={{ color: "red" }}></span>
+          )}
+        </div>
+      ),
+    },
     ...(userDetail?.user_type !== userType.client
       ? [
           {

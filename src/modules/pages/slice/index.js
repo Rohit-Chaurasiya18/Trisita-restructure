@@ -41,7 +41,7 @@ export const getTicketIssues = createAsyncThunk(
   `pages/getTicketIssues`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_TICKET_ISSUES);
+      const response = await axiosReact.get(GET_TICKET_ISSUES + payload);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.message || somethingWentWrong);
@@ -93,8 +93,6 @@ const pagesState = {
   calendarListLoading: false,
   calendarSubscriptionData: null,
   calendarSubscriptionLoading: false,
-  ticketsIssues: [],
-  ticketsIssuesLoading: false,
   subscriptionList: [],
   subscriptionListLoading: false,
   ticketListing: [],
@@ -145,22 +143,6 @@ const pagesSlice = createSlice({
     builder.addCase(getTicketList.rejected, (state) => {
       state.ticketListing = [];
       state.ticketListingLoading = false;
-    });
-    //getTicketIssues
-    builder.addCase(getTicketIssues.pending, (state) => {
-      state.ticketsIssues = [];
-      state.ticketsIssuesLoading = true;
-    });
-    builder.addCase(getTicketIssues.fulfilled, (state, action) => {
-      state.ticketsIssuesLoading = false;
-      state.ticketsIssues = action.payload.data?.map((i) => ({
-        value: i?.id,
-        label: i?.name,
-      }));
-    });
-    builder.addCase(getTicketIssues.rejected, (state) => {
-      state.ticketsIssues = [];
-      state.ticketsIssuesLoading = false;
     });
 
     // getSubscriptionTicket

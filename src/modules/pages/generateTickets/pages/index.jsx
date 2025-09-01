@@ -6,9 +6,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTicketList } from "../../slice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
+import routesConstants from "@/routes/routesConstants";
+import { useNavigate } from "react-router-dom";
 
 const GenerateTicket = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [modal, setModal] = useState({ isOpen: false, type: null });
   const [filteredData, setFilteredData] = useState([]);
   const { userDetail, ticketListing, ticketListingLoading } = useSelector(
@@ -45,7 +48,13 @@ const GenerateTicket = () => {
       width: 200,
       renderCell: (params) => {
         return (
-          <a href={``} target="_blank" rel="noopener noreferrer">
+          <a
+            onClick={() =>
+              navigate(`${routesConstants?.GENERATE_TICKET}/${params?.id}`)
+            }
+            // target="_blank"
+            className="text-decoration-underline cursor-pointer text-primary" 
+          >
             View Progress
           </a>
         );

@@ -132,6 +132,10 @@ export const UPDATE_USER_PERMISSION = "/v1/toggle_user_module/";
 export const CALENDAR_LIST = "/v1/api/calendar_subs/";
 export const GET_CALENDAR_SUBSCRIPTION_DETAILS =
   "/v1/api/get_calender_subscription_detail/";
-export const GET_TICKET_ISSUES = "/v1/api/get_ticket_issues/";
+export const GET_TICKET_ISSUES = "v1/api/get_ticket_issues_by_subscription/";
 export const GENERATE_TICKET = "/v1/api/get_generate_ticket/";
 export const GET_SUBSCRIPTION_TICKET = "/v1/api/get_subscription_for_ticket/";
+export const SUBSCRIPTION_ACQUIRED_TYPE =
+  "/v1/api/get_subscription_acquired_type/";
+export const UPDATE_SUBSCRIPTION_AQUIRED =
+  "/v1/api/update_subscription_acquired/";

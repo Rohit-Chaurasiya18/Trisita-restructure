@@ -57,6 +57,7 @@ import {
   PermissionProfile,
   Calendar,
   GenerateTicket,
+  ViewTicket,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -635,7 +636,7 @@ const routesConfig = {
     // },
     {
       path: routesConstants.GENERATE_TICKET,
-      component: GenerateTicket,
+      component: Outlet,
       roles: [
         userType.superadmin,
         userType.client,
@@ -643,6 +644,30 @@ const routesConfig = {
         userType.primaryAdmin,
       ],
       moduleId: moduleId.GenerateTicket,
+      children: [
+        {
+          index: true,
+          component: GenerateTicket,
+          roles: [
+            userType.superadmin,
+            userType.client,
+            userType.bdManager,
+            userType.primaryAdmin,
+          ],
+          moduleId: moduleId.GenerateTicket,
+        },
+        {
+          path: ":ticketId",
+          component: ViewTicket,
+          roles: [
+            userType.superadmin,
+            userType.client,
+            userType.bdManager,
+            userType.primaryAdmin,
+          ],
+          moduleId: moduleId.GenerateTicket,
+        },
+      ],
     },
     {
       path: routesConstants.CALENDAR,

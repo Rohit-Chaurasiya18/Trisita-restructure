@@ -11,6 +11,7 @@ import {
 import CommonTextareaField from "@/components/common/inputTextField/CommonTextareaField";
 import { toast } from "react-toastify";
 import ImageVideoDropzone from "./ImageVideoDropzone";
+import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
 
 const validationSchema = Yup.object().shape({
   subscripitonReference: Yup.string().required(
@@ -19,6 +20,11 @@ const validationSchema = Yup.object().shape({
   issueType: Yup.string().required("Issue type is required."),
   priority: Yup.string().required("Priority is required."),
   issueDescription: Yup.string().required("Issue description is required."),
+  contect_person_email: Yup.string()
+    .trim()
+    .transform((v) => (v === "" ? undefined : v)) // treat empty as undefined
+    .email("Enter a valid email") // only checks if provided
+    .notRequired(),
 });
 
 const priorityList = [
@@ -29,26 +35,24 @@ const priorityList = [
 ];
 const AddEditTicket = ({ handleClose }) => {
   const dispatch = useDispatch();
-  const {
-    ticketsIssues,
-    ticketsIssuesLoading,
-    subscriptionList,
-    subscriptionListLoading,
-    userDetail,
-  } = useSelector((state) => ({
-    ticketsIssues: state?.pages?.ticketsIssues,
-    ticketsIssuesLoading: state?.pages?.ticketsIssuesLoading,
-    subscriptionList: state?.pages?.subscriptionList,
-    subscriptionListLoading: state?.pages?.subscriptionListLoading,
-    userDetail: state?.profile?.userDetail,
-  }));
+  const { subscriptionList, subscriptionListLoading, userDetail } = useSelector(
+    (state) => ({
+      subscriptionList: state?.pages?.subscriptionList,
+      subscriptionListLoading: state?.pages?.subscriptionListLoading,
+      userDetail: state?.profile?.userDetail,
+    })
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ticketsIssues, setTicketsIssues] = useState([]);
   const formik = useFormik({
     initialValues: {
       subscripitonReference: null,
       issueType: null,
       priority: null,
       issueDescription: "",
+      contact_person_name: "",
+      contect_person_phone: null,
+      contect_person_email: null,
       files: [],
     },
     validationSchema,
@@ -59,6 +63,9 @@ const AddEditTicket = ({ handleClose }) => {
       formData.append("issue", values?.issueType);
       formData.append("message", values?.issueDescription);
       formData.append("priority", values?.priority);
+      formData.append("contact_person_name", values?.contact_person_name);
+      formData.append("contect_person_phone", values?.contect_person_phone);
+      formData.append("contect_person_email", values?.contect_person_email);
       values?.files?.map((file, index) => formData.append(`ticketimage`, file));
       formData.append("subscription", values?.subscripitonReference);
       dispatch(generateTicket(formData)).then((res) => {
@@ -78,17 +85,72 @@ const AddEditTicket = ({ handleClose }) => {
     setFieldValue,
     setFieldTouched,
     handleSubmit,
+    handleChange,
+    handleBlur,
   } = formik;
 
   useEffect(() => {
-    dispatch(getTicketIssues());
     dispatch(getSubscriptionTicket());
   }, []);
-  console.log(values?.files?.map((file) => URL.createObjectURL(file)));
 
+  const handleFetchIssueType = (id) => {
+    dispatch(getTicketIssues(id)).then((res) => {
+      if (res?.payload?.status === 200) {
+        const issues = res?.payload?.data?.map((item) => ({
+          ...item,
+          value: item?.id,
+          label: item?.name,
+        }));
+        setTicketsIssues(issues);
+      }
+    });
+  };
   return (
     <div className="">
       <form className="pb-5" onSubmit={handleSubmit}>
+        <CommonInputTextField
+          labelName="Contact Person's Name"
+          id="contact_person_name"
+          name="contact_person_name"
+          className="input"
+          // required
+          mainDiv="form-group mb-3"
+          labelClass="label"
+          value={values?.contact_person_name}
+          placeHolder="Enter Contact Person's Name"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          // requiredText
+        />
+        <CommonInputTextField
+          labelName="Contact Person's Phone"
+          id="contect_person_phone"
+          name="contect_person_phone"
+          className="input"
+          mainDiv="form-group mb-3"
+          labelClass="label"
+          value={values?.contect_person_phone}
+          placeHolder="Enter Contact Person's Phone"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          type="number"
+        />
+        <CommonInputTextField
+          labelName="Contact Person's Email"
+          id="contect_person_email"
+          name="contect_person_email"
+          className="input"
+          mainDiv="form-group mb-3"
+          labelClass="label"
+          value={values?.contect_person_email}
+          placeHolder="Enter Contact Person's Email"
+          onChange={handleChange}
+          isInvalid={
+            errors?.contect_person_email && touched?.contect_person_email
+          }
+          errorText={errors?.contect_person_email}
+          onBlur={handleBlur}
+        />
         <CustomSelect
           label="Subscripiton Reference"
           required
@@ -98,6 +160,11 @@ const AddEditTicket = ({ handleClose }) => {
           )}
           onChange={(selectedOption) => {
             setFieldValue("subscripitonReference", selectedOption?.value);
+            if (selectedOption?.value) {
+              handleFetchIssueType(selectedOption?.value);
+            } else {
+              setTicketsIssues([]);
+            }
           }}
           options={subscriptionList}
           placeholder="Select a subscription reference"
@@ -119,7 +186,7 @@ const AddEditTicket = ({ handleClose }) => {
           placeholder="Select a issue"
           error={errors?.issueType && touched?.issueType}
           errorText={errors.issueType}
-          isDisabled={ticketsIssuesLoading}
+          // isDisabled={ticketsIssuesLoading}
         />
         <CustomSelect
           label="Priority"

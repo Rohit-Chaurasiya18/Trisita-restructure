@@ -11,7 +11,9 @@ import {
   GET_NEW_SUBSCRIPTION_DETAIL,
   GET_SUBSCRIPTION,
   GET_SUBSCRIPTION_DATA,
+  SUBSCRIPTION_ACQUIRED_TYPE,
   TRIGGER_TEMPLATE_URL,
+  UPDATE_SUBSCRIPTION_AQUIRED,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -211,6 +213,34 @@ export const getTriggeredTemplate = createAsyncThunk(
   }
 );
 
+export const getSubscriptionAcquiredType = createAsyncThunk(
+  `subscription/getSubscriptionAcquiredType`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(SUBSCRIPTION_ACQUIRED_TYPE);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const getUpdateSubscriptionAcquired = createAsyncThunk(
+  `subscription/getUpdateSubscriptionAcquired`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        UPDATE_SUBSCRIPTION_AQUIRED + `${payload?.subscription_id}/`,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 const intialState = {
   lastUpdate: null,
   speedometerRatio: null,
