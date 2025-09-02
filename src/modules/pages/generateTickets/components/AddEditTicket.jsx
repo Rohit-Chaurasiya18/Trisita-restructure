@@ -7,6 +7,7 @@ import {
   generateTicket,
   getSubscriptionTicket,
   getTicketIssues,
+  getTicketList,
 } from "../../slice";
 import CommonTextareaField from "@/components/common/inputTextField/CommonTextareaField";
 import { toast } from "react-toastify";
@@ -71,7 +72,7 @@ const AddEditTicket = ({ handleClose }) => {
       dispatch(generateTicket(formData)).then((res) => {
         if (res?.payload?.status === 200 || res?.payload?.status === 201) {
           toast.success("Ticket generated successfully!");
-          dispatch(getTicketIssues());
+          dispatch(getTicketList());
           handleClose();
         }
         setIsSubmitting(false);
