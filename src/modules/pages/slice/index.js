@@ -5,7 +5,9 @@ import {
   GENERATE_TICKET,
   GET_CALENDAR_SUBSCRIPTION_DETAILS,
   GET_SUBSCRIPTION_TICKET,
+  GET_TICKET_DETAILS,
   GET_TICKET_ISSUES,
+  SEND_TICKET_MESSAGE,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -88,6 +90,34 @@ export const getSubscriptionTicket = createAsyncThunk(
     }
   }
 );
+
+export const getTicketDetails = createAsyncThunk(
+  `pages/getTicketDetails`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        GET_TICKET_DETAILS + `?ticket_id=${payload}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.message || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const sendTicketMessage = createAsyncThunk(
+  `pages/sendTicketMessage`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(SEND_TICKET_MESSAGE, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.message || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.status);
+    }
+  }
+);
 const pagesState = {
   calendarList: [],
   calendarListLoading: false,
@@ -97,6 +127,8 @@ const pagesState = {
   subscriptionListLoading: false,
   ticketListing: [],
   ticketListingLoading: false,
+  ticketDetails: null,
+  ticketDetailsLoading: false,
 };
 
 const pagesSlice = createSlice({
@@ -163,6 +195,18 @@ const pagesSlice = createSlice({
     builder.addCase(getSubscriptionTicket.rejected, (state) => {
       state.subscriptionList = [];
       state.subscriptionListLoading = false;
+    });
+    builder.addCase(getTicketDetails.pending, (state) => {
+      state.ticketDetailsLoading = true;
+      state.ticketDetails = null;
+    });
+    builder.addCase(getTicketDetails.fulfilled, (state, action) => {
+      state.ticketDetailsLoading = false;
+      state.ticketDetails = action.payload.data;
+    });
+    builder.addCase(getTicketDetails.rejected, (state) => {
+      state.ticketDetailsLoading = false;
+      state.ticketDetails = null;
     });
   },
 });

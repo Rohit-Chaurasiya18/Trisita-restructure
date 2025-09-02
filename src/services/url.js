@@ -143,3 +143,5 @@ export const DELETED_SUBSCRIPTION_ACQUIRED_TYPE =
   "v1/api/get_deleted_subscription_acquired_type/";
 export const UPDATE_DELETED_SUBSCRIPTION_AQUIRED =
   "/v1/api/update_deleted_subscription_acquired/";
+export const GET_TICKET_DETAILS = "/v1/api/get_ticket_chat_message/";
+export const SEND_TICKET_MESSAGE = "/v1/api/get_ticket_chat_message/";

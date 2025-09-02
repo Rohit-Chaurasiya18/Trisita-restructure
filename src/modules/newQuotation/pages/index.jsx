@@ -268,12 +268,26 @@ const NewQuotation = () => {
         headerName: "Download Quotation",
         width: 200,
         cellClassName: "",
-        renderCell: (params, index) => (
-          <DownloadQuotation
-            className="assign-button text-black px-3 py-1 rounded border-0"
-            params={params}
-          />
-        ),
+        renderCell: (params, index) => {
+          console.log(params);
+          return (
+            <DownloadQuotation
+              className="assign-button text-black px-3 py-1 rounded border-0"
+              params={{
+                ...params,
+                row: {
+                  ...params?.row,
+                  quotation_date: params?.row?.quotation_date
+                    ? moment(params?.row?.quotation_date).format("DD/MM/YYYY")
+                    : "N/A",
+                  valid_until: params?.row?.valid_until
+                    ? moment(params?.row?.valid_until).format("DD/MM/YYYY")
+                    : "N/A",
+                },
+              }}
+            />
+          );
+        },
       },
 
       {

@@ -7,3 +7,10 @@
     color: black;
   }
 }
+.activity-log-tickets {
+  li {
+    &::before {
+      flex: 0;
+    }
+  }
+}

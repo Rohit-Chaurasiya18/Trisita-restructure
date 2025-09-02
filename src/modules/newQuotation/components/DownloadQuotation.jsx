@@ -181,7 +181,7 @@ const TableHeader = () => {
     { width: "10%", text: "CGST@9%" },
     { width: "10%", text: "SGST@9%" },
     { width: "10%", text: "IGST@18%" },
-    { width: "10%", text: "Inline Amount" },
+    { width: "12%", text: "Inline Amount" },
   ];
   return (
     <View style={styles.tableRow} fixed>
@@ -199,6 +199,7 @@ const TableRow = React.memo(({ row }) => {
     if (index === 0) return "5%";
     if (index === 1) return "30%";
     if (index === 3) return "5%";
+    if (index === 8) return "12%";
     return "10%";
   };
   return (
@@ -218,7 +219,7 @@ const GrandTotalRow = ({ total }) => (
     <Text style={[styles.tableCol, styles.grandTotalLabel, { width: "90%" }]}>
       Grand Total
     </Text>
-    <Text style={[styles.tableCol, styles.grandTotalValue, { width: "10%" }]}>
+    <Text style={[styles.tableCol, styles.grandTotalValue, { width: "12%" }]}>
       {total}
     </Text>
   </View>
@@ -378,7 +379,7 @@ export const MyDocument = ({ params }) => {
           <TermsAndConditions
             bd_person_name={params?.row?.bd_person_name}
             bd_person_phone={params?.row?.bd_person_phone}
-            purchase_payment_terms={params?.row?.purchase_payment_terms}
+            purchase_payment_terms={params?.row?.purchase_payment_terms_name}
             valid_until={params?.row?.valid_until}
             branch_name={params?.row?.branch_name}
           />

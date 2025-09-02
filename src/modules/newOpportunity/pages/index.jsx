@@ -168,7 +168,7 @@ const NewOpportunity = () => {
       },
       { field: "opportunity_type", headerName: "Opportunity Type", width: 250 },
       { field: "product_name", headerName: "Product", width: 250 },
-      { field: "industry_group", headerName: "Product Line Code", width: 250 },
+      { field: "industry_group", headerName: "Industry", width: 250 },
       {
         field: "quantity",
         headerName: "Quantity",
