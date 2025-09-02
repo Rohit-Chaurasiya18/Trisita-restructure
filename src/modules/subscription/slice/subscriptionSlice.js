@@ -1,6 +1,7 @@
 import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
+  DELETED_SUBSCRIPTION_ACQUIRED_TYPE,
   GET_BACKUP_SUBSCRIPTION,
   GET_CHANGED_LOG_SUBSCRIPTION_DATA,
   GET_CHANGED_LOG_SUBSCRIPTION_DETAIL,
@@ -13,6 +14,7 @@ import {
   GET_SUBSCRIPTION_DATA,
   SUBSCRIPTION_ACQUIRED_TYPE,
   TRIGGER_TEMPLATE_URL,
+  UPDATE_DELETED_SUBSCRIPTION_AQUIRED,
   UPDATE_SUBSCRIPTION_AQUIRED,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -232,6 +234,34 @@ export const getUpdateSubscriptionAcquired = createAsyncThunk(
     try {
       const response = await axiosReact.put(
         UPDATE_SUBSCRIPTION_AQUIRED + `${payload?.subscription_id}/`,
+        payload
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const getDeletedSubscriptionAcquiredType = createAsyncThunk(
+  `subscription/getDeletedSubscriptionAcquiredType`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(DELETED_SUBSCRIPTION_ACQUIRED_TYPE);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+export const getUpdateDeletedSubscriptionAcquired = createAsyncThunk(
+  `subscription/getUpdateDeletedSubscriptionAcquired`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        UPDATE_DELETED_SUBSCRIPTION_AQUIRED + `${payload?.subscription_id}/`,
         payload
       );
       return response;

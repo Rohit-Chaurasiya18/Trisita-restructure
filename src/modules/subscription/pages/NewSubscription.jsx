@@ -36,7 +36,6 @@ const SetAction = ({
   subscription_acquired_type_id,
   handleFallback,
 }) => {
-  console.log(subscription_acquired_type_id);
   const dispatch = useDispatch();
   const [subscriptionAcquiredType, setSubscriptionAcquiredType] = useState([]);
   const [selectedType, setSelectedType] = useState(null);

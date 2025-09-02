@@ -139,3 +139,7 @@ export const SUBSCRIPTION_ACQUIRED_TYPE =
   "/v1/api/get_subscription_acquired_type/";
 export const UPDATE_SUBSCRIPTION_AQUIRED =
   "/v1/api/update_subscription_acquired/";
+export const DELETED_SUBSCRIPTION_ACQUIRED_TYPE =
+  "v1/api/get_deleted_subscription_acquired_type/";
+export const UPDATE_DELETED_SUBSCRIPTION_AQUIRED =
+  "/v1/api/update_deleted_subscription_acquired/";

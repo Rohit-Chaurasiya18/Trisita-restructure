@@ -8,8 +8,10 @@ import SubscriptionDetail from "../components/SubscriptionDetail";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getDeletedSubscriptionAcquiredType,
   getDeletedSubscriptionData,
   getDeletedSubscriptionDetail,
+  getUpdateDeletedSubscriptionAcquired,
 } from "../slice/subscriptionSlice";
 import useDebounce from "@/hooks/useDebounce";
 import {
@@ -27,7 +29,114 @@ import {
   getEmptyPieChartConfig,
   userType,
 } from "@/constants";
+import { toast } from "react-toastify";
 
+const SetAction = ({
+  id,
+  handleClose,
+  subscription_acquired_type_id,
+  handleFallback,
+}) => {
+  const dispatch = useDispatch();
+  const [subscriptionAcquiredType, setSubscriptionAcquiredType] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+
+  useEffect(() => {
+    dispatch(getDeletedSubscriptionAcquiredType()).then((res) => {
+      debugger;
+      if (res?.payload?.status === 200) {
+        setSubscriptionAcquiredType(
+          res?.payload?.data?.map((i) => ({
+            value: i?.id,
+            label: i?.name,
+          }))
+        );
+      }
+    });
+  }, []);
+  const handleAction = () => {
+    dispatch(
+      getUpdateDeletedSubscriptionAcquired({
+        subscription_id: id,
+        subscription_acquired_type: selectedType,
+      })
+    ).then((res) => {
+      if (res?.payload?.status === 200) {
+        toast.success("Subscription Acquired Type Updated Successfully");
+      }
+      handleClose();
+      handleFallback(
+        id,
+        subscriptionAcquiredType?.find((i) => i.value === selectedType)
+      );
+    });
+  };
+  useEffect(() => {
+    if (subscription_acquired_type_id) {
+      setSelectedType(subscription_acquired_type_id);
+    }
+  }, [subscription_acquired_type_id]);
+  return (
+    <>
+      <div className="col-12 d-flex my-2">
+        <div className="col-6 fw-bold">Subscription Acquired :</div>
+        <div className="col-6">
+          <Autocomplete
+            options={subscriptionAcquiredType || []}
+            value={
+              subscriptionAcquiredType?.find((i) => i.value === selectedType) ||
+              null
+            }
+            getOptionLabel={(option) => option?.label}
+            sx={{
+              width: 300,
+            }}
+            onChange={(event, newValues) => {
+              setSelectedType(newValues?.value);
+            }}
+            loading={false}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Select Type"
+                variant="outlined"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {params.InputProps.endAdornment}
+                      {false && (
+                        <Typography variant="body2" color="textSecondary">
+                          Loading...
+                        </Typography>
+                      )}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
+        </div>
+      </div>
+      <div className="d-flex justify-content-center mt-4">
+        <CommonButton
+          className={"w-auto"}
+          style={{
+            background: selectedType
+              ? "rgb(21, 149, 221)"
+              : "rgb(192, 205, 212)",
+          }}
+          isDisabled={!selectedType}
+          onClick={() => {
+            handleAction();
+          }}
+        >
+          Action
+        </CommonButton>
+      </div>
+    </>
+  );
+};
 const DeletedSubscription = () => {
   const dispatch = useDispatch();
 
@@ -74,6 +183,8 @@ const DeletedSubscription = () => {
   const [modal, setModal] = useState({
     show: false,
     id: null,
+    isAssign: false,
+    subscription_acquired_type_id: null,
   });
 
   useEffect(() => {
@@ -120,8 +231,17 @@ const DeletedSubscription = () => {
   };
 
   // Handle modal open
-  const handleOpenModel = (id) => {
-    setModal({ show: true, id });
+  const handleOpenModel = (
+    id,
+    isAssign = false,
+    subscription_acquired_type_id
+  ) => {
+    setModal({
+      show: true,
+      id,
+      isAssign,
+      subscription_acquired_type_id: subscription_acquired_type_id,
+    });
     dispatch(getDeletedSubscriptionDetail({ id }));
   };
 
@@ -134,7 +254,13 @@ const DeletedSubscription = () => {
         width: 150,
         renderCell: (params) => (
           <span
-            onClick={() => handleOpenModel(params?.row.id)}
+            onClick={() =>
+              handleOpenModel(
+                params?.row.id,
+                false,
+                params?.row?.subscription_acquired_type_id
+              )
+            }
             className="action-button bg-white text-black px-3 py-1 rounded border-0"
           >
             {params?.value}
@@ -279,6 +405,25 @@ const DeletedSubscription = () => {
                 <div>{Number(params.value).toFixed(2)}</div>
               ),
               sortComparator: (v1, v2) => Number(v1) - Number(v2),
+            },
+            {
+              field: "action",
+              headerName: "Action",
+              width: 150,
+              renderCell: (params) => (
+                <span
+                  onClick={() =>
+                    handleOpenModel(
+                      params?.row?.id,
+                      true,
+                      params?.row?.subscription_acquired_type_id
+                    )
+                  }
+                  className="assign-button text-black px-3 py-1 rounded border-0"
+                >
+                  Assign Trigger
+                </span>
+              ),
             },
           ]
         : []),
@@ -1416,6 +1561,18 @@ const DeletedSubscription = () => {
     setSubSegmentType(viewType);
   };
 
+  const handleFallback = (id, selectedType) => {
+    const updatedData = filteredData?.map((item) =>
+      item?.id === id
+        ? {
+            ...item,
+            subscription_acquired_type_id: selectedType?.value,
+            subscription_acquired_types: selectedType?.label,
+          }
+        : { ...item }
+    );
+    setFilteredData(updatedData);
+  };
   return (
     <>
       <div>
@@ -1711,11 +1868,34 @@ const DeletedSubscription = () => {
 
       <CommonModal
         isOpen={modal.show}
-        handleClose={() => setModal({ show: false, id: null })}
-        scrollable
-        title={"Deleted Subscription Detail"}
+        handleClose={() =>
+          setModal({
+            show: false,
+            id: null,
+            isAssign: false,
+            subscription_acquired_type_id: null,
+          })
+        }
+        scrollable={modal?.isAssign ? false : true}
+        title={modal.isAssign ? "Set Action" : "Deleted Subscription Detail"}
       >
-        <SubscriptionDetail />
+        {modal?.isAssign ? (
+          <SetAction
+            id={modal?.id}
+            handleClose={() =>
+              setModal({
+                show: false,
+                id: null,
+                isAssign: false,
+                subscription_acquired_type_id: null,
+              })
+            }
+            subscription_acquired_type_id={modal?.subscription_acquired_type_id}
+            handleFallback={handleFallback}
+          />
+        ) : (
+          <SubscriptionDetail />
+        )}
       </CommonModal>
     </>
   );
