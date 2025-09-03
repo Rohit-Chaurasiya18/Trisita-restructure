@@ -298,7 +298,24 @@ const NewQuotation = () => {
         renderCell: (params, index) => (
           <span
             onClick={async () => {
-              const blob = await pdf(<MyDocument params={params} />).toBlob();
+              const blob = await pdf(
+                <MyDocument
+                  params={{
+                    ...params,
+                    row: {
+                      ...params?.row,
+                      quotation_date: params?.row?.quotation_date
+                        ? moment(params?.row?.quotation_date).format(
+                            "DD/MM/YYYY"
+                          )
+                        : "N/A",
+                      valid_until: params?.row?.valid_until
+                        ? moment(params?.row?.valid_until).format("DD/MM/YYYY")
+                        : "N/A",
+                    },
+                  }}
+                />
+              ).toBlob();
               const file = new File(
                 [blob],
                 `${params?.row?.quotation_no || "quotation"}.pdf`,
