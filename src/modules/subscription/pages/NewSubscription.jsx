@@ -89,7 +89,6 @@ const SetAction = ({
               width: 300,
             }}
             onChange={(event, newValues) => {
-              console.log(newValues);
               setSelectedType(newValues?.value);
             }}
             loading={false}
@@ -161,6 +160,7 @@ const NewSubscription = () => {
     userDetail: state?.login?.userDetail,
   }));
 
+  const [subscriptionAcquiredType, setSubscriptionAcquiredType] = useState([]);
   const [filteredData, setFilteredData] = useState();
   const [numberOfSeatsBar, setNumberOfSeatsBar] = useState("");
   const [accountGroupLegend, setAccountGroupLegend] = useState("");
@@ -173,6 +173,7 @@ const NewSubscription = () => {
     status: "All Status",
     startDate: "",
     endDate: "",
+    subscriptionAcquire: "All",
   });
   const [modal, setModal] = useState({
     show: false,
@@ -180,10 +181,23 @@ const NewSubscription = () => {
     isAssign: false,
     subscription_acquired_type_id: null,
   });
-
   useEffect(() => {
     dispatch(getAllBranch());
     dispatch(getAllAccount());
+  }, []);
+
+  useEffect(() => {
+    dispatch(getSubscriptionAcquiredType()).then((res) => {
+      if (res?.payload?.status === 200) {
+        setSubscriptionAcquiredType([
+          { value: "All", label: "All" }, // 👈 extra option at index 0
+          ...res?.payload?.data?.map((i) => ({
+            value: i?.id,
+            label: i?.name,
+          })),
+        ]);
+      }
+    });
   }, []);
 
   const debounce = useDebounce(filters?.endDate, 500);
@@ -310,9 +324,13 @@ const NewSubscription = () => {
         field: "contract_manager_email",
         headerName: "Contract Mgr. Email",
         width: 200,
-        renderCell: ({ value }) => (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>{value}</div>
-        ),
+        renderCell: ({ value }) => <div>{value}</div>,
+      },
+      {
+        field: "contract_term",
+        headerName: "Contract Term",
+        width: 200,
+        renderCell: ({ value }) => <div>{value}</div>,
       },
       { field: "seats", headerName: "Seats", width: 70 },
       {
@@ -374,7 +392,11 @@ const NewSubscription = () => {
       ...(userDetail?.user_type !== userType.client
         ? [
             { field: "subscriptionStatus", headerName: "Status", width: 100 },
-            { field: "subscription_acquired_types", headerName: "Subscription Acquired Type", width: 200 },
+            {
+              field: "subscription_acquired_types",
+              headerName: "Subscription Acquired Type",
+              width: 200,
+            },
             {
               field: "acv_price",
               headerName: "Total ACV Price",
@@ -426,6 +448,12 @@ const NewSubscription = () => {
     if (filters?.status !== "All Status") {
       data = data?.filter((item) => item?.trisita_status === filters?.status);
     }
+    if (filters?.subscriptionAcquire !== "All") {
+      data = data?.filter(
+        (item) =>
+          item?.subscription_acquired_type_id === filters?.subscriptionAcquire
+      );
+    }
     if (filters?.account?.length > 0) {
       // data = data?.filter((item) => {
       //   const name = item["account_name"];
@@ -451,6 +479,7 @@ const NewSubscription = () => {
     if (
       filters?.account?.length > 0 ||
       filters?.status !== "All Status" ||
+      filters?.subscriptionAcquire !== "All" ||
       filters?.branch
     ) {
       let data = handleFilter(newSubscriptionData);
@@ -458,7 +487,13 @@ const NewSubscription = () => {
     } else {
       setFilteredData(newSubscriptionData);
     }
-  }, [filters?.account, filters?.branch, filters?.status, newSubscriptionData]);
+  }, [
+    filters?.account,
+    filters?.branch,
+    filters?.status,
+    filters?.subscriptionAcquire,
+    newSubscriptionData,
+  ]);
 
   // Chart click events
   const handleNumberOfSeatsClick = (data) => {
@@ -1625,6 +1660,19 @@ const NewSubscription = () => {
                 }));
               }}
             />
+            {userDetail?.user_type !== userType.client && (
+              <CommonSelect
+                value={filters?.subscriptionAcquire}
+                options={subscriptionAcquiredType || []}
+                onChange={(e) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    subscriptionAcquire: e?.target?.value,
+                  }));
+                }}
+              />
+            )}
+
             <div
               className={`${
                 filters?.account?.length > 0 && "multiple-select-container"

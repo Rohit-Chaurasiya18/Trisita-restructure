@@ -298,7 +298,6 @@ const PermissionProfile = () => {
       setPermissions(resetPermissions);
     }
   };
-  console.log(permissions);
   return (
     <>
       <div className="mb-5">

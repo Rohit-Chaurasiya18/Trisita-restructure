@@ -5,6 +5,7 @@ import {
   GET_EXPORT_OPPORTUNITIES,
   GET_NEW_OPPORTUNITY_DATA,
   GET_OPPORTUNITY_DETAIL,
+  LOCK_UNLOCK_OPPORTUNITY,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -132,6 +133,23 @@ export const generateQuotation = createAsyncThunk(
     }
   }
 );
+
+export const lockUnlockOpportunity = createAsyncThunk(
+  "opportunities/lockUnlockOpportunity",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(
+        LOCK_UNLOCK_OPPORTUNITY +
+          `?id=${payload?.id}&is_locked=${payload?.status}`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
 const initialValue = {
   opportunityLoading: false,
   opportunityList: [],

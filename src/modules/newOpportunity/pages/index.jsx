@@ -5,15 +5,17 @@ import CommonTable from "@/components/common/dataTable/CommonTable";
 import CommonDateRangePicker from "@/components/common/date/CommonDateRangePicker";
 import CommonAutocomplete from "@/components/common/dropdown/CommonAutocomplete";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
-import { getEmptyPieChartConfig } from "@/constants";
+import { getEmptyPieChartConfig, userType } from "@/constants";
 import useDebounce from "@/hooks/useDebounce";
 import { getAllBranch } from "@/modules/insightMetrics/slice/insightMetricsSlice";
 import { getSalesStage } from "@/modules/newQuotation/slice/quotationSlice";
 import {
   generateQuotation,
   getNewOpportunityData,
+  lockUnlockOpportunity,
 } from "@/modules/opportunity/slice/opportunitySlice";
 import routesConstants from "@/routes/routesConstants";
+import { FaLock, FaUnlock } from "react-icons/fa";
 import { Tooltip } from "@mui/material";
 import dayjs from "dayjs";
 import moment from "moment";
@@ -34,6 +36,7 @@ const NewOpportunity = () => {
     salesStageList,
     salesStageListLoading,
     last_updated,
+    userDetail,
   } = useSelector((state) => ({
     newOpportunityData: state?.opportunity?.newOpportunityData,
     newOpportunityDataLoading: state?.opportunity?.newOpportunityDataLoading,
@@ -42,6 +45,7 @@ const NewOpportunity = () => {
     salesStageList: state?.quotation?.salesStage,
     salesStageListLoading: state?.quotation?.salesStageLoading,
     last_updated: state?.opportunity?.newOpportunityDataLastUpdated,
+    userDetail: state?.login?.userDetail,
   }));
 
   const [filteredData, setFilteredData] = useState([]);
@@ -104,6 +108,19 @@ const NewOpportunity = () => {
     handleFetchData();
   }, [filters?.branch, filters?.salesStage, debounce]);
 
+  const handleLockUnlock = (row, is_locked) => {
+    dispatch(lockUnlockOpportunity({ id: row?.id, status: !is_locked })).then(
+      (res) => {
+        if (res?.payload?.status === 200) {
+          handleFetchData();
+          toast.success(
+            `Quotation ${!is_locked ? "locked" : "unlocked"} successfully.`
+          );
+        }
+      }
+    );
+  };
+
   // Table column definitions
   const columns = useMemo(
     () => [
@@ -136,6 +153,40 @@ const NewOpportunity = () => {
           </div>
         ),
       },
+
+      {
+        field: "is_locked",
+        headerName: "Lock / Unlock",
+        width: 150,
+        renderCell: (params) => (
+          <div className="flex items-center w-full justify-center">
+            {!params?.row.is_locked ? (
+              <button
+                onClick={() => {
+                  handleLockUnlock(params?.row, params?.row?.is_locked);
+                }}
+                className={
+                  "action-button bg-transparent text-center px-3 py-1 rounded border-0"
+                }
+              >
+                <FaUnlock color="rgb(34 197 94 / 1)" />
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  handleLockUnlock(params?.row, params?.row?.is_locked);
+                }}
+                className={
+                  "action-button bg-transparent text-center px-3 py-1 rounded border-0"
+                }
+              >
+                <FaLock color="rgb(239 68 68 / 1)" />
+              </button>
+            )}
+          </div>
+        ),
+      },
+
       { field: "branch_name", headerName: "Branch", width: 200 },
       {
         field: "bd_person_details",
@@ -214,6 +265,27 @@ const NewOpportunity = () => {
       {
         field: "total_last_quotated_price",
         headerName: "Total Last Quoated Price",
+        width: 150,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
+        field: "purchase_amount",
+        headerName: "Purchase Price",
+        width: 150,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
+        field: "total_purchase_amount",
+        headerName: "Total Purchase Price",
+        width: 150,
+        renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
+        sortComparator: (v1, v2) => Number(v1) - Number(v2),
+      },
+      {
+        field: "total_gp",
+        headerName: "Total GP",
         width: 150,
         renderCell: (params) => <div>{Number(params.value).toFixed(2)}</div>,
         sortComparator: (v1, v2) => Number(v1) - Number(v2),
@@ -538,35 +610,37 @@ const NewOpportunity = () => {
     [secondgraphlabel]
   );
 
-  // Retention Risk shows summary of the renewal risk for the subscription contract
-  const [retentionRiskType, setRetentionRiskType] = useState("opportunity");
-  const [retentionRiskLegend, setRetentionRiskLegend] = useState("");
+  // Opportunity Category
+  const [opportunityCategoryType, setOpportunityCategoryType] =
+    useState("opportunity");
+  const [opportunityCategoryLegend, setOpportunityCategoryLegend] =
+    useState("");
 
   const handleRiskRetentionLegendClick = (data) => {
     let allData;
-    const isSameColor = retentionRiskLegend === data;
+    const isSameColor = opportunityCategoryLegend === data;
     if (isSameColor) {
       allData = newOpportunityData;
     } else {
       allData = filteredData;
     }
-    setRetentionRiskLegend(isSameColor ? "" : data);
+    setOpportunityCategoryLegend(isSameColor ? "" : data);
     const updatedData = isSameColor
       ? allData
       : allData?.filter((item) =>
           data !== "Unknown"
-            ? item?.ews_retention_health === data
-            : !item?.ews_retention_health
+            ? item?.opportunity_category === data
+            : !item?.opportunity_category
         );
 
     setFilteredData(updatedData);
   };
-  const retentionRiskBarChart = useMemo(() => {
+  const opportunityCategoryBarChart = useMemo(() => {
     if (filteredData?.length) {
       // Aggregate data by account_group based on selected type
       const retentionRiskGroups = {};
       filteredData.forEach((item) => {
-        const group = item?.ews_retention_health || "Unknown";
+        const group = item?.opportunity_category || "Unknown";
         // Initialize group if not exists
         if (!retentionRiskGroups[group]) {
           retentionRiskGroups[group] = {
@@ -584,7 +658,7 @@ const NewOpportunity = () => {
       const labels = Object.keys(retentionRiskGroups);
       let series;
 
-      switch (retentionRiskType) {
+      switch (opportunityCategoryType) {
         case "dtp_price":
           series = labels.map((group) =>
             parseFloat(retentionRiskGroups[group].dtp.toFixed(2))
@@ -634,7 +708,7 @@ const NewOpportunity = () => {
               highlightDataSeries: true, // Highlight the hovered series
             },
             formatter: (seriesName, opts) => {
-              const isHighlighted = seriesName === retentionRiskLegend;
+              const isHighlighted = seriesName === opportunityCategoryLegend;
               const count = opts.w.globals.series[opts.seriesIndex];
               return `<span style="color: ${
                 isHighlighted ? "black" : "black"
@@ -665,22 +739,22 @@ const NewOpportunity = () => {
     } else {
       return getEmptyPieChartConfig();
     }
-  }, [filteredData, retentionRiskType]);
+  }, [filteredData, opportunityCategoryType]);
 
-  const getRetentionRiskTitle = () => {
-    switch (retentionRiskType) {
+  const getOpportunityCategoryTitle = () => {
+    switch (opportunityCategoryType) {
       case "dtp_price":
-        return "Oppen. Retention Risk shows summary of the renewal risk for the dtp price";
+        return "Total opportunity as per Opportunity Category for the dtp price";
       case "acv_price":
-        return "Oppen. Retention Risk shows summary of the renewal risk for the acv price";
+        return "Total opportunity as per Opportunity Category for the acv price";
       case "opportunity":
       default:
-        return "Oppen. Retention Risk shows summary of the renewal risk for the subscription contract";
+        return "Total opportunity as per Opportunity Category";
     }
   };
 
-  const handleRetentionRiskChange = (viewType) => {
-    setRetentionRiskType(viewType);
+  const handleOpportunityCategoryChange = (viewType) => {
+    setOpportunityCategoryType(viewType);
   };
 
   // Total Amount as per Months
@@ -740,6 +814,55 @@ const NewOpportunity = () => {
     ],
   };
 
+  //GP Graph
+  const GPChartData = useMemo(() => {
+    const monthlyData = {};
+
+    // Determine base month (start from selected startDate if available, else current month)
+    const baseMonth = filters?.to_date ? dayjs(filters.to_date) : dayjs(); // fallback to current month
+
+    // Previous 12 months
+    for (let i = 11; i >= 0; i--) {
+      const monthKey = baseMonth.subtract(i, "month").format("YYYY-MM");
+      monthlyData[monthKey] = { gp_total: 0 };
+    }
+
+    // Aggregate DTP and ACV by endDate month
+    (filteredData || []).forEach((sub) => {
+      const endMonth = dayjs(sub?.contract_date).format("YYYY-MM");
+      if (monthlyData[endMonth]) {
+        monthlyData[endMonth].gp_total += Number(sub?.total_gp) || 0;
+      }
+    });
+
+    const categories = Object.keys(monthlyData);
+    const GPData = categories.map((month) =>
+      parseFloat(monthlyData[month].gp_total.toFixed(2))
+    );
+
+    return { categories, GPData };
+  }, [filteredData, filters?.startDate]);
+
+  const GPMonth = {
+    options: {
+      chart: { height: 350, type: "bar" },
+      xaxis: {
+        categories: GPChartData.categories,
+        title: { text: "Months" },
+      },
+      yaxis: {
+        title: { text: "Price" },
+      },
+      colors: ["#007BFF"],
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          columnWidth: "50%",
+        },
+      },
+    },
+    series: [{ name: "GP Price", data: GPChartData.GPData }],
+  };
   // Total Opportunity as per Account Group
   const [accountGroupType, setAccountGroupType] = useState("opportunity");
   const [accountGroupLegend, setAccountGroupLegend] = useState("");
@@ -1193,6 +1316,12 @@ const NewOpportunity = () => {
     setAccountType_Type(viewType);
   };
 
+  const showGpGraph = useMemo(() => {
+    return [userType.superadmin, userType.bdManager].includes(
+      userDetail?.user_type
+    );
+  }, [userDetail]);
+
   return (
     <div className="opportunity-container">
       <div className="quotation-header mb-5">
@@ -1292,15 +1421,15 @@ const NewOpportunity = () => {
           />
           <div className="opportunity-retention-account subscription-chart">
             <CommonChart
-              title={getRetentionRiskTitle()}
-              options={retentionRiskBarChart?.options}
-              series={retentionRiskBarChart?.series}
+              title={getOpportunityCategoryTitle()}
+              options={opportunityCategoryBarChart?.options}
+              series={opportunityCategoryBarChart?.series}
               className="chart-data-2"
               subCategory={["Opportunity", "DTP", "ACV"]}
               onSubCategoryClick={(index) => {
-                if (index === 0) handleRetentionRiskChange("opportunity");
-                if (index === 1) handleRetentionRiskChange("dtp_price");
-                if (index === 2) handleRetentionRiskChange("acv_price");
+                if (index === 0) handleOpportunityCategoryChange("opportunity");
+                if (index === 1) handleOpportunityCategoryChange("dtp_price");
+                if (index === 2) handleOpportunityCategoryChange("acv_price");
               }}
             />
             <CommonChart
@@ -1322,6 +1451,22 @@ const NewOpportunity = () => {
             className="chart-data-2"
           />
         </div>
+      )}
+      {showGpGraph && (
+        <>
+          {newOpportunityDataLoading ? (
+            <SkeletonLoader />
+          ) : (
+            <div className="account-industry-chart-2 mt-4 new-subs-amountPerMonth">
+              <CommonChart
+                title="Total GP as per Months"
+                options={GPMonth.options}
+                series={GPMonth.series}
+                className="chart-data-2"
+              />
+            </div>
+          )}
+        </>
       )}
 
       {newOpportunityDataLoading ? (

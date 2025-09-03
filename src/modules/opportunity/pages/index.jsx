@@ -264,6 +264,12 @@ const Opportunity = () => {
       width: 220,
     },
     {
+      field: "contract_term",
+      headerName: "Contract Term",
+      width: 200,
+      renderCell: ({ value }) => <div>{value}</div>,
+    },
+    {
       field: "productLines",
       headerName: "Product Line",
       width: 250,

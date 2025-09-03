@@ -77,6 +77,10 @@ const validationSchema = Yup.object({
     .required("Last quoted price is required.")
     .positive("Last quoted price must be a positive number.")
     .integer("Last quoted price must be an integer."),
+  purchaseAmount: Yup.number()
+    .required("Purchase price is required.")
+    .positive("Purchase price must be a positive number.")
+    .integer("Purchase price must be an integer."),
   bdPerson: Yup.array()
     .of(Yup.mixed()) // or Yup.number(), Yup.string(), depending on type
     .min(1, "At least one value must be selected.")
@@ -139,6 +143,7 @@ const AddEditNewOpportunity = () => {
     dtp_price: 0,
     quantity: null,
     lastQuotedPrice: null,
+    purchaseAmount: null,
     remarks: "",
   };
   const {
@@ -162,6 +167,7 @@ const AddEditNewOpportunity = () => {
         product_master: values?.productMaster,
         quantity: values?.quantity,
         last_quoated_price: values?.lastQuotedPrice,
+        purchase_amount: values?.purchaseAmount,
         opportunity_category: values?.opportunityCategory,
         opportunity_type: values?.opportunityType,
         salse_stage: values?.salesStage,
@@ -288,6 +294,7 @@ const AddEditNewOpportunity = () => {
           setFieldValue("dtp_price", opportunityData?.dtp_price_decimal);
           setFieldValue("quantity", opportunityData?.quantity);
           setFieldValue("lastQuotedPrice", opportunityData?.last_quoated_price);
+          setFieldValue("purchaseAmount", opportunityData?.purchase_amount);
           setFieldValue("remarks", opportunityData?.remarks);
           setFieldValue("dtp_price", opportunityData?.dtp_price);
           setFieldValue("acv_price", opportunityData?.acv_price);
@@ -652,6 +659,32 @@ const AddEditNewOpportunity = () => {
             value={values?.lastQuotedPrice * values?.quantity}
             isDisabled
           />
+
+          <CommonInputTextField
+            labelName="Purchase Amount Price"
+            id="purchaseAmount"
+            name="purchaseAmount"
+            className="input"
+            mainDiv="form-group"
+            type="number"
+            placeHolder="Enter Purchase Amount Price"
+            value={values?.purchaseAmount}
+            isInvalid={errors?.purchaseAmount && touched?.purchaseAmount}
+            errorText={errors?.purchaseAmount}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            min={1}
+            requiredText
+            required
+          />
+          <CommonInputTextField
+            labelName="Purchase Amount Price Total"
+            className="input"
+            mainDiv="form-group"
+            type="number"
+            value={values?.purchaseAmount * values?.quantity}
+            isDisabled
+          />
           <CommonInputTextField
             labelName="Remarks"
             id="remarks"
@@ -682,17 +715,19 @@ const AddEditNewOpportunity = () => {
                 ? "Submitting..."
                 : "Submit"}
             </CommonButton>
-            {opportunityId && <CommonButton
-              onClick={() => {
-                setIsCreateNew(true);
-                handleSubmit();
-              }}
-              type="button"
-              className="add-account-btn"
-              isDisabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating New" : "Create New"}
-            </CommonButton>}
+            {opportunityId && (
+              <CommonButton
+                onClick={() => {
+                  setIsCreateNew(true);
+                  handleSubmit();
+                }}
+                type="button"
+                className="add-account-btn"
+                isDisabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating New" : "Create New"}
+              </CommonButton>
+            )}
           </div>
         </form>
       </div>

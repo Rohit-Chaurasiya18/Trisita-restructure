@@ -166,9 +166,13 @@ const ChangedLogSubscription = () => {
         field: "contract_manager_email",
         headerName: "Contract Mgr. Email",
         width: 200,
-        renderCell: ({ value }) => (
-          <div style={{ whiteSpace: "normal", maxWidth: "200px" }}>{value}</div>
-        ),
+        renderCell: ({ value }) => <div>{value}</div>,
+      },
+      {
+        field: "contract_term",
+        headerName: "Contract Term",
+        width: 200,
+        renderCell: ({ value }) => <div>{value}</div>,
       },
       { field: "seats", headerName: "Seats", width: 70 },
       {

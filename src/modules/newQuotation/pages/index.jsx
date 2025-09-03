@@ -269,7 +269,6 @@ const NewQuotation = () => {
         width: 200,
         cellClassName: "",
         renderCell: (params, index) => {
-          console.log(params);
           return (
             <DownloadQuotation
               className="assign-button text-black px-3 py-1 rounded border-0"

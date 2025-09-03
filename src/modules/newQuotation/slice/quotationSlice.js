@@ -169,8 +169,7 @@ export const lockUnlockQuotation = createAsyncThunk(
     try {
       const response = await axiosReact.get(
         LOCK_UNLOCK_QUOTATION +
-          `?id=${payload?.id}&is_locked=${payload?.status}`,
-        payload
+          `?id=${payload?.id}&is_locked=${payload?.status}`
       );
       return response;
     } catch (err) {

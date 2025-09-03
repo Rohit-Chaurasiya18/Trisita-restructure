@@ -325,6 +325,12 @@ const DeletedSubscription = () => {
         width: 200,
         renderCell: ({ value }) => <div>{value}</div>,
       },
+      {
+        field: "contract_term",
+        headerName: "Contract Term",
+        width: 200,
+        renderCell: ({ value }) => <div>{value}</div>,
+      },
       { field: "seats", headerName: "Seats", width: 100 },
       {
         field: "startDate",

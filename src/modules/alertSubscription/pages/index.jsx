@@ -190,6 +190,12 @@ const AlertSubscription = () => {
       width: 200,
       renderCell: ({ value }) => renderLimitedText(value),
     },
+    {
+      field: "contract_term",
+      headerName: "Contract Term",
+      width: 200,
+      renderCell: ({ value }) => renderLimitedText(value),
+    },
     { field: "account_type", headerName: "Account Type", width: 200 },
     { field: "seats", headerName: "Seats", width: 100 },
     {

@@ -386,12 +386,16 @@ const Subscription = () => {
       data = data?.filter((item) => item?.trisita_status === filters?.status);
     }
     if (filters?.account?.length > 0) {
+      // data = data?.filter((item) => {
+      //   const name = item["account_name"];
+      //   return filters?.account.some(
+      //     (value) =>
+      //       name && name.toLowerCase().includes(value.label.toLowerCase())
+      //   );
+      // });
       data = data?.filter((item) => {
-        const name = item["account_name"];
-        return filters?.account.some(
-          (value) =>
-            name && name.toLowerCase().includes(value.label.toLowerCase())
-        );
+        const name = item["account_csn"];
+        return filters?.account.some((value) => name === value.csn);
       });
     }
     return data;

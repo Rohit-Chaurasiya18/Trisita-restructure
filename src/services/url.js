@@ -145,3 +145,5 @@ export const UPDATE_DELETED_SUBSCRIPTION_AQUIRED =
   "/v1/api/update_deleted_subscription_acquired/";
 export const GET_TICKET_DETAILS = "/v1/api/get_ticket_chat_message/";
 export const SEND_TICKET_MESSAGE = "/v1/api/get_ticket_chat_message/";
+export const LOCK_UNLOCK_OPPORTUNITY =
+  "/v1/api/get_new_opportunity_lock_unlock/";

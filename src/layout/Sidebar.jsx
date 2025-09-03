@@ -61,7 +61,7 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
           <ul>
             {navLinks?.map((link, index) => (
               <>
-                {link?.roles?.includes(userDetail?.user_type) && (
+                {link?.roles?.includes(user?.user_type) && (
                   <>
                     {link?.isLabel ? (
                       <>
@@ -74,7 +74,7 @@ const Sidebar = ({ isOpen, setIsOpen, isMobileView, setIsMobileView }) => {
                         )}
                         {link?.item?.map((item, ind) => (
                           <>
-                            {item?.roles?.includes(userDetail?.user_type) &&
+                            {item?.roles?.includes(user?.user_type) &&
                               user?.module_assigned_id?.includes(
                                 item?.moduleId
                               ) && (
