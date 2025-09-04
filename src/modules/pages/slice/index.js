@@ -7,6 +7,7 @@ import {
   GET_SUBSCRIPTION_TICKET,
   GET_TICKET_DETAILS,
   GET_TICKET_ISSUES,
+  REGENERATE_TICKET,
   SEND_TICKET_MESSAGE,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -118,6 +119,37 @@ export const sendTicketMessage = createAsyncThunk(
     }
   }
 );
+
+export const markAsClosed = createAsyncThunk(
+  `pages/markAsClosed`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        GENERATE_TICKET + `${payload}/closed/`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.message || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.status);
+    }
+  }
+);
+
+export const regenerateTicket = createAsyncThunk(
+  `pages/regenerateTicket`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.post(
+        REGENERATE_TICKET + `${payload}/regenerate/`
+      );
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.message || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.status);
+    }
+  }
+);
+
 const pagesState = {
   calendarList: [],
   calendarListLoading: false,

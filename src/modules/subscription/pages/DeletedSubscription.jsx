@@ -395,6 +395,11 @@ const DeletedSubscription = () => {
         ? [
             { field: "subscriptionStatus", headerName: "Status", width: 100 },
             {
+              field: "subscription_acquired_type",
+              headerName: "Subscription Acquired Type",
+              width: 200,
+            },
+            {
               field: "acv_price",
               headerName: "Total ACV Price",
               width: 130,
@@ -412,25 +417,25 @@ const DeletedSubscription = () => {
               ),
               sortComparator: (v1, v2) => Number(v1) - Number(v2),
             },
-            {
-              field: "action",
-              headerName: "Action",
-              width: 150,
-              renderCell: (params) => (
-                <span
-                  onClick={() =>
-                    handleOpenModel(
-                      params?.row?.id,
-                      true,
-                      params?.row?.subscription_acquired_type_id
-                    )
-                  }
-                  className="assign-button text-black px-3 py-1 rounded border-0"
-                >
-                  Assign Trigger
-                </span>
-              ),
-            },
+            // {
+            //   field: "action",
+            //   headerName: "Action",
+            //   width: 150,
+            //   renderCell: (params) => (
+            //     <span
+            //       onClick={() =>
+            //         handleOpenModel(
+            //           params?.row?.id,
+            //           true,
+            //           params?.row?.subscription_acquired_type_id
+            //         )
+            //       }
+            //       className="assign-button text-black px-3 py-1 rounded border-0"
+            //     >
+            //       Assign Trigger
+            //     </span>
+            //   ),
+            // },
           ]
         : []),
     ],

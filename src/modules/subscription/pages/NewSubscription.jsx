@@ -75,7 +75,7 @@ const SetAction = ({
   }, [subscription_acquired_type_id]);
   return (
     <>
-      <div className="col-12 d-flex my-2">
+      <div className="col-12 d-flex my-2 subscription-acquired">
         <div className="col-6 fw-bold">Subscription Acquired :</div>
         <div className="col-6">
           <Autocomplete

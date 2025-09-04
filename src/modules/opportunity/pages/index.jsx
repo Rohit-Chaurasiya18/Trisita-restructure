@@ -199,6 +199,14 @@ const Opportunity = () => {
         </div>
       ),
     },
+    {
+      field: "subscriptionReferenceNumbers",
+      headerName: "Subscription Reference Numbers",
+      width: 250,
+      renderCell: (parmas) => (
+        <div>{parmas?.value?.length > 0 ? parmas?.value?.join(", ") : ""}</div>
+      ),
+    },
     { field: "total_quantity", headerName: "Quantity", width: 100 },
     { field: "contract_number", headerName: "Contract Number", width: 150 },
     {

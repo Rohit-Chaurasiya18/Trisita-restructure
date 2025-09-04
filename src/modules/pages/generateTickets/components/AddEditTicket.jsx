@@ -13,6 +13,7 @@ import CommonTextareaField from "@/components/common/inputTextField/CommonTextar
 import { toast } from "react-toastify";
 import ImageVideoDropzone from "./ImageVideoDropzone";
 import CommonInputTextField from "@/components/common/inputTextField/CommonInputTextField";
+import Loader from "@/components/common/loaders/Loader";
 
 const validationSchema = Yup.object().shape({
   subscripitonReference: Yup.string().required(
@@ -25,7 +26,7 @@ const validationSchema = Yup.object().shape({
     .trim()
     .transform((v) => (v === "" ? undefined : v)) // treat empty as undefined
     .email("Enter a valid email") // only checks if provided
-    .notRequired(),
+    .required("Contact person email is required."),
 });
 
 const priorityList = [
@@ -64,7 +65,7 @@ const AddEditTicket = ({ handleClose }) => {
       formData.append("issue", values?.issueType);
       formData.append("message", values?.issueDescription);
       formData.append("priority", values?.priority);
-      formData.append("contact_person_name", values?.contact_person_name);
+      formData.append("contect_person_name", values?.contact_person_name);
       formData.append("contect_person_phone", values?.contect_person_phone);
       formData.append("contect_person_email", values?.contect_person_email);
       values?.files?.map((file, index) => formData.append(`ticketimage`, file));
@@ -108,6 +109,7 @@ const AddEditTicket = ({ handleClose }) => {
   };
   return (
     <div className="">
+      {isSubmitting && <Loader />}
       <form className="pb-5" onSubmit={handleSubmit}>
         <CommonInputTextField
           labelName="Contact Person's Name"
@@ -151,6 +153,8 @@ const AddEditTicket = ({ handleClose }) => {
           }
           errorText={errors?.contect_person_email}
           onBlur={handleBlur}
+          required
+          requiredText
         />
         <CustomSelect
           label="Subscripiton Reference"

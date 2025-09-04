@@ -161,7 +161,7 @@
 
 // New Subscription Page
 .new-subs-amountPerMonth {
-  .insight-metrics-chart{
+  .insight-metrics-chart {
     width: 100% !important;
   }
 }
@@ -262,6 +262,19 @@
   gap: 10px;
   @media (max-width: 985px) {
     display: grid;
-    
+  }
+}
+.subscription-acquired {
+  @media (max-width: 995px) {
+    & .MuiAutocomplete-root {
+      width: 100% !important;
+    }
+  }
+  @media (max-width: 375px) {
+    display: grid !important;
+    gap: 10px;
+    .col-6 {
+      width: 100% !important;
+    }
   }
 }

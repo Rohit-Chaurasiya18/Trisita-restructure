@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { getTicketDetails, sendTicketMessage } from "../../slice";
+import { useNavigate, useParams } from "react-router-dom";
+import { getTicketDetails, markAsClosed, sendTicketMessage } from "../../slice";
 
 // MUI Timeline imports
 import Timeline from "@mui/lab/Timeline";
@@ -16,13 +16,20 @@ import { Button, TextField } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { toast } from "react-toastify";
 import { somethingWentWrong } from "@/constants/SchemaValidation";
+import CommonButton from "@/components/common/buttons/CommonButton";
+import routesConstants from "@/routes/routesConstants";
+import { userType } from "@/constants";
 
 const ViewTicket = () => {
   const dispatch = useDispatch();
-  const { ticketDetails, ticketDetailsLoading } = useSelector((state) => ({
-    ticketDetails: state.pages.ticketDetails,
-    ticketDetailsLoading: state.pages.ticketDetailsLoading,
-  }));
+  const navigate = useNavigate();
+  const { ticketDetails, ticketDetailsLoading, userDetail } = useSelector(
+    (state) => ({
+      ticketDetails: state.pages.ticketDetails,
+      ticketDetailsLoading: state.pages.ticketDetailsLoading,
+      userDetail: state?.login?.userDetail,
+    })
+  );
   const { ticketId } = useParams();
   const [message, setMessage] = useState("");
 
@@ -91,14 +98,32 @@ const ViewTicket = () => {
           {/* Ticket Card */}
           <div className="row g-0 border rounded shadow-sm">
             <div className="col-md-12 border-end p-3 bg-light">
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex justify-content-between align-items-center flex-wrap">
                 <h6 className="fw-bold text-primary">
                   Ticket Number#:{" "}
                   <span className="text-dark">{ticketDetails?.ticket_no}</span>
                 </h6>
-                <span className="badge bg-light text-danger border border-danger">
-                  {ticketDetails?.ticket_status}
-                </span>
+                <div className="d-flex gap-3 flex-wrap align-items-center">
+                  <span className="badge bg-light text-danger border border-danger">
+                    {ticketDetails?.ticket_level}
+                  </span>
+                  {ticketDetails?.ticket_status !== "closed" &&
+                    userDetail?.user_type !== userType.client && (
+                      <CommonButton
+                        className="closed-ticket"
+                        onClick={() => {
+                          dispatch(markAsClosed(ticketId)).then((res) => {
+                            if (res?.payload?.status === 200) {
+                              toast.success("Ticket closed successfully.");
+                              navigate(routesConstants.GENERATE_TICKET);
+                            }
+                          });
+                        }}
+                      >
+                        Mark as closed
+                      </CommonButton>
+                    )}
+                </div>
               </div>
 
               <div className="d-flex justify-content-between flex-wrap">

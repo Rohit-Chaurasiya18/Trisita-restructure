@@ -3,11 +3,13 @@ import CommonModal from "@/components/common/modal/CommonModal";
 import { useEffect, useState } from "react";
 import AddEditTicket from "../components/AddEditTicket";
 import { useDispatch, useSelector } from "react-redux";
-import { getTicketList } from "../../slice";
+import { getTicketList, regenerateTicket } from "../../slice";
 import SkeletonLoader from "@/components/common/loaders/Skeleton";
 import CommonTable from "@/components/common/dataTable/CommonTable";
 import routesConstants from "@/routes/routesConstants";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import CustomSweetAlert from "@/components/common/customSweetAlert/CustomSweetAlert";
 
 const GenerateTicket = () => {
   const dispatch = useDispatch();
@@ -39,6 +41,8 @@ const GenerateTicket = () => {
     { field: "productLine", headerName: "Product Line", width: 250 },
     { field: "ticket_raised_by_name", headerName: "Raised By", width: 200 },
     { field: "priority", headerName: "Priority", width: 200 },
+    { field: "escalation_level", headerName: "Escalation level", width: 200 },
+
     { field: "account_name", headerName: "Account Name", width: 200 },
     { field: "issue_name", headerName: "Issue", width: 200 },
     { field: "ticket_status", headerName: "Status", width: 200 },
@@ -53,7 +57,7 @@ const GenerateTicket = () => {
               navigate(`${routesConstants?.GENERATE_TICKET}/${params?.id}`)
             }
             // target="_blank"
-            className="text-decoration-underline cursor-pointer text-primary" 
+            className="text-decoration-underline cursor-pointer text-primary"
           >
             View Progress
           </a>
@@ -62,13 +66,54 @@ const GenerateTicket = () => {
     },
     {
       field: "sla_resolution_due",
-      headerName: "Service Time",
+      headerName: "Service Time (in Minutes)",
       width: 200,
     },
     {
       field: "sla_response_due",
-      headerName: "Response Time",
+      headerName: "Response Time (in Minutes)",
       width: 200,
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 200,
+      renderCell: (params) => {
+        return (
+          params?.row?.ticket_status === "Closed" && (
+            <span
+              onClick={() => {
+                CustomSweetAlert(
+                  "Regenerate Ticket?",
+                  `Are you sure you want to regenerate this ticket?`,
+                  "Warning",
+                  true,
+                  "Yes, Regenerate Ticket",
+                  "Cancel",
+                  (result) => {
+                    if (result.isConfirmed) {
+                      dispatch(regenerateTicket(params?.row?.id)).then(
+                        (res) => {
+                          if (
+                            res?.payload?.status === 200 ||
+                            res?.payload?.status === 201
+                          ) {
+                            dispatch(getTicketList());
+                            toast.success("Ticket regenerated successfully.");
+                          }
+                        }
+                      );
+                    }
+                  }
+                );
+              }}
+              className="assign-button text-black px-3 py-2 rounded border-0"
+            >
+              Regenerate Ticket
+            </span>
+          )
+        );
+      },
     },
   ];
 
