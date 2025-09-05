@@ -148,3 +148,4 @@ export const SEND_TICKET_MESSAGE = "/v1/api/get_ticket_chat_message/";
 export const LOCK_UNLOCK_OPPORTUNITY =
   "/v1/api/get_new_opportunity_lock_unlock/";
 export const REGENERATE_TICKET = "/v1/api/get_regenerate_ticket/";
+export const GET_LEARNING_LAB = "/v1/api/learninglabs/";

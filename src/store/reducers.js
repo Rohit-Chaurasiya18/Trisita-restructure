@@ -22,6 +22,7 @@ import LicenseOptimizationReducer from "@/modules/licenseOptimization/slice/Lice
 import CampaignReducer from "@/modules/data/campaign/slice/CampaignSlice";
 import superAdminConsoleReducer from "@/modules/superAdminConsole/slice/index";
 import pagesReducer from "@/modules/pages/slice/index";
+import knowledgePortalReducer from "@/modules/knowledgePortal/slice/index";
 
 const reducer = combineReducers({
   dashboard: dashboardReducer,
@@ -47,5 +48,6 @@ const reducer = combineReducers({
   Campaign: CampaignReducer,
   superAdminConsole: superAdminConsoleReducer,
   pages: pagesReducer,
+  knowledgePortal: knowledgePortalReducer,
 });
 export default reducer;

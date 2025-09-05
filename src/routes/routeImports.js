@@ -170,3 +170,13 @@ export const GenerateTicket = lazy(() =>
 export const ViewTicket = lazy(() =>
   import("@/modules/pages/generateTickets/components/ViewTicket")
 );
+export const LearningLab = lazy(() =>
+  import("@/modules/knowledgePortal/pages/learningLab/pages/index")
+);
+export const ViewLearningLab = lazy(() =>
+  import("@/modules/knowledgePortal/pages/learningLab/pages/ViewLearningLab")
+);
+
+export const ProductKnowledge = lazy(() =>
+  import("@/modules/knowledgePortal/pages/productKnowledge/pages/index")
+);

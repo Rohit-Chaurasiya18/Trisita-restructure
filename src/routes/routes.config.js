@@ -58,6 +58,9 @@ import {
   Calendar,
   GenerateTicket,
   ViewTicket,
+  LearningLab,
+  ViewLearningLab,
+  ProductKnowledge,
 } from "./routeImports";
 import { Outlet } from "react-router-dom";
 import { userType } from "@/constants";
@@ -613,15 +616,37 @@ const routesConfig = {
     },
     {
       path: routesConstants.LEARNING_LAB,
-      component: ComingSoon,
-      roles: [userType.client],
+      component: Outlet,
+      roles: [userType.client, userType.superadmin],
       moduleId: moduleId.LearningLab,
+      children: [
+        {
+          index: true,
+          component: LearningLab,
+          roles: [userType.client, userType.superadmin],
+          moduleId: moduleId.LearningLab,
+        },
+        {
+          path: ":learningLabId",
+          component: ViewLearningLab,
+          roles: [userType.client, userType.superadmin],
+          moduleId: moduleId.LearningLab,
+        },
+      ],
     },
     {
       path: routesConstants.PRODUCT_KNOWLEDGE,
-      component: ComingSoon,
-      roles: [userType.client],
+      component: Outlet,
+      roles: [userType.client, userType.superadmin],
       moduleId: moduleId.ProductKnowledge,
+      children: [
+        {
+          index: true,
+          component: ProductKnowledge,
+          roles: [userType.client, userType.superadmin],
+          moduleId: moduleId.ProductKnowledge,
+        },
+      ],
     },
     {
       path: routesConstants.TRAINING_SESSION,

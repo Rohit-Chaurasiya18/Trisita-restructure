@@ -1780,6 +1780,16 @@ const Subscription = () => {
     setSubSegmentType(viewType);
   };
 
+  const filteredAccountList = useMemo(
+    () =>
+      account_list?.filter((item) =>
+        subscriptionData
+          ?.map((item) => item?.account_name)
+          ?.includes(item?.label)
+      ),
+    [subscriptionData]
+  );
+
   return (
     <>
       <div>
@@ -1863,7 +1873,7 @@ const Subscription = () => {
                   }));
                 }}
                 options={
-                  account_list?.filter(
+                  filteredAccountList?.filter(
                     (item) =>
                       !filters?.account
                         ?.map((i) => i?.value)

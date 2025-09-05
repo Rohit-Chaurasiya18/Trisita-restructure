@@ -386,7 +386,7 @@ const NewSubscription = () => {
         headerName: "Created Date",
         width: 130,
         renderCell: ({ value }) => (
-          <span>{new Date(value).toLocaleDateString()}</span>
+          <span>{value ? moment(value).format("DD/MM/YYYY") : "N/A"}</span>
         ),
       },
       ...(userDetail?.user_type !== userType.client

@@ -410,7 +410,7 @@ export const navLinks = [
   {
     name: "Knowledge Portal",
     isLabel: true,
-    roles: [userType.client],
+    roles: [userType.client, userType.superadmin],
     modules: [
       moduleId.LearningLab,
       moduleId.ProductKnowledge,
@@ -421,21 +421,21 @@ export const navLinks = [
         itemName: "Learning Lab",
         href: routesConstants?.LEARNING_LAB,
         iconUrl: <PersonOutlinedIcon />,
-        roles: [userType.client],
+        roles: [userType.client, userType.superadmin],
         moduleId: moduleId.LearningLab,
       },
       {
         itemName: "Product Knowledge",
         href: routesConstants?.PRODUCT_KNOWLEDGE,
         iconUrl: <PersonOutlinedIcon />,
-        roles: [userType.client],
+        roles: [userType.client, userType.superadmin],
         moduleId: moduleId.ProductKnowledge,
       },
       {
         itemName: "Request Training Session",
         href: routesConstants?.TRAINING_SESSION,
         iconUrl: <CalendarTodayOutlinedIcon />,
-        roles: [userType.client],
+        roles: [userType.client, userType.superadmin],
         moduleId: moduleId.RequestTrainingSession,
       },
     ],

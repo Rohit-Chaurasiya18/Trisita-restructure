@@ -250,7 +250,7 @@ const ChangedLogSubscription = () => {
         headerName: "Created Date",
         width: 200,
         renderCell: ({ value }) => (
-          <span>{new Date(value).toLocaleDateString()}</span>
+          <span>{value ? moment(value).format("DD/MM/YYYY") : "N/A"}</span>
         ),
       },
     ],
