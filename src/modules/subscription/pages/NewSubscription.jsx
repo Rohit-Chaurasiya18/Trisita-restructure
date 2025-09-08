@@ -1616,6 +1616,7 @@ const NewSubscription = () => {
                   branch: null,
                   status: "All Status",
                   startDate: null,
+                  subscriptionAcquire: "All",
                   endDate: null,
                 });
                 setDateRange([null, null]);
