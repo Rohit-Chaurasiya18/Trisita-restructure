@@ -106,7 +106,6 @@ const LearningLab = () => {
   useEffect(() => {
     dispatch(getLearningLab());
   }, []);
-  console.log(learningLabList, learningLabListLoading);
   return (
     <>
       {learningLabListLoading ? (
@@ -122,7 +121,16 @@ const LearningLab = () => {
           <div className="learning-lab-container">
             {learningLabList?.map((workflow, index) => {
               return (
-                <div key={index} className="event-card">
+                <div
+                  key={index}
+                  className="event-card"
+                  onClick={() => {
+                    window.open(
+                      `${routesConstants.LEARNING_LAB}/${workflow?.id}`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <div className="image-container">
                     <img
                       src={workflow?.image}
@@ -131,20 +139,19 @@ const LearningLab = () => {
                     />
                   </div>
                   <div className="card-content">
-                    <h3 className="event-title">
-                      {workflow?.product}
-                    </h3>
+                    <h3 className="event-title">{workflow?.product}</h3>
                     <p className="event-description">
                       Explore the key products and workflows used in the{" "}
-                      {workflow.subcategories_name} industry, as detailed in the Autodesk
-                      documentation.
+                      {workflow.subcategories_name} industry, as detailed in the
+                      Autodesk documentation.
                     </p>
                     <button
                       className="more-button"
                       aria-label="Learn more"
                       onClick={() => {
-                        navigate(
-                          `${routesConstants.LEARNING_LAB}/${workflow?.id}`
+                        window.open(
+                          `${routesConstants.LEARNING_LAB}/${workflow?.id}`,
+                          "_blank"
                         );
                       }}
                     >

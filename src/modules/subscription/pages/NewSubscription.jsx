@@ -382,6 +382,12 @@ const NewSubscription = () => {
         renderCell: ({ value }) => <div>{value}</div>,
       },
       {
+        field: "prorata_order",
+        headerName: "Prodata Order",
+        width: 250,
+        renderCell: ({ value }) => <div>{value}</div>,
+      },
+      {
         field: "created_date",
         headerName: "Created Date",
         width: 130,
@@ -397,6 +403,7 @@ const NewSubscription = () => {
               headerName: "Subscription Acquired Type",
               width: 200,
             },
+            
             {
               field: "acv_price",
               headerName: "Total ACV Price",

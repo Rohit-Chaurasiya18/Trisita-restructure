@@ -16,10 +16,23 @@ export const getLearningLab = createAsyncThunk(
     }
   }
 );
-
+export const viewLearningLab = createAsyncThunk(
+  `knowledgePortal/viewLearningLab`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.get(GET_LEARNING_LAB + `${payload}/`);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
 const knowledgePortalState = {
   learningLabList: [],
   learningLabListLoading: false,
+  learningLabDetail: null,
+  learningLabDetailLoading: false,
 };
 
 const knowledgePortalSlice = createSlice({
@@ -40,6 +53,21 @@ const knowledgePortalSlice = createSlice({
     builder.addCase(getLearningLab.rejected, (state, action) => {
       state.learningLabList = [];
       state.learningLabListLoading = false;
+    });
+
+    builder.addCase(viewLearningLab.pending, (state, action) => {
+      state.learningLabDetail = null;
+      state.learningLabDetailLoading = true;
+    });
+
+    builder.addCase(viewLearningLab.fulfilled, (state, action) => {
+      state.learningLabDetail = action.payload.data;
+      state.learningLabDetailLoading = false;
+    });
+
+    builder.addCase(viewLearningLab.rejected, (state, action) => {
+      state.learningLabDetail = [];
+      state.learningLabDetailLoading = false;
     });
   },
 });

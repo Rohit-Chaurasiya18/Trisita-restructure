@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Container,
   Typography,
@@ -24,6 +24,10 @@ import ViewInArIcon from "@mui/icons-material/ViewInAr"; // Navisworks
 import TimelineIcon from "@mui/icons-material/Timeline"; // BIM 360
 import BuildIcon from "@mui/icons-material/Build"; // Autodesk Build
 import DescriptionIcon from "@mui/icons-material/Description"; // Autodesk Docs
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { viewLearningLab } from "@/modules/knowledgePortal/slice";
+import SkeletonLoader from "@/components/common/loaders/Skeleton";
 
 const products = [
   {
@@ -59,75 +63,93 @@ const products = [
 ];
 
 const ViewLearningLab = () => {
+  const dispatch = useDispatch();
+  const { learningLabId } = useParams();
+  const { learningLabDetail, learningLabDetailLoading } = useSelector(
+    (state) => ({
+      learningLabDetail: state?.knowledgePortal?.learningLabDetail,
+      learningLabDetailLoading:
+        state?.knowledgePortal?.learningLabDetailLoading,
+    })
+  );
+  useEffect(() => {
+    dispatch(viewLearningLab(learningLabId));
+  }, [learningLabId]);
   return (
     <>
-      <div className="mb-4">
-        <div className="commom-header-title mb-0">View Learning Lab</div>
-        <span className="common-breadcrum-msg">View the learning lab</span>
-      </div>
-      <div>
-        {/* Header */}
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Engineering, Procurement & Construction (EPC)
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Key Products:
-        </Typography>
-        <Box sx={{ mb: 4 }}>
-          {products.map((p) => (
-            <Chip
-              key={p.name}
-              label={p.name}
-              color="primary"
-              variant="outlined"
-              sx={{ mr: 1, mb: 1 }}
-            />
-          ))}
-        </Box>
+      {learningLabDetailLoading ? (
+        <SkeletonLoader />
+      ) : (
+        <>
+          <div className="mb-4">
+            <div className="commom-header-title mb-0">View Learning Lab</div>
+            <span className="common-breadcrum-msg">View the learning lab</span>
+          </div>
+          <div>
+            {/* Header */}
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              {learningLabDetail?.product || "N/A"}
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              Key Products:
+            </Typography>
+            <Box sx={{ mb: 4 }}>
+              {learningLabDetail?.subcategories?.map((p) => (
+                <Chip
+                  key={p.name}
+                  label={p.name}
+                  color="primary"
+                  variant="outlined"
+                  sx={{ mr: 1, mb: 1 }}
+                />
+              ))}
+            </Box>
 
-        {/* Workflow Timeline */}
-        <Typography variant="h5" gutterBottom>
-          Workflow
-        </Typography>
-        <Timeline position="alternate">
-          {products.map((p, index) => (
-            <TimelineItem key={index}>
-              <TimelineSeparator>
-                <TimelineDot color="primary" />
-                {index < products.length - 1 && <TimelineConnector />}
-              </TimelineSeparator>
-              <TimelineContent>
-                <Typography variant="h6">{p.name}</Typography>
-                <Typography color="text.secondary">{p.desc}</Typography>
-              </TimelineContent>
-            </TimelineItem>
-          ))}
-        </Timeline>
+            {/* Workflow Timeline */}
+            <Typography variant="h5" gutterBottom>
+              Workflow
+            </Typography>
+            <Timeline position="alternate">
+              {learningLabDetail?.subcategories?.map((p, index) => (
+                <TimelineItem key={index}>
+                  <TimelineSeparator>
+                    <TimelineDot color="primary" />
+                    {index < learningLabDetail?.subcategories?.length - 1 && <TimelineConnector />}
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <Typography variant="h6">{p.name}</Typography>
+                    <Typography color="text.secondary">{p.description}</Typography>
+                  </TimelineContent>
+                </TimelineItem>
+              ))}
+            </Timeline>
 
-        {/* Product Cards */}
-        <Typography variant="h5" sx={{ mt: 6, mb: 2 }}>
-          Product Details
-        </Typography>
-        <Grid container spacing={3}>
-          {products.map((p) => (
-            <Grid item xs={12} sm={6} md={4} key={p.name}>
-              <Card
-                sx={{
-                  transition: "0.3s",
-                  "&:hover": { transform: "scale(1.05)", boxShadow: 6 },
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">
-                    {p.name}
-                  </Typography>
-                  <Typography color="text.secondary">{p.desc}</Typography>
-                </CardContent>
-              </Card>
+            {/* Product Cards */}
+            <Typography variant="h5" sx={{ mt: 6, mb: 2 }}>
+              Product Details
+            </Typography>
+            <Grid container spacing={3}>
+              {learningLabDetail?.subcategories?.map((p) => (
+                <Grid item xs={12} sm={6} md={4} key={p.name}>
+                  <Card
+                    sx={{
+                      transition: "0.3s",
+                      "&:hover": { transform: "scale(1.05)", boxShadow: 6 },
+                    }}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" fontWeight="bold">
+                        {p.name}
+                      </Typography>
+                      <Typography color="text.secondary">{p.description}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
-      </div>
+          </div>
+        </>
+      )}
     </>
   );
 };
