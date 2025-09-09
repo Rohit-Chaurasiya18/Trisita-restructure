@@ -68,7 +68,37 @@ const OpportunityTab = ({ fields }) => {
   );
 };
 
-const tabConfig = [
+// 🔹 Function to dynamically generate line item fields
+const generateLineItemFields = (detail) => {
+  if (!detail?.line_items) return [];
+
+  return detail.line_items.map((_, idx) => ({
+    title: `Line Items ${idx + 1} Details`,
+    data: [
+      { label: "Serial#", path: ["line_items", idx, "serial_number"] },
+      { label: "Renewal SKU", path: ["line_items", idx, "renewal_sku"] },
+      {
+        label: "SKU Description",
+        path: ["line_items", idx, "sku_description"],
+      },
+      { label: "Seats", path: ["line_items", idx, "seats"] },
+      { label: "Deployment", path: ["line_items", idx, "deployment"] },
+      { label: "Status", path: ["line_items", idx, "status"] },
+      { label: "Asset Status", path: ["line_items", idx, "asset_status"] },
+      {
+        label: "Support Program",
+        path: ["line_items", idx, "support_program"],
+      },
+      {
+        label: "Program Eligibility",
+        path: ["line_items", idx, "program_eligibility"],
+      },
+      { label: "Renew", path: ["line_items", idx, "renew"] },
+    ],
+  }));
+};
+
+const baseTabConfig = [
   {
     id: "1",
     fields: [
@@ -178,35 +208,6 @@ const tabConfig = [
       },
     ],
   },
-  {
-    id: "5",
-    fields: [
-      {
-        title: "Line Items 1 Details",
-        data: [
-          { label: "Serial#", path: ["line_items", 0, "serial_number"] },
-          { label: "Renewal SKU", path: ["line_items", 0, "renewal_sku"] },
-          {
-            label: "SKU Description",
-            path: ["line_items", 0, "sku_description"],
-          },
-          { label: "Seats", path: ["line_items", 0, "seats"] },
-          { label: "Deployment", path: ["line_items", 0, "deployment"] },
-          { label: "Status", path: ["line_items", 0, "status"] },
-          { label: "Asset Status", path: ["line_items", 0, "asset_status"] },
-          {
-            label: "Support Program",
-            path: ["line_items", 0, "support_program"],
-          },
-          {
-            label: "Program Eligibility",
-            path: ["line_items", 0, "program_eligibility"],
-          },
-          { label: "Renew", path: ["line_items", 0, "renew"] },
-        ],
-      },
-    ],
-  },
 ];
 
 const OpportunityDetail = ({ id }) => {
@@ -214,11 +215,23 @@ const OpportunityDetail = ({ id }) => {
   const tabRefs = useRef([]);
   const [activeTab, setActiveTab] = useState("1");
 
+  const { opportunityDetail } = useSelector((state) => state.opportunity);
+  const detail = opportunityDetail?.message?.[0];
+
   useEffect(() => {
     if (id) {
       dispatch(getOpportunityDetail(id));
     }
   }, [id]);
+
+  // 🔹 Add dynamic line items tab
+  const dynamicTabConfig = [
+    ...baseTabConfig,
+    {
+      id: "5",
+      fields: generateLineItemFields(detail),
+    },
+  ];
 
   useEffect(() => {
     const activeLabel = tabRefs.current.find(
@@ -262,7 +275,9 @@ const OpportunityDetail = ({ id }) => {
       </div>
       <div className="main-container-alertSubscription end-customer-details">
         <OpportunityTab
-          fields={tabConfig.find((tab) => tab.id === activeTab)?.fields || []}
+          fields={
+            dynamicTabConfig.find((tab) => tab.id === activeTab)?.fields || []
+          }
         />
       </div>
     </>
