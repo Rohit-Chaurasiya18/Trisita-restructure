@@ -1,9 +1,11 @@
+import { somethingWentWrong } from "@/constants/SchemaValidation";
 import { axiosReact } from "@/services/api";
 import {
   ACTIVE_PRODUCT_MASTER,
   GET_ACCOUNT_BY_BD_PERSON,
   GET_BD_PERSON_BY_BRANCH,
   GET_ORDER_LOADING_HO,
+  GET_ORDER_LOADING_HO_LISTING,
 } from "@/services/url";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
@@ -12,7 +14,7 @@ export const getOrderLoadingHOList = createAsyncThunk(
   `orderLoadingApi/getOrderLoadingHOList`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_ORDER_LOADING_HO);
+      const response = await axiosReact.get(GET_ORDER_LOADING_HO_LISTING);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);
@@ -63,12 +65,27 @@ export const getActiveProductMaster = createAsyncThunk(
   }
 );
 
-//
 export const addOrderLoadingHO = createAsyncThunk(
   `orderLoadingApi/addOrderLoadingHO`,
   async (payload, thunkAPI) => {
     try {
       const response = await axiosReact.post(GET_ORDER_LOADING_HO, payload);
+      return response;
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || somethingWentWrong);
+      return thunkAPI.rejectWithValue(err?.response?.data?.statusCode);
+    }
+  }
+);
+
+export const updateOrderLoadingHO = createAsyncThunk(
+  `orderLoadingApi/updateOrderLoadingHO`,
+  async (payload, thunkAPI) => {
+    try {
+      const response = await axiosReact.put(
+        GET_ORDER_LOADING_HO + `${payload?.id}/`,
+        payload?.formData
+      );
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

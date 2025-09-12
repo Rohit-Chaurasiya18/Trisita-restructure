@@ -6,6 +6,7 @@ import {
   GET_DELETED_COUNT,
   GET_INVOICE_PENDING_LIST,
   GET_ORDER_LOADING_HO,
+  GET_ORDER_LOADING_HO_LISTING,
   GET_PAYMENTS_OUTSTANDING_LIST,
   GET_PAYMENTS_OVERDUE_LIST,
   GET_RENEWAL_DUE,
@@ -97,7 +98,7 @@ export const getOrderLoadingPo = createAsyncThunk(
   `dashboard/getOrderLoadingPo`,
   async (payload, thunkAPI) => {
     try {
-      const response = await axiosReact.get(GET_ORDER_LOADING_HO + payload);
+      const response = await axiosReact.get(GET_ORDER_LOADING_HO_LISTING + payload);
       return response;
     } catch (err) {
       toast.error(err?.response?.data?.detail || somethingWentWrong);

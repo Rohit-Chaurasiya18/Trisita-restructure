@@ -96,7 +96,12 @@ const OrderLoadingHOListing = () => {
                     navigate(
                       routesConstants?.ORDER_LOADING_PO +
                         routesConstants?.UPDATE_ORDER_LOADING_PO +
-                        `/${params?.id}`
+                        `/${params?.id}`,
+                      {
+                        state: {
+                          user: params?.row?.user_type,
+                        },
+                      }
                     )
                 : null
             }

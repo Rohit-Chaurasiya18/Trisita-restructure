@@ -38,7 +38,7 @@ const OrderLoadingHO = () => {
                 routesConstants?.ADD_ORDER_LOADING_PO,
               {
                 state: {
-                  user: newValue,
+                  user: newValue?.value,
                 },
               }
             );
